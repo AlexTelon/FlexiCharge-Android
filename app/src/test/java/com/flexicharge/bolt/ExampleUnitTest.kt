@@ -1,4 +1,4 @@
-package com.example.bolt
+package com.flexicharge.bolt
 
 import org.junit.Test
 
