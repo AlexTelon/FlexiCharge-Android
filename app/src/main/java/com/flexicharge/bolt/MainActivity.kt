@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
-import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.widget.Toast
@@ -73,9 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
         editTextInput5.doOnTextChanged { _, _, _, count ->
             if (count == 1) editTextInput6.requestFocus()
-        //validateConnectionToFakeAPI()
-        validateConnectionToMockDataApi()
-
+        }
     }
 
     private fun validateConnectionToMockDataApi() {
@@ -87,20 +84,22 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val chargerId = response.body() as FakeJsonResponse
                     Log.d("validateConnection", "Connected to charger " + chargerId.id)
-                    lifecycleScope.launch(Dispatchers.Main)  {
-                        binding.mainActivityConnectedStatus.text = "Connected to charger " + chargerId.id
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.mainActivityConnectedStatus.text =
+                            "Connected to charger " + chargerId.id
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main)  {
-                        binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.mainActivityConnectedStatus.text =
+                            "Not connected to charger Kapp"
                     }
                 }
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Crashed with Exception")
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
-                lifecycleScope.launch(Dispatchers.Main)  {
+                lifecycleScope.launch(Dispatchers.Main) {
                     binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
                 }
             }
@@ -115,20 +114,21 @@ class MainActivity : AppCompatActivity() {
 
                 if (response.isSuccessful) {
                     Log.d("validateConnection", "Connected to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main)  {
+                    lifecycleScope.launch(Dispatchers.Main) {
                         binding.mainActivityConnectedStatus.text = "Connected to charger Kapp"
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main)  {
-                        binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.mainActivityConnectedStatus.text =
+                            "Not connected to charger Kapp"
                     }
                 }
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Crashed with Exception")
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
-                lifecycleScope.launch(Dispatchers.Main)  {
+                lifecycleScope.launch(Dispatchers.Main) {
                     binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
                 }
             }
