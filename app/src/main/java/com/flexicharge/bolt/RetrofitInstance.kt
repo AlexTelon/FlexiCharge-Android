@@ -17,7 +17,7 @@ class RetrofitInstance {
                 .build()
 
             Retrofit.Builder()
-                .baseUrl("https://jsonplaceholder.typicode.com/") // PLACEHOLDER URL!!!!!!!
+                .baseUrl("https://rawb.se") // PLACEHOLDER URL!!!!!!!
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()
