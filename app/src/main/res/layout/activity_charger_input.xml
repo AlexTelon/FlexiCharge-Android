@@ -9,81 +9,101 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="30dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/charger_input_status"
+        app:layout_constraintBottom_toTopOf="@+id/materialCardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
             android:id="@+id/charger_input_edit_text_1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:editable="true"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center"
             android:inputType="number"
-            android:text="1" />
+            android:maxLength="1"
+            android:text="1"
+            android:textSize="24sp" />
 
         <EditText
             android:id="@+id/charger_input_edit_text_2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:background="@color/white"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center"
             android:inputType="number"
-            android:text="2" />
+            android:maxLength="1"
+            android:text="2"
+            android:textSize="24sp" />
 
         <EditText
             android:id="@+id/charger_input_edit_text_3"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:editable="true"
-            android:text="3" />
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center"
+            android:maxLength="1"
+            android:text="3"
+            android:textSize="24sp" />
 
         <EditText
             android:id="@+id/charger_input_edit_text_4"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:editable="true"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center"
             android:inputType="number"
-            android:text="4" />
+            android:maxLength="1"
+            android:text="4"
+            android:textSize="24sp" />
 
         <EditText
             android:id="@+id/charger_input_edit_text_5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:editable="true"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center"
             android:inputType="number"
-            android:text="5" />
+            android:text="5"
+            android:textSize="24sp" />
 
         <EditText
             android:id="@+id/charger_input_edit_text_6"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:editable="true"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center"
             android:inputType="number"
-            android:text="6" />
+            android:text="6"
+            android:textSize="24sp" />
 
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="50dp"
+        android:layout_marginBottom="25dp"
+        app:cardBackgroundColor="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,8 +114,11 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:background="@android:color/transparent"
             android:gravity="center"
-            android:text="Charger Occupied"
+            android:text="@string/charger_status_enter_code"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout" />

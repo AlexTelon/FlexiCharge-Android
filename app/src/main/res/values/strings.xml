@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Bolt</string>
+    <string name="charger_status_occupied">Charger is occupied</string>
+    <string name="charger_status_enter_code">Enter the Code Written on the Charger</string>
 </resources>
