@@ -8,24 +8,30 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
+import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val button = findViewById<Button>(R.id.button)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        button.setOnClickListener {
+        binding.button.setOnClickListener {
             setupChargerInput()
         }
 
     }
+
     private fun setupChargerInput() {
 
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
         )
+
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
             R.layout.layout_charger_input,
             findViewById<ConstraintLayout>(R.id.chargerInputLayout)
