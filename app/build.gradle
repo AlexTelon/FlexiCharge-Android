@@ -56,8 +56,7 @@ dependencies {
     // okHttpLoggingInterceptor
     implementation 'com.squareup.okhttp3:logging-interceptor:4.2.1'
     // ViewmodelScope and RuntimeScope
-    def arch_version = '2.2.0-alpha01'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$arch_version"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$arch_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
 
 }
