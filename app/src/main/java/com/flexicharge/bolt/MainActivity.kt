@@ -2,6 +2,13 @@ package com.flexicharge.bolt
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.doOnTextChanged
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -20,9 +27,52 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //validateConnectionToFakeAPI()
-        validateConnectionToMockDataApi()
+        binding.button.setOnClickListener {
+            setupChargerInput()
+        }
 
+    }
+
+    private fun setupChargerInput() {
+
+        val bottomSheetDialog = BottomSheetDialog(
+            this@MainActivity, R.style.BottomSheetDialogTheme
+        )
+
+        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
+            R.layout.layout_charger_input,
+            findViewById<ConstraintLayout>(R.id.chargerInputLayout)
+        )
+
+        setupChargerInputFocus(bottomSheetView)
+
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
+    }
+
+    private fun setupChargerInputFocus(view: View) {
+        val editTextInput1 = view.findViewById<EditText>(R.id.charger_input_edit_text_1)
+        val editTextInput2 = view.findViewById<EditText>(R.id.charger_input_edit_text_2)
+        val editTextInput3 = view.findViewById<EditText>(R.id.charger_input_edit_text_3)
+        val editTextInput4 = view.findViewById<EditText>(R.id.charger_input_edit_text_4)
+        val editTextInput5 = view.findViewById<EditText>(R.id.charger_input_edit_text_5)
+        val editTextInput6 = view.findViewById<EditText>(R.id.charger_input_edit_text_6)
+
+        editTextInput1.doOnTextChanged { _, _, _, count ->
+            if (count == 1) editTextInput2.requestFocus()
+        }
+        editTextInput2.doOnTextChanged { _, _, _, count ->
+            if (count == 1) editTextInput3.requestFocus()
+        }
+        editTextInput3.doOnTextChanged { _, _, _, count ->
+            if (count == 1) editTextInput4.requestFocus()
+        }
+        editTextInput4.doOnTextChanged { _, _, _, count ->
+            if (count == 1) editTextInput5.requestFocus()
+        }
+        editTextInput5.doOnTextChanged { _, _, _, count ->
+            if (count == 1) editTextInput6.requestFocus()
+        }
     }
 
     private fun validateConnectionToMockDataApi() {
@@ -34,20 +84,22 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val chargerId = response.body() as FakeJsonResponse
                     Log.d("validateConnection", "Connected to charger " + chargerId.id)
-                    lifecycleScope.launch(Dispatchers.Main)  {
-                        binding.mainActivityConnectedStatus.text = "Connected to charger " + chargerId.id
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.mainActivityConnectedStatus.text =
+                            "Connected to charger " + chargerId.id
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main)  {
-                        binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.mainActivityConnectedStatus.text =
+                            "Not connected to charger Kapp"
                     }
                 }
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Crashed with Exception")
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
-                lifecycleScope.launch(Dispatchers.Main)  {
+                lifecycleScope.launch(Dispatchers.Main) {
                     binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
                 }
             }
@@ -62,20 +114,21 @@ class MainActivity : AppCompatActivity() {
 
                 if (response.isSuccessful) {
                     Log.d("validateConnection", "Connected to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main)  {
+                    lifecycleScope.launch(Dispatchers.Main) {
                         binding.mainActivityConnectedStatus.text = "Connected to charger Kapp"
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main)  {
-                        binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.mainActivityConnectedStatus.text =
+                            "Not connected to charger Kapp"
                     }
                 }
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Crashed with Exception")
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
-                lifecycleScope.launch(Dispatchers.Main)  {
+                lifecycleScope.launch(Dispatchers.Main) {
                     binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
                 }
             }

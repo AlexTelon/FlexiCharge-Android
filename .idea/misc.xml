@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/rounded_edittext.xml" value="1.0214285714285714" />
+        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_charger_id.xml" value="0.3333333333333333" />
+        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_charger_input.xml" value="0.22" />
+        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.14666666666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.3307291666666667" />
       </map>
     </option>
