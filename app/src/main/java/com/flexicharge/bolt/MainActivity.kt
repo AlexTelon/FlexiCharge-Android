@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         else {
                             chargerInputStatus.text = "Charger " + chargerId.id + " is busy"
-                            chargerInputStatus.setBackgroundResource(R.color.green)
+                            chargerInputStatus.setBackgroundResource(R.color.red)
                         }
                     }
                 } else {
