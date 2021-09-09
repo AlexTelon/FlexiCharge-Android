@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         binding.button.setOnClickListener {
             setupChargerInput()
         }
-
     }
 
     private fun setupChargerInput() {
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         setupChargerInputFocus(bottomSheetView)
-        setupChargerIdValidator(bottomSheetView)
+        setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
     }
@@ -74,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupChargerIdValidator(view: View) {
+    private fun setupChargerInputCompletion(view: View) {
         val editTextInput1 = view.findViewById<EditText>(R.id.charger_input_edit_text_1)
         val editTextInput2 = view.findViewById<EditText>(R.id.charger_input_edit_text_2)
         val editTextInput3 = view.findViewById<EditText>(R.id.charger_input_edit_text_3)
@@ -82,63 +81,47 @@ class MainActivity : AppCompatActivity() {
         val editTextInput5 = view.findViewById<EditText>(R.id.charger_input_edit_text_5)
         val editTextInput6 = view.findViewById<EditText>(R.id.charger_input_edit_text_6)
         val chargerInputStatus = view.findViewById<TextView>(R.id.charger_input_status)
-        editTextInput6.doOnTextChanged { _, _, _, count ->
-            //if (count == 1) editTextInput6.requestFocus()
+        editTextInput6.doOnTextChanged { _, _, _, _ ->
             var chargerId = (editTextInput1.text.toString() +
                     editTextInput2.text.toString() +
                     editTextInput3.text.toString() +
                     editTextInput4.text.toString() +
                     editTextInput5.text.toString() +
                     editTextInput6.text.toString())
-            chargerInputStatus.text = "Connected to " + chargerId
-            chargerInputStatus.setBackgroundResource(R.color.green)
-            //chargerInputStatus.setTextColor(resources.getColor(R.color.green))
-            validateConnectionToMockDataApi(chargerId)
-            Log.d("editTextInput6",chargerId)
+            if (validateChargerId(chargerId)) validateConnectionToMockDataApi(chargerId, chargerInputStatus)
+            else {
+                chargerInputStatus.text = "ChargerId has to consist of 6 digits"
+                chargerInputStatus.setBackgroundResource(R.color.red)
+            }
         }
     }
 
-
-
-/*    fun validateChargerIdInput(
-        chargerId: String
-    ): Boolean {
+    private fun validateChargerId(chargerId: String): Boolean {
         if(chargerId.length != 6) {
             return false
         }
         if(chargerId.count { it.isDigit() } != 6) {
             return false
         }
-        if(chargerId in occupiedChargerIds) {
-            return false
-        }
-        if(chargerId !in availableChargerIds) {
-            return false
-        }
-
         return true
-    }*/
+    }
 
-
-
-    private fun validateConnectionToMockDataApi(chargerId: String) {
+    private fun validateConnectionToMockDataApi(chargerId: String, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-
                 val response = RetrofitInstance.api.getMockApiData(chargerId)
-                Log.d("asdf", response.isSuccessful.toString())
                 if (response.isSuccessful) {
                     val chargerId = response.body() as FakeJsonResponse
                     Log.d("validateConnection", "Connected to charger " + chargerId.id)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        binding.mainActivityConnectedStatus.text =
-                            "Connected to charger " + chargerId.id
+                        chargerInputStatus.text = "Connected to charger " + chargerId.id
+                        chargerInputStatus.setBackgroundResource(R.color.green)
                     }
                 } else {
-                    Log.d("validateConnection", "Could not connect to charger Kapp")
+                    Log.d("validateConnection", "Could not connect to charger" + chargerId)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        binding.mainActivityConnectedStatus.text =
-                            "Not connected to charger Kapp"
+                        chargerInputStatus.text = "Charger does not exist"
+                        chargerInputStatus.setBackgroundResource(R.color.red)
                     }
                 }
             } catch (e: HttpException) {
@@ -146,36 +129,8 @@ class MainActivity : AppCompatActivity() {
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
                 lifecycleScope.launch(Dispatchers.Main) {
-                    binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
-                }
-            }
-        }
-    }
-
-
-    private fun validateConnectionToFakeAPI() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.api.getFakeApiData()
-
-                if (response.isSuccessful) {
-                    Log.d("validateConnection", "Connected to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        binding.mainActivityConnectedStatus.text = "Connected to charger Kapp"
-                    }
-                } else {
-                    Log.d("validateConnection", "Could not connect to charger Kapp")
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        binding.mainActivityConnectedStatus.text =
-                            "Not connected to charger Kapp"
-                    }
-                }
-            } catch (e: HttpException) {
-                Log.d("validateConnection", "Crashed with Exception")
-            } catch (e: IOException) {
-                Log.d("validateConnection", "You might not have internet connection")
-                lifecycleScope.launch(Dispatchers.Main) {
-                    binding.mainActivityConnectedStatus.text = "Not connected to charger Kapp"
+                    chargerInputStatus.text = "Unable to establish connection to charger"
+                    chargerInputStatus.setBackgroundResource(R.color.red)
                 }
             }
         }
