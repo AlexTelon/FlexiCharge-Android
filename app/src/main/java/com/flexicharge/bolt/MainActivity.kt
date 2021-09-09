@@ -114,13 +114,19 @@ class MainActivity : AppCompatActivity() {
                     val chargerId = response.body() as FakeJsonResponse
                     Log.d("validateConnection", "Connected to charger " + chargerId.id)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        chargerInputStatus.text = "Connected to charger " + chargerId.id
-                        chargerInputStatus.setBackgroundResource(R.color.green)
+                        if (chargerId.status == 1) {
+                            chargerInputStatus.text = "Connected to charger " + chargerId.id
+                            chargerInputStatus.setBackgroundResource(R.color.green)
+                        }
+                        else {
+                            chargerInputStatus.text = "Charger " + chargerId.id + " is busy"
+                            chargerInputStatus.setBackgroundResource(R.color.green)
+                        }
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger" + chargerId)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        chargerInputStatus.text = "Charger does not exist"
+                        chargerInputStatus.text = "Charger " + chargerId + " does not exist"
                         chargerInputStatus.setBackgroundResource(R.color.red)
                     }
                 }
@@ -129,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
                 lifecycleScope.launch(Dispatchers.Main) {
-                    chargerInputStatus.text = "Unable to establish connection to charger"
+                    chargerInputStatus.text = "Unable to establish connection"
                     chargerInputStatus.setBackgroundResource(R.color.red)
                 }
             }
