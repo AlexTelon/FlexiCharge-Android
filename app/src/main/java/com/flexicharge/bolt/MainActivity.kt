@@ -1,5 +1,7 @@
 package com.flexicharge.bolt
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,24 +12,35 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.databinding.ActivityMainBinding
+import com.flexicharge.bolt.databinding.ActivityMapsBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var mapsBinding : ActivityMapsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        mapsBinding = ActivityMapsBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         binding.button.setOnClickListener {
             setupChargerInput()
+        }
+
+        binding.mapsButton.setOnClickListener{
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
         }
     }
 
