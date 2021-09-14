@@ -11,11 +11,14 @@
         android:id="@+id/charger_input_list_recyclerview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="@+id/linearLayout"
         app:layout_constraintStart_toStartOf="@+id/linearLayout"
-        app:layout_constraintTop_toTopOf="@id/chargerInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/arrow"
         tools:listitem="@layout/charger_list_item" />
+
     <TextView
         android:id="@+id/chargers_near_me"
         android:layout_width="wrap_content"

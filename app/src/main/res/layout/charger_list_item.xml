@@ -12,7 +12,6 @@
         android:layout_marginEnd="32dp"
         android:text="Distans i nummer"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@id/charger_address"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +22,6 @@
         android:layout_marginStart="32dp"
         android:text="Gata"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/charger_distance"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

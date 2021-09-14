@@ -60,29 +60,31 @@ class MainActivity : AppCompatActivity() {
             findViewById<ConstraintLayout>(R.id.chargerInputLayout)
         )
 
-        setupChargerRecyclerView(bottomSheetView)
         val arrow = bottomSheetView.findViewById<ImageView>(R.id.arrow)
         arrow.setOnClickListener {
             displayChargerList(bottomSheetView,arrow)
         }
+
         setupChargerInputFocus(bottomSheetView)
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
     }
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
-        val recyclerViewPlaceholder = bottomSheetView.findViewById<TextView>(R.id.textView_recyclerviewPlaceholder)
+        val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
+        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
+        listOfChargersRecyclerView.adapter = ChargerListAdapter(chargerAddressList, chargerDistanceList, numberOfChargers)
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
-        if(recyclerViewPlaceholder.visibility == View.GONE){
+        if(listOfChargersRecyclerView.visibility == View.GONE){
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse) );
             TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, AutoTransition())
-            recyclerViewPlaceholder.visibility = View.VISIBLE
+            listOfChargersRecyclerView.visibility = View.VISIBLE
             chargersNearMe.visibility = View.GONE
         } else {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
             TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, AutoTransition())
-            recyclerViewPlaceholder.visibility = View.GONE
+            listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
         }
     }
@@ -94,12 +96,6 @@ class MainActivity : AppCompatActivity() {
             chargerDistanceList.add(i*100)
             numberOfChargers.add(i)
         }
-    }
-
-    private fun setupChargerRecyclerView(view: View) {
-        val listOfChargersRecyclerView = view.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
-        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
-        listOfChargersRecyclerView.adapter = ChargerListAdapter(chargerAddressList, chargerDistanceList, numberOfChargers)
     }
 
     private fun setupChargerInputFocus(view: View) {
