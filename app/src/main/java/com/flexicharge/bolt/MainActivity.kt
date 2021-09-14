@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         val editTextInput6 = view.findViewById<EditText>(R.id.charger_input_edit_text_6)
         val chargerInputStatus = view.findViewById<TextView>(R.id.charger_input_status)
         editTextInput6.doOnTextChanged { _, _, _, _ ->
-            var chargerId = (editTextInput1.text.toString() +
+            val chargerId = (editTextInput1.text.toString() +
                     editTextInput2.text.toString() +
                     editTextInput3.text.toString() +
                     editTextInput4.text.toString() +
