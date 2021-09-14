@@ -1,7 +1,9 @@
 package com.flexicharge.bolt
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
 
@@ -27,5 +29,6 @@ class RegisterSplashActivity : AppCompatActivity() {
     }
     fun continueAsGuest(view: View) {
         //Continue to MainActivity
+        startActivity(Intent(this, MainActivity::class.java))
     }
 }
