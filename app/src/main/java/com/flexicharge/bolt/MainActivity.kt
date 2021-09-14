@@ -111,15 +111,15 @@ class MainActivity : AppCompatActivity() {
             try {
                 val response = RetrofitInstance.api.getMockApiData(chargerId)
                 if (response.isSuccessful) {
-                    val chargerId = response.body() as FakeJsonResponse
-                    Log.d("validateConnection", "Connected to charger " + chargerId.id)
+                    val charger = response.body() as FakeJsonResponse
+                    Log.d("validateConnection", "Connected to charger " + charger.id)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        if (chargerId.status == 1) {
-                            chargerInputStatus.text = "Connected to charger " + chargerId.id
+                        if (charger.status == 1) {
+                            chargerInputStatus.text = "Connected to charger " + charger.id + "\n located at Long:" + charger.location.longitude + " Lat:" + charger.location.latitude
                             chargerInputStatus.setBackgroundResource(R.color.green)
                         }
                         else {
-                            chargerInputStatus.text = "Charger " + chargerId.id + " is busy"
+                            chargerInputStatus.text = "Charger " + charger.id + " is busy"
                             chargerInputStatus.setBackgroundResource(R.color.red)
                         }
                     }
