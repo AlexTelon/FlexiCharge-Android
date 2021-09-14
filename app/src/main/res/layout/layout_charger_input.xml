@@ -7,6 +7,16 @@
     android:layout_height="wrap_content"
     android:background="@color/dark_grey">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/charger_input_list_recyclerview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="@+id/linearLayout"
+        app:layout_constraintTop_toTopOf="@id/chargerInputLayout"
+        tools:listitem="@layout/charger_list_item" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"

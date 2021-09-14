@@ -11,6 +11,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.flexicharge.bolt.adapters.ChargerListAdapter
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,12 +22,19 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
+    private var chargerAddressList = mutableListOf<String>()
+    private var chargerDistanceList = mutableListOf<Int>()
+    private var numberOfChargers = mutableListOf<Int>()
+
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //Fill lists with trash data for now
+        addToList()
 
         binding.button.setOnClickListener {
             setupChargerInput()
@@ -42,10 +52,26 @@ class MainActivity : AppCompatActivity() {
             findViewById<ConstraintLayout>(R.id.chargerInputLayout)
         )
 
+        setupChargerRecyclerView(bottomSheetView)
         setupChargerInputFocus(bottomSheetView)
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+    }
+
+    //Delete later.
+    private fun addToList() {
+        for (i in 1..5) {
+            chargerAddressList.add("Kungsgatan 5")
+            chargerDistanceList.add(i*100)
+            numberOfChargers.add(i)
+        }
+    }
+
+    private fun setupChargerRecyclerView(view: View) {
+        val listOfChargersRecyclerView = view.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
+        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
+        listOfChargersRecyclerView.adapter = ChargerListAdapter(chargerAddressList, chargerDistanceList, numberOfChargers)
     }
 
     private fun setupChargerInputFocus(view: View) {
