@@ -11,12 +11,12 @@
         android:id="@+id/charger_input_list_recyclerview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="25dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/arrow"
+        app:layout_constraintTop_toBottomOf="@+id/chargers_near_me"
         tools:listitem="@layout/charger_list_item" />
 
     <TextView
@@ -34,22 +34,24 @@
         android:id="@+id/arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/ic_arrow_down_48"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_arrow_down_48" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="35dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/charger_input_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/charger_input_list_recyclerview">
+        app:layout_constraintTop_toBottomOf="@+id/charger_input_list_recyclerview">
 
         <EditText
             android:id="@+id/charger_input_edit_text_1"
@@ -139,7 +141,6 @@
         android:id="@+id/charger_input_status"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="25dp"
         android:layout_marginBottom="25dp"
         android:layout_weight="1"
         android:background="@android:color/transparent"
@@ -149,8 +150,7 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
