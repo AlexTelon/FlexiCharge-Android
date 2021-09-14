@@ -2,6 +2,8 @@ package com.flexicharge.bolt
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -9,6 +11,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
+import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,10 +61,30 @@ class MainActivity : AppCompatActivity() {
         )
 
         setupChargerRecyclerView(bottomSheetView)
+        val arrow = bottomSheetView.findViewById<ImageView>(R.id.arrow)
+        arrow.setOnClickListener {
+            displayChargerList(bottomSheetView,arrow)
+        }
         setupChargerInputFocus(bottomSheetView)
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+    }
+    private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
+        val recyclerViewPlaceholder = bottomSheetView.findViewById<TextView>(R.id.textView_recyclerviewPlaceholder)
+        val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
+
+        if(recyclerViewPlaceholder.visibility == View.GONE){
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse) );
+            TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, AutoTransition())
+            recyclerViewPlaceholder.visibility = View.VISIBLE
+            chargersNearMe.visibility = View.GONE
+        } else {
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
+            TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, AutoTransition())
+            recyclerViewPlaceholder.visibility = View.GONE
+            chargersNearMe.visibility = View.VISIBLE
+        }
     }
 
     //Delete later.
