@@ -3,6 +3,7 @@ package com.flexicharge.bolt
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.AutoTransition
+import android.transition.Fade
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -61,15 +62,14 @@ class MainActivity : AppCompatActivity() {
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
         val recyclerViewPlaceholder = bottomSheetView.findViewById<TextView>(R.id.textView_recyclerviewPlaceholder)
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
+        TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
 
         if(recyclerViewPlaceholder.visibility == View.GONE){
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse) );
-            TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, AutoTransition())
             recyclerViewPlaceholder.visibility = View.VISIBLE
             chargersNearMe.visibility = View.GONE
         } else {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
-            TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, AutoTransition())
             recyclerViewPlaceholder.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
         }
