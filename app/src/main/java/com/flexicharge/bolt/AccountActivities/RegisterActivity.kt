@@ -1,18 +1,18 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.AccountActivities
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
+import com.flexicharge.bolt.MainActivity
+import com.flexicharge.bolt.R
 
-class RegisterSplashActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register_splash)
+        setContentView(R.layout.activity_register)
     }
 
 
@@ -23,9 +23,11 @@ class RegisterSplashActivity : AppCompatActivity() {
         // Communicate with backend
         // Handle Backend Reply
         // Proceed to MainActivity upon confirmation
+        Toast.makeText(applicationContext, "TODO: Register Account!", Toast.LENGTH_SHORT).show()
     }
     fun goToSignIn(view: View) {
         //Go to sign in activity
+        startActivity(Intent(this, LoginActivity::class.java))
     }
     fun continueAsGuest(view: View) {
         //Continue to MainActivity

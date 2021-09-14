@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", false)
         if (!isGuest) {
-            startActivity(Intent(this, RegisterSplashActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
     }

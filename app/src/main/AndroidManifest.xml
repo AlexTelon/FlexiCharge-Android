@@ -12,10 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bolt">
         <activity
-            android:name=".RegisterSplashActivity"
+            android:name=".AccountActivities.ForgotPasswordActivity"
             android:exported="true" />
         <activity
-            android:name="com.flexicharge.bolt.MainActivity"
+            android:name=".AccountActivities.LoginActivity"
+            android:exported="true" />
+        <activity
+            android:name=".AccountActivities.RegisterActivity"
+            android:exported="true" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
