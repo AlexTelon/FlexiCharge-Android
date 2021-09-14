@@ -1,5 +1,7 @@
 package com.flexicharge.bolt
 
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,11 +27,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         binding.button.setOnClickListener {
             setupChargerInput()
         }
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val isGuest = sharedPreferences.getBoolean("isGuest", false)
+        if (!isGuest) {
+            startActivity(Intent(this, RegisterSplashActivity::class.java))
+            finish()
+        }
     }
+
 
     private fun setupChargerInput() {
 
