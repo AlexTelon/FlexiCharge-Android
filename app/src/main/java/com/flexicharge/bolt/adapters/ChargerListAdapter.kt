@@ -14,7 +14,7 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemAddress: TextView = itemView.findViewById(R.id.charger_address)
         val itemDistance: TextView = itemView.findViewById(R.id.charger_distance)
-        //val itemNumberOfChargers: RecyclerView = itemView.findViewById(R.id.charger_available_chargers_recyclerview)
+        val itemNumberOfChargers: TextView = itemView.findViewById(R.id.charger_number_of_available)
 
         init {
             itemView.setOnClickListener { v: View ->
@@ -33,7 +33,7 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemAddress.text = chargerAddress[position]
         holder.itemDistance.text = chargerDistance[position].toString()
-        //holder.itemNumberOfChargers
+        holder.itemNumberOfChargers.text = numberOfChargers[position].toString()
     }
 
     override fun getItemCount(): Int {
