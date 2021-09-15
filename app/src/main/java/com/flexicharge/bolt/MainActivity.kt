@@ -1,5 +1,9 @@
 package com.flexicharge.bolt
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,28 +14,107 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.databinding.ActivityMainBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.lang.Exception
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var mMap: GoogleMap
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var currentLocation: Location
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fetchLocation()
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         binding.button.setOnClickListener {
             setupChargerInput()
         }
+
     }
 
-    private fun setupChargerInput() {
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        val chargerPos = LatLng(57.779978, 14.161790)
+        try {
+            val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
+            mMap.addCircle(
+                CircleOptions().center(curPos).radius(30000.0).fillColor(0x034078105).strokeColor(
+                    0x096144147.toInt()
+                ).strokeWidth(4f)
+            )
+            mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
+
+        } catch (e: Exception) {
+            Log.v("MapsActivity", e.message.toString())
+        }
+
+      //  mMap.addMarker(MarkerOptions().position(chargerPos).title("Charger"))
+    }
+
+    private fun fetchLocation() {
+        try {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    1
+                )
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                    1
+                )
+
+            }
+            val task = fusedLocationProviderClient.lastLocation
+            task.addOnSuccessListener { location ->
+                if (location != null) {
+                    currentLocation = location
+                    val supportMapFragment =
+                        supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+                    supportMapFragment.getMapAsync(this)
+                }
+            }
+        } catch (e: Exception) {
+            Log.v("MapsActivity", e.message.toString())
+        }
+    }
+
+    fun setupChargerInput() {
 
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
@@ -88,7 +171,10 @@ class MainActivity : AppCompatActivity() {
                     editTextInput4.text.toString() +
                     editTextInput5.text.toString() +
                     editTextInput6.text.toString())
-            if (validateChargerId(chargerId)) validateConnectionToMockDataApi(chargerId, chargerInputStatus)
+            if (validateChargerId(chargerId)) validateConnectionToMockDataApi(
+                chargerId,
+                chargerInputStatus
+            )
             else {
                 chargerInputStatus.text = "ChargerId has to consist of 6 digits"
                 chargerInputStatus.setBackgroundResource(R.color.red)
@@ -97,10 +183,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validateChargerId(chargerId: String): Boolean {
-        if(chargerId.length != 6) {
+        if (chargerId.length != 6) {
             return false
         }
-        if(chargerId.count { it.isDigit() } != 6) {
+        if (chargerId.count { it.isDigit() } != 6) {
             return false
         }
         return true
@@ -115,10 +201,13 @@ class MainActivity : AppCompatActivity() {
                     Log.d("validateConnection", "Connected to charger " + charger.id)
                     lifecycleScope.launch(Dispatchers.Main) {
                         if (charger.status == 1) {
-                            chargerInputStatus.text = "Connected to charger " + charger.id + "\n located at Long:" + charger.location.longitude + " Lat:" + charger.location.latitude
+                            chargerInputStatus.text =
+                                "Connected to charger " + charger.id + "\n located at Long:" + charger.location.longitude + " Lat:" + charger.location.latitude
+                            mMap.addMarker(MarkerOptions().position(LatLng(charger.location.latitude, charger.location.longitude)).title("Charger " + chargerId))
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(charger.location.latitude, charger.location.longitude), 13f))
+
                             chargerInputStatus.setBackgroundResource(R.color.green)
-                        }
-                        else {
+                        } else {
                             chargerInputStatus.text = "Charger " + charger.id + " is busy"
                             chargerInputStatus.setBackgroundResource(R.color.red)
                         }
