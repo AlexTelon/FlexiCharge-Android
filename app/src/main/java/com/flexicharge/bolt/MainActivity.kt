@@ -3,7 +3,6 @@ package com.flexicharge.bolt
 import android.content.Context
 import android.content.Intent
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -42,15 +41,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         binding.button.setOnClickListener {
             setupChargerInput()
         }
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fetchLocation()
         
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", false)
@@ -60,20 +64,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-    private fun setupChargerInput() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        fetchLocation()
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
-        binding.button.setOnClickListener {
-            setupChargerInput()
-        }
-
-    }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -131,7 +121,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun setupChargerInput() {
+    private fun setupChargerInput() {
       
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
