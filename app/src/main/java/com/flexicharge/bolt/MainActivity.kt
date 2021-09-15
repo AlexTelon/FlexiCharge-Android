@@ -1,5 +1,7 @@
 package com.flexicharge.bolt
 
+import android.content.Context
+import android.content.Intent
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,6 +18,7 @@ import android.util.Log
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -44,7 +47,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        binding.button.setOnClickListener {
+            setupChargerInput()
+        }
+        
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val isGuest = sharedPreferences.getBoolean("isGuest", false)
+        if (!isGuest) {
+            startActivity(Intent(this, RegisterActivity::class.java))
+            finish()
+        }
+    }
 
+
+    private fun setupChargerInput() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -115,7 +132,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun setupChargerInput() {
-
+      
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
         )
