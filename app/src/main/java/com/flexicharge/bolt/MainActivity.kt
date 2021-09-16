@@ -7,6 +7,9 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.AutoTransition
+import android.transition.Fade
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -14,9 +17,18 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
+import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.flexicharge.bolt.adapters.ChargerListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -36,6 +48,10 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private var chargerAddressList = mutableListOf<String>()
+    private var chargerDistanceList = mutableListOf<Int>()
+    private var numberOfChargers = mutableListOf<Int>()
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -47,10 +63,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //Fill lists with trash data for now
+        addToList()
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        binding.button.setOnClickListener {
+        binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -132,10 +152,42 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             findViewById<ConstraintLayout>(R.id.chargerInputLayout)
         )
 
+        val arrow = bottomSheetView.findViewById<ImageView>(R.id.arrow)
+        arrow.setOnClickListener {
+            displayChargerList(bottomSheetView,arrow)
+        }
+
         setupChargerInputFocus(bottomSheetView)
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+    }
+    private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
+        val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
+        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
+        listOfChargersRecyclerView.adapter = ChargerListAdapter(chargerAddressList, chargerDistanceList, numberOfChargers)
+        val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
+
+        TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
+
+        if(listOfChargersRecyclerView.visibility == View.GONE){
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse) );
+            listOfChargersRecyclerView.visibility = View.VISIBLE
+            chargersNearMe.visibility = View.GONE
+        } else {
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
+            listOfChargersRecyclerView.visibility = View.GONE
+            chargersNearMe.visibility = View.VISIBLE
+        }
+    }
+
+    //Delete later.
+    private fun addToList() {
+        for (i in 0..5) {
+            chargerAddressList.add("Kungsgatan 5")
+            chargerDistanceList.add(i*100)
+            numberOfChargers.add(i)
+        }
     }
 
     private fun setupChargerInputFocus(view: View) {
@@ -172,7 +224,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val editTextInput6 = view.findViewById<EditText>(R.id.charger_input_edit_text_6)
         val chargerInputStatus = view.findViewById<TextView>(R.id.charger_input_status)
         editTextInput6.doOnTextChanged { _, _, _, _ ->
-            var chargerId = (editTextInput1.text.toString() +
+            val chargerId = (editTextInput1.text.toString() +
                     editTextInput2.text.toString() +
                     editTextInput3.text.toString() +
                     editTextInput4.text.toString() +
