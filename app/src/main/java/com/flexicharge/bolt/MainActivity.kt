@@ -39,6 +39,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,6 +57,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
+    private lateinit var mockChargers: Chargers
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,16 +85,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
+        updateMockChargerList()
     }
 
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         val chargerPos = LatLng(57.779978, 14.161790)
+        mMap.setMapStyle(
+          MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
+        );
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
             mMap.addCircle(
-                CircleOptions().center(curPos).radius(30000.0).fillColor(0x034078105).strokeColor(
+                CircleOptions().center(curPos).radius(1.0).fillColor(0x034078105).strokeColor(
                     0x096144147.toInt()
                 ).strokeWidth(4f)
             )
@@ -161,6 +168,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+        //getAllChargersFromMockDataApi()
     }
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
@@ -251,12 +259,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         return true
     }
 
+    private fun updateMockChargerList() {
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.api.getMockChargerList()
+                if (response.isSuccessful) {
+                    val chargers = response.body() as Chargers
+                    Log.d("validateConnection", "Connected to charger ")
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        if (!chargers.isEmpty()) {
+                            mockChargers = response.body() as Chargers
+                        }
+                    }
+                } else {
+                    Log.d("validateConnection", "Could not connect to charger")
+                    lifecycleScope.launch(Dispatchers.Main) {
+                    }
+                }
+            } catch (e: HttpException) {
+                Log.d("validateConnection", "Crashed with Exception")
+            } catch (e: IOException) {
+                Log.d("validateConnection", "You might not have internet connection")
+                lifecycleScope.launch(Dispatchers.Main) {
+                }
+            }
+        }
+
+    }
+
     private fun validateConnectionToMockDataApi(chargerId: String, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockApiData(chargerId)
+                val response = RetrofitInstance.api.getMockCharger(chargerId)
                 if (response.isSuccessful) {
-                    val charger = response.body() as FakeJsonResponse
+                    val charger = response.body() as Charger
                     Log.d("validateConnection", "Connected to charger " + charger.id)
                     lifecycleScope.launch(Dispatchers.Main) {
                         if (charger.status == 1) {
