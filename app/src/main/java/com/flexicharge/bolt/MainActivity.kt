@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
     //Delete later.
     private fun addToList() {
-        for (i in 1..5) {
+        for (i in 0..5) {
             chargerAddressList.add("Kungsgatan 5")
             chargerDistanceList.add(i*100)
             numberOfChargers.add(i)
