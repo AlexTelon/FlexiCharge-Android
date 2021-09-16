@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.transition.AutoTransition
 import android.transition.Fade
 import android.transition.TransitionManager
 import android.view.LayoutInflater
@@ -18,10 +17,7 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.view.animation.LinearInterpolator
-import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
@@ -39,6 +35,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +43,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
 
     private var chargerAddressList = mutableListOf<String>()
     private var chargerDistanceList = mutableListOf<Int>()
@@ -56,6 +53,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
+    private lateinit var mockChargers: Chargers
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,9 +62,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        //Fill lists with trash data for now
-        addToList()
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -82,16 +78,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
+        updateMockChargerList()
     }
 
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         val chargerPos = LatLng(57.779978, 14.161790)
+        mMap.setMapStyle(
+          MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
+        );
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
             mMap.addCircle(
-                CircleOptions().center(curPos).radius(30000.0).fillColor(0x034078105).strokeColor(
+                CircleOptions().center(curPos).radius(1.0).fillColor(0x034078105).strokeColor(
                     0x096144147.toInt()
                 ).strokeWidth(4f)
             )
@@ -161,11 +161,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+        //getAllChargersFromMockDataApi()
     }
+
+
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
-        listOfChargersRecyclerView.adapter = ChargerListAdapter(chargerAddressList, chargerDistanceList, numberOfChargers)
+        listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers, this)
+        //listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers.map { it.chargePointAddress }, mockChargers.map {it.chargePointId}, mockChargers.map { it.chargePointId})
+
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
@@ -178,15 +183,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
-        }
-    }
-
-    //Delete later.
-    private fun addToList() {
-        for (i in 0..5) {
-            chargerAddressList.add("Kungsgatan 5")
-            chargerDistanceList.add(i*100)
-            numberOfChargers.add(i)
         }
     }
 
@@ -251,20 +247,47 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         return true
     }
 
+    private fun updateMockChargerList() {
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.api.getMockChargerList()
+                if (response.isSuccessful) {
+                    val chargers = response.body() as Chargers
+                    Log.d("validateConnection", "Connected to charger ")
+                    if (!chargers.isEmpty()) {
+                        mockChargers = response.body() as Chargers
+                    }
+                } else {
+                    Log.d("validateConnection", "Could not connect to charger")
+                }
+            } catch (e: HttpException) {
+                Log.d("validateConnection", "Crashed with Exception")
+            } catch (e: IOException) {
+                Log.d("validateConnection", "You might not have internet connection")
+            }
+        }
+
+    }
+
+    override fun addAndPanToMarker (latitude: Double, longitude: Double, title: String) {
+        mMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude)).title(title))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
+
+    }
+
     private fun validateConnectionToMockDataApi(chargerId: String, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockApiData(chargerId)
+                val response = RetrofitInstance.api.getMockCharger(chargerId)
                 if (response.isSuccessful) {
-                    val charger = response.body() as FakeJsonResponse
+                    val charger = response.body() as Charger
                     Log.d("validateConnection", "Connected to charger " + charger.id)
                     lifecycleScope.launch(Dispatchers.Main) {
                         if (charger.status == 1) {
                             chargerInputStatus.text =
                                 "Connected to charger " + charger.id + "\n located at Long:" + charger.location.longitude + " Lat:" + charger.location.latitude
-                            mMap.addMarker(MarkerOptions().position(LatLng(charger.location.latitude, charger.location.longitude)).title("Charger " + chargerId))
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(charger.location.latitude, charger.location.longitude), 13f))
-
+                            addAndPanToMarker(charger.location.latitude, charger.location.longitude, charger.chargePointAddress)
                             chargerInputStatus.setBackgroundResource(R.color.green)
                         } else {
                             chargerInputStatus.text = "Charger " + charger.id + " is busy"
