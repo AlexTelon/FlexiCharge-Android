@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        binding.button.setOnClickListener {
+        binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
