@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
             listOfChargersRecyclerView.visibility = View.GONE
-            chargersNearMe.visibility = View.GONE
+            chargersNearMe.visibility = View.VISIBLE
         }
     }
 
