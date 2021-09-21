@@ -22,6 +22,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     0x096144147.toInt()
                 ).strokeWidth(4f)
             )
-            mockChargers.forEach { mMap.addMarker(MarkerOptions().position(LatLng(it.location.latitude, it.location.longitude)).title(it.id.toString())) }
+            addNewMarkers(mockChargers)
             mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
 
@@ -121,6 +122,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             Toast.makeText(this,"This charger is " + distance.toString() + " km away", Toast.LENGTH_SHORT).show()
             Toast.makeText(this, "Number of chargers: " + numberOfChargers.toString(), Toast.LENGTH_SHORT).show()
             true
+        }
+    }
+
+    private fun addNewMarkers(chargers: Chargers){
+        val blackIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
+        val greenIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
+        val redIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
+        chargers.forEach {
+            val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location.latitude, it.location.longitude)).title(it.id.toString()))
+            if(it.numberOfChargers > 0) marker.setIcon(greenIcon)
+            else marker.setIcon(redIcon)
         }
     }
 
