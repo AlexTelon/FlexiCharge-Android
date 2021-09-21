@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,15 +34,19 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
+import java.math.BigDecimal
+import java.math.RoundingMode
+import kotlin.math.acos
+import kotlin.math.cos
+import kotlin.math.sin
+
+
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
 
@@ -49,15 +54,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private var chargerDistanceList = mutableListOf<Int>()
     private var numberOfChargers = mutableListOf<Int>()
 
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
     private lateinit var mockChargers: Chargers
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        updateMockChargerList()
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -66,8 +72,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
+        }
+        binding.positionPinButton.setOnClickListener {
+            moveCameraToCurrentPosition()
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
@@ -78,23 +88,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
-        updateMockChargerList()
     }
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val chargerPos = LatLng(57.779978, 14.161790)
         mMap.setMapStyle(
           MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
-        );
+        )
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
             mMap.addCircle(
-                CircleOptions().center(curPos).radius(1.0).fillColor(0x034078105).strokeColor(
+                CircleOptions().center(curPos).radius(13000.0).fillColor(0x034078105).strokeColor(
                     0x096144147.toInt()
                 ).strokeWidth(4f)
             )
+            mockChargers.forEach { mMap.addMarker(MarkerOptions().position(LatLng(it.location.latitude, it.location.longitude)).title(it.id.toString())) }
             mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
 
@@ -102,7 +110,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             Log.v("MapsActivity", e.message.toString())
         }
 
-      //  mMap.addMarker(MarkerOptions().position(chargerPos).title("Charger"))
+        mMap.setOnMarkerClickListener {  marker ->
+            val distance = BigDecimal(distanceToMarkerInKm(marker.position.latitude, marker.position.longitude)).setScale(1, RoundingMode.HALF_EVEN)
+            var numberOfChargers : Int = -1
+            mockChargers.forEach {
+                if(it.id.toString() == marker.title.toString()){
+                    numberOfChargers = it.numberOfChargers
+                }
+            }
+            Toast.makeText(this,"This charger is " + distance.toString() + " km away", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Number of chargers: " + numberOfChargers.toString(), Toast.LENGTH_SHORT).show()
+            true
+        }
+    }
+
+    private fun moveCameraToCurrentPosition(){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
     }
 
     private fun fetchLocation() {
@@ -311,5 +334,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 }
             }
         }
+    }
+
+    private fun distanceToMarkerInKm(markerLat : Double, markerLon : Double): Double{
+        val curPosLat : Double = currentLocation.latitude
+        val curPosLon : Double = currentLocation.longitude
+        val theta = curPosLon - markerLon
+        var distance = sin(deg2rad(curPosLat)) * sin(deg2rad(markerLat)) + cos(deg2rad(curPosLat)) * cos(deg2rad(markerLat)) * cos(deg2rad(theta))
+        distance = acos(distance)
+        distance = rad2deg(distance)
+        distance *= 60 * 1.1515
+        distance *= 1.609344
+        return distance
+    }
+
+    private fun deg2rad(deg : Double): Double {
+        return deg * Math.PI / 180.0
+    }
+
+    private fun rad2deg(rad : Double): Double {
+        return rad * 180 / Math.PI
     }
 }
