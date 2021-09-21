@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private lateinit var mockChargers: Chargers
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -156,7 +155,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         arrow.setOnClickListener {
             displayChargerList(bottomSheetView,arrow)
         }
-
         setupChargerInputFocus(bottomSheetView)
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -166,24 +164,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
+
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
-        listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers, this)
+        if (this::mockChargers.isInitialized)
+            listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers, this)
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers.map { it.chargePointAddress }, mockChargers.map {it.chargePointId}, mockChargers.map { it.chargePointId})
-
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
 
-        if(listOfChargersRecyclerView.visibility == View.GONE){
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse) );
+        if (listOfChargersRecyclerView.visibility == View.GONE) {
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
             listOfChargersRecyclerView.visibility = View.VISIBLE
             chargersNearMe.visibility = View.GONE
         } else {
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
         }
+
     }
 
     private fun setupChargerInputFocus(view: View) {
