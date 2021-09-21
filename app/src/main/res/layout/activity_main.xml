@@ -1,33 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MapsActivity"
-        />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="parent"
+        tools:context=".MapsActivity" />
 
     <ImageButton
         android:id="@+id/identify_charger_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
-        android:background="@drawable/ic_round_menu_background"
+        android:layout_marginBottom="35dp"
+        android:alpha="0.9"
+        android:background="@drawable/oval_menu_background"
         android:padding="16dp"
-        android:src="@drawable/ic_charger" />
+        android:src="@drawable/ic_charger"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintHorizontal_bias="0.498"
+        map:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/camera_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.9"
+        android:background="@drawable/oval_menu_background"
+        android:padding="16dp"
+        android:src="@drawable/ic_camera"
+        map:layout_constraintBottom_toBottomOf="@+id/identify_charger_button"
+        map:layout_constraintEnd_toStartOf="@+id/identify_charger_button"
+        map:layout_constraintHorizontal_bias="0.172"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="@+id/identify_charger_button" />
+
+    <ImageButton
+        android:id="@+id/user_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.9"
+        android:background="@drawable/oval_menu_background"
+        android:padding="16dp"
+        android:src="@drawable/ic_user"
+        map:layout_constraintBottom_toBottomOf="@+id/identify_charger_button"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintTop_toTopOf="@+id/identify_charger_button" />
+
+    <ImageButton
+        android:id="@+id/position_pin_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:alpha="0.9"
+        android:background="@drawable/oval_menu_background"
+        android:padding="16dp"
+        android:src="@drawable/ic_position_pin"
+        map:layout_constraintBottom_toTopOf="@+id/camera_button"
+        map:layout_constraintEnd_toEndOf="@+id/camera_button"
+        map:layout_constraintStart_toStartOf="@+id/camera_button" />
 
 
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
