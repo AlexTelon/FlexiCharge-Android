@@ -18,7 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bolt">
         <activity
-            android:name=".ProfileMenuActivity"
+            android:name=".ProfileMenuLoggedOutActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ProfileMenuLoggedInActivity"
             android:exported="true" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

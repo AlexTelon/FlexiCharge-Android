@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.view.View
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
 
-class ProfileMenuActivity : AppCompatActivity() {
+class ProfileMenuLoggedInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile_menu)
+        setContentView(R.layout.activity_profile_menu_logged_in)
     }
     fun chargingHistoryClick(view: View) {}
     fun invoiceClick(view: View) {}
