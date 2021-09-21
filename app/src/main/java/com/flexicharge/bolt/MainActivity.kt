@@ -68,6 +68,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
         }
+        binding.userButton.setOnClickListener {
+            startActivity(Intent(this, ProfileMenuActivity::class.java))
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
         
@@ -183,7 +186,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
         }
-
     }
 
     private fun setupChargerInputFocus(view: View) {
