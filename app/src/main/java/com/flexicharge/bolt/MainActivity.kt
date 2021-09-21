@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun setupChargerInput() {
+   private fun setupChargerInput() {
 
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
