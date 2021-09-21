@@ -58,7 +58,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val isGuest = sharedPreferences.getBoolean("isGuest", false)
+        if (!isGuest) {
+            startActivity(Intent(this, RegisterActivity::class.java))
+            finish()
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -68,15 +73,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
         }
+        binding.userButton.setOnClickListener {
+            if (isGuest) {
+                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
+            }
+            else {
+                startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
+            }
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
         
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val isGuest = sharedPreferences.getBoolean("isGuest", false)
-        if (!isGuest) {
-            startActivity(Intent(this, RegisterActivity::class.java))
-            finish()
-        }
+
         updateMockChargerList()
     }
 
@@ -183,7 +191,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
         }
-
     }
 
     private fun setupChargerInputFocus(view: View) {
