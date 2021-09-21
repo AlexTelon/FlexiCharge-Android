@@ -1,12 +1,15 @@
 package com.flexicharge.bolt
 
-data class FakeJsonResponse(
+class Chargers : ArrayList<Charger>()
+data class Charger(
+    val chargePointId: Int,
+    val chargePointAddress: String,
+    val numberOfChargers: Int,
     val id: Int,
     val location: Location,
-    val chargePointId: Int,
     val status: Int
 )
-
 data class Location(
     val latitude: Double,
-    val longitude: Double)
+    val longitude: Double
+)

@@ -7,5 +7,8 @@ import retrofit2.http.Query
 
 interface ApiInterface {
     @GET("charger/{chargerId}")
-    suspend fun getMockApiData(@Path("chargerId") chargerId: String): Response<FakeJsonResponse>
+    suspend fun getMockCharger(@Path("chargerId") chargerId: String): Response<Charger>
+
+    @GET("charger")
+    suspend fun getMockChargerList(): Response<Chargers>
 }
