@@ -64,10 +64,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val isGuest = sharedPreferences.getBoolean("isGuest", false)
+        if (!isGuest) {
+            startActivity(Intent(this, RegisterActivity::class.java))
+            finish()
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -81,15 +85,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
         }
+        binding.userButton.setOnClickListener {
+            if (isGuest) {
+                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
+            }
+            else {
+                startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
+            }
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
-
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val isGuest = sharedPreferences.getBoolean("isGuest", false)
-        if (!isGuest) {
-            startActivity(Intent(this, RegisterActivity::class.java))
-            finish()
-        }
+        
         updateMockChargerList()
     }
 
@@ -217,7 +223,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         arrow.setOnClickListener {
             displayChargerList(bottomSheetView,arrow)
         }
-
         setupChargerInputFocus(bottomSheetView)
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -226,21 +231,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     }
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
+
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
-        listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers, this)
+        if (this::mockChargers.isInitialized)
+            listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers, this)
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers.map { it.chargePointAddress }, mockChargers.map {it.chargePointId}, mockChargers.map { it.chargePointId})
-
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
 
-        if(listOfChargersRecyclerView.visibility == View.GONE){
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse) );
+        if (listOfChargersRecyclerView.visibility == View.GONE) {
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
             listOfChargersRecyclerView.visibility = View.VISIBLE
             chargersNearMe.visibility = View.GONE
         } else {
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate) );
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
         }
