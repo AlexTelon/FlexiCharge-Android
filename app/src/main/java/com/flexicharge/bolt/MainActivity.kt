@@ -288,6 +288,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             else {
                 chargerInputStatus.text = "ChargerId has to consist of 6 digits"
                 chargerInputStatus.setBackgroundResource(R.color.red)
+                chargerInputStatus.isClickable = false
             }
         }
     }
@@ -354,18 +355,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
                     Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        if (charger.status == 1) {
-                            setChargerStatus(charger.chargerID,0)
-                            chargerInputStatus.text =
-                                "Connected to charger " + charger.chargerID + "\n located at Latitude:" + charger.location[0] + " Longitude:" + charger.location[1]
-                            addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
-                            chargerInputStatus.setBackgroundResource(R.color.green)
-                        } else if (charger.status == 0){
-                            chargerInputStatus.text = "Charger " + charger.chargerID + " is busy"
-                            chargerInputStatus.setBackgroundResource(R.color.red)
-                        } else if (charger.status == 2) {
-                            chargerInputStatus.text = "Charger " + charger.chargerID + " is out of order"
-                            chargerInputStatus.setBackgroundResource(R.color.red)
+                        when (charger.status) {
+                            0 -> {
+                                chargerInputStatus.text = "Charger " + charger.chargerID + " is busy"
+                                chargerInputStatus.setBackgroundResource(R.color.red)
+                            }
+                            1 -> {
+                                chargerInputStatus.text = "Charger " + charger.chargerID + " is available, tap to connect"
+                                chargerInputStatus.isClickable=true
+                                chargerInputStatus.setBackgroundResource(R.color.green)
+                                chargerInputStatus.setOnClickListener {
+                                    setChargerStatus(charger.chargerID,0)
+                                    chargerInputStatus.isClickable=true
+                                    chargerInputStatus.setBackgroundResource(R.color.yellow)
+                                    chargerInputStatus.text = "Charger " + charger.chargerID + " is connected. Tap to disconnect"
+                                    chargerInputStatus.setOnClickListener {
+                                        setChargerStatus(charger.chargerID,1)
+                                        chargerInputStatus.text = "You disconnected from charger " + charger.chargerID + ". Have a nice day!"
+                                        chargerInputStatus.setBackgroundResource(R.color.green)
+                                        chargerInputStatus.isClickable=false
+                                    }
+                                }
+                                addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
+                                //chargerInputStatus.setBackgroundResource(R.color.green)
+                            }
+                            2 -> {
+                                chargerInputStatus.text = "Charger " + charger.chargerID + " is out of order"
+                                chargerInputStatus.setBackgroundResource(R.color.red)
+                            }
                         }
                     }
                 } else {
