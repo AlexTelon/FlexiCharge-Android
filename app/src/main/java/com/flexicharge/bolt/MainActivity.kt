@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
-        updateMockChargerList()
+        updateChargerList()
     }
 
 
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-        //getAllChargersFromMockDataApi()
+        //getAllChargersFromDataApi()
     }
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargers.isInitialized)
             listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this)
-        //listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers.map { it.chargePointAddress }, mockChargers.map {it.chargePointId}, mockChargers.map { it.chargePointId})
+        //listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers.map { it.chargePointAddress }, chargers.map {it.chargePointId}, chargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     editTextInput4.text.toString() +
                     editTextInput5.text.toString() +
                     editTextInput6.text.toString())
-            if (validateChargerId(chargerId)) validateConnectionToMockDataApi(
+            if (validateChargerId(chargerId)) validateConnectionToDataApi(
                 chargerId.toInt(),
                 chargerInputStatus
             )
@@ -303,10 +303,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         return true
     }
 
-    private fun updateMockChargerList() {
+    private fun updateChargerList() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockChargerList()
+                val response = RetrofitInstance.api.getChargerList()
                 if (response.isSuccessful) {
                     val chargers = response.body() as Chargers
                     Log.d("validateConnection", "Connected to charger ")
@@ -333,7 +333,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     val charger = response.body() as Charger
                     Log.d("validateConnection", "Charger:" + charger.chargerID +  " status set to" + status)
                     //if (!chargers.isEmpty()) {
-                    //    mockChargers = response.body() as Chargers
+                    //    chargers = response.body() as Chargers
                     //}
                 } else {
                     Log.d("validateConnection", "Could not change status")
@@ -346,10 +346,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    private fun validateConnectionToMockDataApi(chargerId: Int, chargerInputStatus: TextView) {
+    private fun validateConnectionToDataApi(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockCharger(chargerId)
+                val response = RetrofitInstance.api.getCharger(chargerId)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
 
