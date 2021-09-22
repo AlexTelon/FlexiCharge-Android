@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                         if (charger.status == 1) {
                             setChargerStatus(charger.chargerID,0)
                             chargerInputStatus.text =
-                                "Connected to charger " + charger.chargerID + "\n located at Long:" + charger.location[0] + " Lat:" + charger.location[1]
+                                "Connected to charger " + charger.chargerID + "\n located at Latitude:" + charger.location[0] + " Longitude:" + charger.location[1]
                             addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
                             chargerInputStatus.setBackgroundResource(R.color.green)
                         } else if (charger.status == 0){
