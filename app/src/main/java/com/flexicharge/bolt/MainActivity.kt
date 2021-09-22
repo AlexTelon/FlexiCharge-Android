@@ -3,8 +3,6 @@ package com.flexicharge.bolt
 import android.content.Context
 import android.content.Intent
 import android.Manifest
-import android.app.Activity
-import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -22,8 +20,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -32,13 +28,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.adapters.ChargerListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.databinding.ActivityMainBinding
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
@@ -50,15 +44,11 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
 
-    private var chargerAddressList = mutableListOf<String>()
-    private var chargerDistanceList = mutableListOf<Int>()
-    private var numberOfChargers = mutableListOf<Int>()
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
-    private lateinit var mockChargers: Chargers
+    private lateinit var chargers: Chargers
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -233,8 +223,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
-        if (this::mockChargers.isInitialized)
-            listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers, this)
+        if (this::chargers.isInitialized)
+            listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this)
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers.map { it.chargePointAddress }, mockChargers.map {it.chargePointId}, mockChargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
@@ -313,7 +303,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     }
 
     private fun updateMockChargerList() {
-
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.api.getMockChargerList()
@@ -321,7 +310,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     val chargers = response.body() as Chargers
                     Log.d("validateConnection", "Connected to charger ")
                     if (!chargers.isEmpty()) {
-                        mockChargers = response.body() as Chargers
+                        this@MainActivity.chargers = response.body() as Chargers
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger")
@@ -335,14 +324,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     }
 
-    override fun addAndPanToMarker (latitude: Double, longitude: Double, title: String) {
-        mMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude)).title(title))
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
-
-    }
-
     private fun setChargerStatus(chargerId: Int, status: Int) {
-
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.api.setChargerStatus(chargerId, status)
