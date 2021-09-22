@@ -7,7 +7,7 @@ import retrofit2.http.*
 
 interface ApiInterface {
     @GET("chargers/{chargerId}")
-    suspend fun getMockCharger(@Path("chargerId") chargerId: String): Response<Charger>
+    suspend fun getMockCharger(@Path("chargerId") chargerId: Int): Response<Charger>
 
     @GET("chargers")
     suspend fun getMockChargerList(): Response<Chargers>
@@ -15,7 +15,7 @@ interface ApiInterface {
     @FormUrlEncoded
     @PUT("chargers/{chargerId}")
     suspend fun setChargerStatus(
-        @Path("chargerId") chargerId: String,
-        @Field("status") status: String
+        @Path("chargerId") chargerId: Int,
+        @Field("status") status: Int
     ): Response<Charger>
 }

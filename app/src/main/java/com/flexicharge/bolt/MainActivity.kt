@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     editTextInput5.text.toString() +
                     editTextInput6.text.toString())
             if (validateChargerId(chargerId)) validateConnectionToMockDataApi(
-                chargerId,
+                chargerId.toInt(),
                 chargerInputStatus
             )
             else {
@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     }
 
-    private fun setChargerStatus(chargerId: String, status: String) {
+    private fun setChargerStatus(chargerId: Int, status: Int) {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -303,23 +303,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    private fun validateConnectionToMockDataApi(chargerId: String, chargerInputStatus: TextView) {
+    private fun validateConnectionToMockDataApi(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockCharger(chargerId.toInt().toString())
+                val response = RetrofitInstance.api.getMockCharger(chargerId)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
 
                     Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
                         if (charger.status == 1) {
-                            setChargerStatus(chargerId.toInt().toString(),"0" )
+                            setChargerStatus(charger.chargerID,0)
                             chargerInputStatus.text =
                                 "Connected to charger " + charger.chargerID + "\n located at Long:" + charger.location[0] + " Lat:" + charger.location[1]
                             addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
                             chargerInputStatus.setBackgroundResource(R.color.green)
-                        } else {
+                        } else if (charger.status == 0){
                             chargerInputStatus.text = "Charger " + charger.chargerID + " is busy"
+                            chargerInputStatus.setBackgroundResource(R.color.red)
+                        } else if (charger.status == 2) {
+                            chargerInputStatus.text = "Charger " + charger.chargerID + " is out of order"
                             chargerInputStatus.setBackgroundResource(R.color.red)
                         }
                     }
