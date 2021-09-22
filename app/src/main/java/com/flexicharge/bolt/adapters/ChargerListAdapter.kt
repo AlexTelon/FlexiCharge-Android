@@ -26,8 +26,8 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
         init {
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
-                Toast.makeText(itemView.context, "You clicked on charger at ${mockChargers[position].chargePointAddress}", Toast.LENGTH_SHORT).show()
-                act.addAndPanToMarker(mockChargers[position].location.latitude, mockChargers[position].location.longitude, mockChargers[position].chargePointAddress)
+                Toast.makeText(itemView.context, "You clicked on charger at ${mockChargers[position].chargePointID}", Toast.LENGTH_SHORT).show()
+                act.addAndPanToMarker(mockChargers[position].location[0], mockChargers[position].location[1], mockChargers[position].chargerID.toString())
             }
         }
 
@@ -44,10 +44,10 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemAddress.text = mockChargers[position].chargePointAddress
+        holder.itemAddress.text = mockChargers[position].chargerID.toString()
         holder.itemDistance.text = ""
-        if(mockChargers[position].numberOfChargers > 0 ){
-            holder.itemNumberOfChargers.text = mockChargers[position].numberOfChargers.toString()
+        if(mockChargers.size > 0 ){
+            holder.itemNumberOfChargers.text = mockChargers.size.toString()
         } else {
             holder.itemNumberOfChargers.text =holder.itemView.context.getString(R.string.no_chargers_available)
             holder.itemNumberOfChargers.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))

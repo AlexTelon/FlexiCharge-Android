@@ -1,7 +1,7 @@
 package com.flexicharge.bolt
 
-class Chargers : ArrayList<Charger>()
-data class Charger(
+class Chargerss : ArrayList<Chargerr>()
+data class Chargerr(
     val chargePointId: Int,
     val chargePointAddress: String,
     val numberOfChargers: Int,

@@ -83,7 +83,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
-        
 
         updateMockChargerList()
     }
@@ -91,7 +90,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val chargerPos = LatLng(57.779978, 14.161790)
         mMap.setMapStyle(
           MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
         );
@@ -283,21 +281,45 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     }
 
+    private fun setChargerStatus(chargerId: String, status: String) {
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.api.setChargerStatus(chargerId, status)
+                if (response.isSuccessful) {
+                    val charger = response.body() as Charger
+                    Log.d("validateConnection", "Charger:" + charger.chargerID +  " status set to" + status)
+                    //if (!chargers.isEmpty()) {
+                    //    mockChargers = response.body() as Chargers
+                    //}
+                } else {
+                    Log.d("validateConnection", "Could not change status")
+                }
+            } catch (e: HttpException) {
+                Log.d("validateConnection", "Crashed with Exception")
+            } catch (e: IOException) {
+                Log.d("validateConnection", "You might not have internet connection")
+            }
+        }
+    }
+
     private fun validateConnectionToMockDataApi(chargerId: String, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockCharger(chargerId)
+                val response = RetrofitInstance.api.getMockCharger(chargerId.toInt().toString())
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
-                    Log.d("validateConnection", "Connected to charger " + charger.id)
+
+                    Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
                         if (charger.status == 1) {
+                            setChargerStatus(chargerId.toInt().toString(),"0" )
                             chargerInputStatus.text =
-                                "Connected to charger " + charger.id + "\n located at Long:" + charger.location.longitude + " Lat:" + charger.location.latitude
-                            addAndPanToMarker(charger.location.latitude, charger.location.longitude, charger.chargePointAddress)
+                                "Connected to charger " + charger.chargerID + "\n located at Long:" + charger.location[0] + " Lat:" + charger.location[1]
+                            addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
                             chargerInputStatus.setBackgroundResource(R.color.green)
                         } else {
-                            chargerInputStatus.text = "Charger " + charger.id + " is busy"
+                            chargerInputStatus.text = "Charger " + charger.chargerID + " is busy"
                             chargerInputStatus.setBackgroundResource(R.color.red)
                         }
                     }

@@ -17,7 +17,7 @@ class RetrofitInstance {
                 .build()
 
             Retrofit.Builder()
-                .baseUrl("https://rawb.se") // PLACEHOLDER URL!!!!!!!
+                .baseUrl("http://54.220.194.65:8080")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()
