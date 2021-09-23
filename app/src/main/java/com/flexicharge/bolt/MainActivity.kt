@@ -357,18 +357,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     lifecycleScope.launch(Dispatchers.Main) {
                         when (charger.status) {
                             0 -> {
-                                chargerInputStatus.text = "Charger " + charger.chargerID + " is busy"
+                                chargerInputStatus.text = "Charger Occupied"
                                 chargerInputStatus.setBackgroundResource(R.color.red)
                             }
                             1 -> {
-                                chargerInputStatus.text = "Charger " + charger.chargerID + " is available, tap to connect"
+                                chargerInputStatus.text = "Begin Charging"
                                 chargerInputStatus.isClickable=true
                                 chargerInputStatus.setBackgroundResource(R.color.green)
                                 chargerInputStatus.setOnClickListener {
                                     setChargerStatus(charger.chargerID,0)
                                     chargerInputStatus.isClickable=true
                                     chargerInputStatus.setBackgroundResource(R.color.yellow)
-                                    chargerInputStatus.text = "Charger " + charger.chargerID + " is connected. Tap to disconnect"
+                                    chargerInputStatus.text = "Tap to disconnect"
                                     chargerInputStatus.setOnClickListener {
                                         setChargerStatus(charger.chargerID,1)
                                         chargerInputStatus.text = "You disconnected from charger " + charger.chargerID + ". Have a nice day!"
@@ -380,7 +380,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                                 //chargerInputStatus.setBackgroundResource(R.color.green)
                             }
                             2 -> {
-                                chargerInputStatus.text = "Charger " + charger.chargerID + " is out of order"
+                                chargerInputStatus.text = "Charger Out of Order"
                                 chargerInputStatus.setBackgroundResource(R.color.red)
                             }
                         }
@@ -388,7 +388,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 } else {
                     Log.d("validateConnection", "Could not connect to charger" + chargerId)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        chargerInputStatus.text = "Charger " + chargerId + " does not exist"
+                        chargerInputStatus.text = "Charger Not Identified"
                         chargerInputStatus.setBackgroundResource(R.color.red)
                     }
                 }
