@@ -205,7 +205,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
-
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargers.isInitialized)
@@ -255,7 +254,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 Log.d("validateConnection", "You might not have internet connection")
             }
         }
-
     }
 
     private fun setChargerStatus(chargerId: Int, status: Int) {
