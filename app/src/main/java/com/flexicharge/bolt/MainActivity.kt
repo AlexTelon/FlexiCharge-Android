@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -67,7 +68,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         setContentView(binding.root)
 
         binding.positionPinButton.setOnClickListener {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
+            if (this::currentLocation.isInitialized) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
+            } else {
+                Toast.makeText(this, "Location permissions are required for this feature.", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val mapFragment = supportFragmentManager
@@ -104,18 +109,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             PERMISSION_CODE ->
             if (grantResults.isNotEmpty() && grantResults[0] ==
             PackageManager.PERMISSION_GRANTED) {
-            fetchLocation()
+            getLocationAccess()
         }
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.uiSettings.isMyLocationButtonEnabled = false
-        getLocationAccess()
-        mMap.setMapStyle(
-          MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
-        )
+    private fun setCurrentLocation() {
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
             //mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
@@ -125,8 +124,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             Log.v("MapsActivity", e.message.toString())
             // TODO ERROR HANDLING
         }
+    }
 
-      //  mMap.addMarker(MarkerOptions().position(chargerPos).title("Charger"))
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        mMap.uiSettings.isMyLocationButtonEnabled = false
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style) )
     }
 
     private fun fetchLocation() {
@@ -146,42 +149,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 val supportMapFragment =
                     supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
                 supportMapFragment.getMapAsync(this)
+                setCurrentLocation()
+            } else {
+                //fetchLocation()
+                Toast.makeText(this, "Could not set currentLocation", Toast.LENGTH_SHORT).show()
             }
         }
-        /*
-        val task = fusedLocationProviderClient.lastLocation
-        task.addOnSuccessListener { location −>
-            if (location != null) {
-                currentLocation = location
-                val supportMapFragment = (supportFragmentManager.findFragmentById(R.id.map) as
-                        SupportMapFragment?)!!
-                supportMapFragment.getMapAsync(this)
-            }
-        }
-        */
-        /*
-        try {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    1
-                )
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                    1
-                )
-
-            }
-            */
     }
 
     override fun addAndPanToMarker (latitude: Double, longitude: Double, title: String) {
