@@ -16,8 +16,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Bolt">
-
+        android:theme="@style/Theme.Bolt"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ProfileMenuLoggedOutActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ProfileMenuLoggedInActivity"
+            android:exported="true" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -29,6 +35,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
         <activity
             android:name=".AccountActivities.ForgotPasswordActivity"
             android:exported="true" />
@@ -37,12 +44,13 @@
             android:exported="true" />
         <activity
             android:name=".AccountActivities.RegisterActivity"
-            android:exported="true" />         
-        <activity  
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
