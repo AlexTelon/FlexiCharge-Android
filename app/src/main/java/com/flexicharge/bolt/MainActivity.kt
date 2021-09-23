@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,7 +12,6 @@ import android.transition.Fade
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -36,10 +36,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -47,7 +44,7 @@ import java.io.IOException
 import java.lang.Exception
 import java.text.DecimalFormat
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.panToMarkerInterface {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
@@ -128,7 +125,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             Log.v("MapsActivity", e.message.toString())
             // TODO ERROR HANDLING
         }
-      //  addNewMarkers(chargers)
+
     }
 
     private fun addNewMarkers(chargers: Chargers){
@@ -173,8 +170,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    override fun addAndPanToMarker (latitude: Double, longitude: Double, title: String) {
-        mMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude)).title(title))
+    override fun panToMarker (latitude: Double, longitude: Double, title: String, status: Int) {
+//        val icon : BitmapDescriptor
+//        if (status == 0) {
+//            icon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
+//        }
+//        else if (status == 1) {
+//            icon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
+//        }
+//        else {
+//            icon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
+//        }
+//        mMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude)).title(title)).setIcon(icon)
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
     }
     private fun setupChargerDialog() {
@@ -269,6 +276,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     Log.d("validateConnection", "Connected to charger ")
                     if (!chargers.isEmpty()) {
                         this@MainActivity.chargers = response.body() as Chargers
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            addNewMarkers(chargers)
+                        }
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger")
@@ -311,6 +321,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
                     Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
+                        panToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString(), charger.status)
                         when (charger.status) {
                             0 -> {
                                 chargerInputStatus.text = "Charger Occupied"
@@ -332,7 +343,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                                         chargerInputStatus.isClickable=false
                                     }
                                 }
-                                addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
+
                                 //chargerInputStatus.setBackgroundResource(R.color.green)
                             }
                             2 -> {
