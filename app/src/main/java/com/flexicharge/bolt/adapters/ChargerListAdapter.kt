@@ -1,6 +1,7 @@
 package com.flexicharge.bolt.adapters
 
 import android.app.Activity
+import android.location.Location
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.Chargers
 import com.flexicharge.bolt.MainActivity
 import com.flexicharge.bolt.R
+import java.math.BigDecimal
+import java.text.DecimalFormat
+import kotlin.math.round
 
-class ChargerListAdapter(private var chargers: Chargers, private var act: addAndPanToMarkerInterface) :
+class ChargerListAdapter(private var chargers: Chargers, private var act: addAndPanToMarkerInterface, private var distance : MutableList<String>) :
 RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,8 +48,9 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        holder.itemDistance.text = distance[position] + "km"
         holder.itemAddress.text = "Charger " + chargers[position].chargerID.toString()
-        holder.itemDistance.text = ""
         if(chargers.size > 0 ){
             holder.itemNumberOfChargers.text = "1 charger"
         } else {

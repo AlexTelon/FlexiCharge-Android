@@ -23,6 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +36,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
@@ -43,6 +45,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
+import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
 
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", false)
@@ -79,6 +83,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
         binding.identifyChargerButton.setOnClickListener {
             setupChargerDialog()
         }
@@ -94,7 +99,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         fetchLocation()
         updateChargerList()
     }
-
 
     private fun getLocationAccess() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -123,6 +127,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         } catch (e: Exception) {
             Log.v("MapsActivity", e.message.toString())
             // TODO ERROR HANDLING
+        }
+      //  addNewMarkers(chargers)
+    }
+
+    private fun addNewMarkers(chargers: Chargers){
+        val blackIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
+        val greenIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
+        val redIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
+        chargers.forEach {
+            val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location[0], it.location[1])).title(it.chargerID.toString()))
+            if(it.status == 1) marker.setIcon(greenIcon)
+            else marker.setIcon(redIcon)
         }
     }
 
@@ -205,10 +221,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
+        var distanceToCharger = mutableListOf<String>()
+        chargers.forEach {
+            var dist = FloatArray(1)
+            Location.distanceBetween(it.location[0], it.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+            val df = DecimalFormat("#.##")
+            val distanceStr = df.format(dist[0] / 1000).toString()
+            distanceToCharger.add(distanceStr)
+        }
+
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargers.isInitialized)
-            listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this)
+            listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this, distanceToCharger)
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers.map { it.chargePointAddress }, chargers.map {it.chargePointId}, chargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
