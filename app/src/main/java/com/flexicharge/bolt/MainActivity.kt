@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+        const val PERMISSION_CODE = 101
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +73,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         setContentView(binding.root)
 
         binding.positionPinButton.setOnClickListener {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
+            if (this::currentLocation.isInitialized) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
+            } else {
+                Toast.makeText(this, "Location permissions are required for this feature.", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val mapFragment = supportFragmentManager
@@ -102,43 +108,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return
-                }
-                mMap.isMyLocationEnabled = true
-            }
-            else {
-                // TODO ERROR HANDLING
-                finish()
-            }
+        when (requestCode) {
+            PERMISSION_CODE ->
+            if (grantResults.isNotEmpty() && grantResults[0] ==
+            PackageManager.PERMISSION_GRANTED) {
+            getLocationAccess()
+        }
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.uiSettings.isMyLocationButtonEnabled = false
-        getLocationAccess()
-        mMap.setMapStyle(
-            MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
-        )
+    private fun setCurrentLocation() {
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
@@ -161,40 +142,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    private fun fetchLocation() {
-        try {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    1
-                )
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                    1
-                )
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        mMap.uiSettings.isMyLocationButtonEnabled = false
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style) )
+    }
 
+    private fun fetchLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+            PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+            PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
+            return
+        }
+        val task = fusedLocationProviderClient.lastLocation
+        task.addOnSuccessListener { location ->
+            if (location != null) {
+                currentLocation = location
+                val supportMapFragment =
+                    supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+                supportMapFragment.getMapAsync(this)
+                getLocationAccess()
+                setCurrentLocation()
+            } else {
+                Toast.makeText(this, "Could not set currentLocation", Toast.LENGTH_SHORT).show()
             }
-            val task = fusedLocationProviderClient.lastLocation
-            task.addOnSuccessListener { location ->
-                if (location != null) {
-                    currentLocation = location
-                    val supportMapFragment =
-                        supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-                    supportMapFragment.getMapAsync(this)
-                }
-            }
-        } catch (e: Exception) {
-            Log.v("MapsActivity", e.message.toString())
-            // TODO ERROR HANDLING
         }
     }
 
@@ -304,7 +279,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 Log.d("validateConnection", "You might not have internet connection")
             }
         }
-
     }
 
     private fun setChargerStatus(chargerId: Int, status: Int) {
