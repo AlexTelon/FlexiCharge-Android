@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
-        updateMockChargerList()
+        updateChargerList()
     }
 
 
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         setupChargerInputCompletion(bottomSheetView)
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-        //getAllChargersFromMockDataApi()
+        //getAllChargersFromDataApi()
     }
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargers.isInitialized)
             listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this)
-        //listOfChargersRecyclerView.adapter = ChargerListAdapter(mockChargers.map { it.chargePointAddress }, mockChargers.map {it.chargePointId}, mockChargers.map { it.chargePointId})
+        //listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers.map { it.chargePointAddress }, chargers.map {it.chargePointId}, chargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
@@ -281,13 +281,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     editTextInput4.text.toString() +
                     editTextInput5.text.toString() +
                     editTextInput6.text.toString())
-            if (validateChargerId(chargerId)) validateConnectionToMockDataApi(
+            if (validateChargerId(chargerId)) validateConnectionToDataApi(
                 chargerId.toInt(),
                 chargerInputStatus
             )
             else {
                 chargerInputStatus.text = "ChargerId has to consist of 6 digits"
                 chargerInputStatus.setBackgroundResource(R.color.red)
+                chargerInputStatus.isClickable = false
             }
         }
     }
@@ -302,10 +303,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         return true
     }
 
-    private fun updateMockChargerList() {
+    private fun updateChargerList() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockChargerList()
+                val response = RetrofitInstance.api.getChargerList()
                 if (response.isSuccessful) {
                     val chargers = response.body() as Chargers
                     Log.d("validateConnection", "Connected to charger ")
@@ -332,7 +333,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     val charger = response.body() as Charger
                     Log.d("validateConnection", "Charger:" + charger.chargerID +  " status set to" + status)
                     //if (!chargers.isEmpty()) {
-                    //    mockChargers = response.body() as Chargers
+                    //    chargers = response.body() as Chargers
                     //}
                 } else {
                     Log.d("validateConnection", "Could not change status")
@@ -345,33 +346,49 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    private fun validateConnectionToMockDataApi(chargerId: Int, chargerInputStatus: TextView) {
+    private fun validateConnectionToDataApi(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getMockCharger(chargerId)
+                val response = RetrofitInstance.api.getCharger(chargerId)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
 
                     Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        if (charger.status == 1) {
-                            setChargerStatus(charger.chargerID,0)
-                            chargerInputStatus.text =
-                                "Connected to charger " + charger.chargerID + "\n located at Latitude:" + charger.location[0] + " Longitude:" + charger.location[1]
-                            addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
-                            chargerInputStatus.setBackgroundResource(R.color.green)
-                        } else if (charger.status == 0){
-                            chargerInputStatus.text = "Charger " + charger.chargerID + " is busy"
-                            chargerInputStatus.setBackgroundResource(R.color.red)
-                        } else if (charger.status == 2) {
-                            chargerInputStatus.text = "Charger " + charger.chargerID + " is out of order"
-                            chargerInputStatus.setBackgroundResource(R.color.red)
+                        when (charger.status) {
+                            0 -> {
+                                chargerInputStatus.text = "Charger Occupied"
+                                chargerInputStatus.setBackgroundResource(R.color.red)
+                            }
+                            1 -> {
+                                chargerInputStatus.text = "Begin Charging"
+                                chargerInputStatus.isClickable=true
+                                chargerInputStatus.setBackgroundResource(R.color.green)
+                                chargerInputStatus.setOnClickListener {
+                                    setChargerStatus(charger.chargerID,0)
+                                    chargerInputStatus.isClickable=true
+                                    chargerInputStatus.setBackgroundResource(R.color.yellow)
+                                    chargerInputStatus.text = "Tap to disconnect"
+                                    chargerInputStatus.setOnClickListener {
+                                        setChargerStatus(charger.chargerID,1)
+                                        chargerInputStatus.text = "You disconnected from charger " + charger.chargerID + ". Have a nice day!"
+                                        chargerInputStatus.setBackgroundResource(R.color.green)
+                                        chargerInputStatus.isClickable=false
+                                    }
+                                }
+                                addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString())
+                                //chargerInputStatus.setBackgroundResource(R.color.green)
+                            }
+                            2 -> {
+                                chargerInputStatus.text = "Charger Out of Order"
+                                chargerInputStatus.setBackgroundResource(R.color.red)
+                            }
                         }
                     }
                 } else {
                     Log.d("validateConnection", "Could not connect to charger" + chargerId)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        chargerInputStatus.text = "Charger " + chargerId + " does not exist"
+                        chargerInputStatus.text = "Charger Not Identified"
                         chargerInputStatus.setBackgroundResource(R.color.red)
                     }
                 }

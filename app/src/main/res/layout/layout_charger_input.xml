@@ -157,6 +157,8 @@
         android:id="@+id/charger_input_status"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_marginBottom="25dp"
         android:layout_weight="1"
         android:background="@android:color/transparent"
