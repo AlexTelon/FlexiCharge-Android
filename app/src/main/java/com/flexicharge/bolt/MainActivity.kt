@@ -20,8 +20,8 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,36 +34,31 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
-import java.math.BigDecimal
-import java.math.RoundingMode
-import kotlin.math.acos
-import kotlin.math.cos
-import kotlin.math.sin
-
-
+import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
-
-    private var chargerAddressList = mutableListOf<String>()
-    private var chargerDistanceList = mutableListOf<Int>()
-    private var numberOfChargers = mutableListOf<Int>()
-
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
-    private lateinit var mockChargers: Chargers
+    private lateinit var chargers: Chargers
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        updateMockChargerList()
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", false)
@@ -85,54 +80,73 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInput()
         }
-        binding.positionPinButton.setOnClickListener {
-            moveCameraToCurrentPosition()
+        binding.userButton.setOnClickListener {
+            if (isGuest) {
+                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
+            }
+            else {
+                startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
+            }
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
+        updateChargerList()
+    }
 
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val isGuest = sharedPreferences.getBoolean("isGuest", false)
-        if (!isGuest) {
-            startActivity(Intent(this, RegisterActivity::class.java))
-            finish()
+    private fun getLocationAccess() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.isMyLocationEnabled = true
+        }
+        else
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return
+                }
+                mMap.isMyLocationEnabled = true
+            }
+            else {
+                // TODO ERROR HANDLING
+                finish()
+            }
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        mMap.uiSettings.isMyLocationButtonEnabled = false
+        getLocationAccess()
         mMap.setMapStyle(
             MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
         )
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
-            /*
-            mMap.addCircle(
-                CircleOptions().center(curPos).radius(13000.0).fillColor(0x034078105).strokeColor(
-                    0x096144147.toInt()
-                ).strokeWidth(4f)
-            )
-            addNewMarkers(mockChargers)
-            mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
 
         } catch (e: Exception) {
             Log.v("MapsActivity", e.message.toString())
             // TODO ERROR HANDLING
         }
-
-        mMap.setOnMarkerClickListener {  marker ->
-            val distance = BigDecimal(distanceToMarkerInKm(marker.position.latitude, marker.position.longitude)).setScale(1, RoundingMode.HALF_EVEN)
-            var numberOfChargers : Int = -1
-            mockChargers.forEach {
-                if(it.id.toString() == marker.title.toString()){
-                    numberOfChargers = it.numberOfChargers
-                }
-            }
-            Toast.makeText(this,"This charger is " + distance.toString() + " km away", Toast.LENGTH_SHORT).show()
-            Toast.makeText(this, "Number of chargers: " + numberOfChargers.toString(), Toast.LENGTH_SHORT).show()
-            true
-        }
+      //  addNewMarkers(chargers)
     }
 
     private fun addNewMarkers(chargers: Chargers){
@@ -140,14 +154,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         val greenIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
         chargers.forEach {
-            val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location.latitude, it.location.longitude)).title(it.id.toString()))
-            if(it.numberOfChargers > 0) marker.setIcon(greenIcon)
+            val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location[0], it.location[1])).title(it.chargerID.toString()))
+            if(it.status == 1) marker.setIcon(greenIcon)
             else marker.setIcon(redIcon)
         }
-    }
-
-    private fun moveCameraToCurrentPosition(){
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
     }
 
     private fun fetchLocation() {
@@ -215,11 +225,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     }
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
+        var distanceToCharger = mutableListOf<String>()
+        chargers.forEach {
+            var dist = FloatArray(1)
+            Location.distanceBetween(it.location[0], it.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+            val df = DecimalFormat("#.##")
+            val distanceStr = df.format(dist[0] / 1000).toString()
+            distanceToCharger.add(distanceStr)
+        }
 
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargers.isInitialized)
-            listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this)
+            listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this, distanceToCharger)
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers.map { it.chargePointAddress }, chargers.map {it.chargePointId}, chargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
@@ -398,25 +416,4 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             }
         }
     }
-
-    private fun distanceToMarkerInKm(markerLat : Double, markerLon : Double): Double{
-        val curPosLat : Double = currentLocation.latitude
-        val curPosLon : Double = currentLocation.longitude
-        val theta = curPosLon - markerLon
-        var distance = sin(deg2rad(curPosLat)) * sin(deg2rad(markerLat)) + cos(deg2rad(curPosLat)) * cos(deg2rad(markerLat)) * cos(deg2rad(theta))
-        distance = acos(distance)
-        distance = rad2deg(distance)
-        distance *= 60 * 1.1515
-        distance *= 1.609344
-        return distance
-    }
-
-    private fun deg2rad(deg : Double): Double {
-        return deg * Math.PI / 180.0
-    }
-
-    private fun rad2deg(rad : Double): Double {
-        return rad * 180 / Math.PI
-    }
 }
-
