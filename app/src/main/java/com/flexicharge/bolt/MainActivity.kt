@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+        private const val PERMISSION_CODE = 101
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,53 +98,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return
-                }
-                mMap.isMyLocationEnabled = true
-            }
-            else {
-                // TODO ERROR HANDLING
-                finish()
-            }
+        when (requestCode) {
+            PERMISSION_CODE ->
+            if (grantResults.isNotEmpty() && grantResults[0] ==
+            PackageManager.PERMISSION_GRANTED) {
+            fetchLocation()
+        }
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.uiSettings.isMyLocationButtonEnabled = false
-        val chargerPos = LatLng(57.779978, 14.161790)
         getLocationAccess()
         mMap.setMapStyle(
           MapStyleOptions.loadRawResourceStyle(this, R.raw.flexicharge_map_style)
-        );
+        )
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
-            /*
-            mMap.addCircle(
-                CircleOptions().center(curPos).radius(1.0).fillColor(0x034078105).strokeColor(
-                    0x096144147.toInt()
-                ).strokeWidth(4f)
-            )
-            */
             //mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
 
@@ -156,6 +130,36 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     }
 
     private fun fetchLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+            PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+            PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE)
+            return
+        }
+        val task = fusedLocationProviderClient.lastLocation
+        task.addOnSuccessListener { location ->
+            if (location != null) {
+                currentLocation = location
+                val supportMapFragment =
+                    supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+                supportMapFragment.getMapAsync(this)
+            }
+        }
+        /*
+        val task = fusedLocationProviderClient.lastLocation
+        task.addOnSuccessListener { location −>
+            if (location != null) {
+                currentLocation = location
+                val supportMapFragment = (supportFragmentManager.findFragmentById(R.id.map) as
+                        SupportMapFragment?)!!
+                supportMapFragment.getMapAsync(this)
+            }
+        }
+        */
+        /*
         try {
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -177,19 +181,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 )
 
             }
-            val task = fusedLocationProviderClient.lastLocation
-            task.addOnSuccessListener { location ->
-                if (location != null) {
-                    currentLocation = location
-                    val supportMapFragment =
-                        supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-                    supportMapFragment.getMapAsync(this)
-                }
-            }
-        } catch (e: Exception) {
-            Log.v("MapsActivity", e.message.toString())
-            // TODO ERROR HANDLING
-        }
+            */
     }
 
     override fun addAndPanToMarker (latitude: Double, longitude: Double, title: String) {
