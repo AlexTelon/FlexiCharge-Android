@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-        private const val PERMISSION_CODE = 101
+        const val PERMISSION_CODE = 101
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +117,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun setCurrentLocation() {
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
-            //mMap.addMarker(MarkerOptions().position(curPos).title("You are here"))
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
 
         } catch (e: Exception) {
@@ -149,9 +148,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 val supportMapFragment =
                     supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
                 supportMapFragment.getMapAsync(this)
+                getLocationAccess()
                 setCurrentLocation()
             } else {
-                //fetchLocation()
                 Toast.makeText(this, "Could not set currentLocation", Toast.LENGTH_SHORT).show()
             }
         }
