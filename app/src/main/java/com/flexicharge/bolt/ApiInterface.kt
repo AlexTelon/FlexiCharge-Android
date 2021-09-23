@@ -1,14 +1,21 @@
 package com.flexicharge.bolt
 
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
+
+
 
 interface ApiInterface {
-    @GET("charger/{chargerId}")
-    suspend fun getMockCharger(@Path("chargerId") chargerId: String): Response<Charger>
+    @GET("chargers/{chargerId}")
+    suspend fun getCharger(@Path("chargerId") chargerId: Int): Response<Charger>
 
-    @GET("charger")
-    suspend fun getMockChargerList(): Response<Chargers>
+    @GET("chargers")
+    suspend fun getChargerList(): Response<Chargers>
+
+    @FormUrlEncoded
+    @PUT("chargers/{chargerId}")
+    suspend fun setChargerStatus(
+        @Path("chargerId") chargerId: Int,
+        @Field("status") status: Int
+    ): Response<Charger>
 }

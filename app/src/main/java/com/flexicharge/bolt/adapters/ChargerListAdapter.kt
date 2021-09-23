@@ -13,7 +13,7 @@ import com.flexicharge.bolt.Chargers
 import com.flexicharge.bolt.MainActivity
 import com.flexicharge.bolt.R
 
-class ChargerListAdapter(private var mockChargers: Chargers, private var act: addAndPanToMarkerInterface) :
+class ChargerListAdapter(private var chargers: Chargers, private var act: addAndPanToMarkerInterface) :
 RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,8 +26,8 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
         init {
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
-                Toast.makeText(itemView.context, "You clicked on charger at ${mockChargers[position].chargePointAddress}", Toast.LENGTH_SHORT).show()
-                act.addAndPanToMarker(mockChargers[position].location.latitude, mockChargers[position].location.longitude, mockChargers[position].chargePointAddress)
+                Toast.makeText(itemView.context, "You clicked on charger at ${chargers[position].chargePointID}", Toast.LENGTH_SHORT).show()
+                act.addAndPanToMarker(chargers[position].location[0], chargers[position].location[1], chargers[position].chargerID.toString())
             }
         }
 
@@ -44,10 +44,10 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemAddress.text = mockChargers[position].chargePointAddress
+        holder.itemAddress.text = "Charger " + chargers[position].chargerID.toString()
         holder.itemDistance.text = ""
-        if(mockChargers[position].numberOfChargers > 0 ){
-            holder.itemNumberOfChargers.text = mockChargers[position].numberOfChargers.toString()
+        if(chargers.size > 0 ){
+            holder.itemNumberOfChargers.text = "1 charger"
         } else {
             holder.itemNumberOfChargers.text =holder.itemView.context.getString(R.string.no_chargers_available)
             holder.itemNumberOfChargers.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))
@@ -56,7 +56,7 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     }
 
     override fun getItemCount(): Int {
-        return mockChargers.size
+        return chargers.size
     }
 
 }
