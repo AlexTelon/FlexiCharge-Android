@@ -44,7 +44,7 @@ import java.io.IOException
 import java.lang.Exception
 import java.text.DecimalFormat
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.addAndPanToMarkerInterface {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.panToMarkerInterface {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    override fun addAndPanToMarker (latitude: Double, longitude: Double, title: String, status: Int) {
+    override fun panToMarker (latitude: Double, longitude: Double, title: String, status: Int) {
 //        val icon : BitmapDescriptor
 //        if (status == 0) {
 //            icon = BitmapDescriptorFactory.fromBitmap(this.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
@@ -321,7 +321,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
                     Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        addAndPanToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString(), charger.status)
+                        panToMarker(charger.location[0], charger.location[1], charger.chargePointID.toString(), charger.status)
                         when (charger.status) {
                             0 -> {
                                 chargerInputStatus.text = "Charger Occupied"
