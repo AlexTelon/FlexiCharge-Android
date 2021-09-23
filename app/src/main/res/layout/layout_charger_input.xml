@@ -11,11 +11,13 @@
         android:id="@+id/charger_input_list_recyclerview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
         android:layout_marginTop="5dp"
+        android:layout_marginEnd="25dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/charger_input_pinview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chargers_near_me"
         tools:listitem="@layout/charger_list_item" />
 
@@ -26,7 +28,7 @@
         android:layout_marginTop="-10dp"
         android:text="@string/chargers_near_me"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/arrow" />
@@ -40,118 +42,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView_recyclerviewPlaceholder"
+
+    <com.chaos.view.PinView
+        android:id="@+id/charger_input_pinview"
+        style="@style/PinWidget.PinView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Insert ReyclerView here"
-        android:textColor="@color/white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/arrow"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginStart="25dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="25dp"
-        android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
+        android:cursorVisible="true"
+        android:hint="------"
+        android:inputType="number"
+        android:itemBackground="@drawable/rounded_edittext"
+        android:padding="5dp"
+        android:textColor="@color/dark_grey"
+        android:textColorHint="@color/light_grey"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:theme="@style/Theme.AppCompat"
+        app:cursorColor="@color/light_grey"
+        app:cursorWidth="2dp"
+        app:itemCount="6"
+        app:itemHeight="65dp"
+        app:itemRadius="10dp"
+        app:itemSpacing="10dp"
+        app:itemWidth="45dp"
         app:layout_constraintBottom_toTopOf="@+id/charger_input_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/charger_input_list_recyclerview">
-
-        <EditText
-            android:id="@+id/charger_input_edit_text_1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_edittext"
-            android:gravity="center"
-            android:hint="-"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxLength="1"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/charger_input_edit_text_2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_edittext"
-            android:gravity="center"
-            android:hint="-"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxLength="1"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/charger_input_edit_text_3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_edittext"
-            android:gravity="center"
-            android:hint="-"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxLength="1"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/charger_input_edit_text_4"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_edittext"
-            android:gravity="center"
-            android:hint="-"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxLength="1"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/charger_input_edit_text_5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_edittext"
-            android:gravity="center"
-            android:hint="-"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxLength="1"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/charger_input_edit_text_6"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_edittext"
-            android:gravity="center"
-            android:hint="-"
-            android:inputType="number"
-            android:maxLength="1"
-            android:textSize="24sp" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/charger_input_list_recyclerview"
+        app:viewType="rectangle" />
 
     <TextView
         android:id="@+id/charger_input_status"
@@ -159,7 +79,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="25dp"
         android:layout_marginEnd="25dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="30dp"
         android:layout_weight="1"
         android:background="@android:color/transparent"
         android:gravity="center"
