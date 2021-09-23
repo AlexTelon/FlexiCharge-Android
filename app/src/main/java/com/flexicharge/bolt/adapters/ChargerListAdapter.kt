@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.Chargers
 import com.flexicharge.bolt.R
 
-class ChargerListAdapter(private var chargers: Chargers, private var act: addAndPanToMarkerInterface, private var distance : MutableList<String>) :
+class ChargerListAdapter(private var chargers: Chargers, private var act: panToMarkerInterface, private var distance : MutableList<String>) :
 RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -25,7 +25,7 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
                 Toast.makeText(itemView.context, "You clicked on charger at ${chargers[position].chargePointID}", Toast.LENGTH_SHORT).show()
-                act.addAndPanToMarker(
+                act.panToMarker(
                     chargers[position].location[0],
                     chargers[position].location[1],
                     chargers[position].chargerID.toString(),
@@ -36,8 +36,8 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
 
     }
 
-    interface addAndPanToMarkerInterface {
-        fun addAndPanToMarker (latitude: Double, longitude: Double, title: String, status: Int) {
+    interface panToMarkerInterface {
+        fun panToMarker (latitude: Double, longitude: Double, title: String, status: Int) {
         }
     }
 
