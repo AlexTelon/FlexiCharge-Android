@@ -164,8 +164,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 supportMapFragment.getMapAsync(this)
                 getLocationAccess()
                 setCurrentLocation()
-            } else {
-                Toast.makeText(this, "Could not set currentLocation", Toast.LENGTH_SHORT).show()
             }
         }
     }
