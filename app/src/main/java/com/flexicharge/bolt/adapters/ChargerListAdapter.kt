@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.Chargers
@@ -24,7 +23,6 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
         init {
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
-                Toast.makeText(itemView.context, "You clicked on charger at ${chargers[position].chargePointID}", Toast.LENGTH_SHORT).show()
                 act.panToMarker(
                     chargers[position].location[0],
                     chargers[position].location[1],
