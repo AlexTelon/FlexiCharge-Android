@@ -1,22 +1,21 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.payment
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.webkit.WebView
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.flexicharge.bolt.R
+import com.flexicharge.bolt.payment.api.OrderClient
+import com.flexicharge.bolt.payment.api.OrderPayload
 import com.klarna.mobile.sdk.api.payments.*
-import com.flexicharge.bolt.api.OrderClient
-import com.flexicharge.bolt.api.OrderPayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class SampleActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
-
+class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
     private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
     private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
@@ -68,7 +67,7 @@ class SampleActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 val response = orderCall.execute()
                 if (response.isSuccessful) {
                     runOnUiThread {
-                        startActivity(Intent(this@SampleActivity, OrderCompletedActivity::class.java))
+                        startActivity(Intent(this@KlarnaActivity, KlarnaOrderCompletedActivity::class.java))
                         finish()
                     }
                 } else {

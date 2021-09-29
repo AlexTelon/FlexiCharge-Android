@@ -1,12 +1,12 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.AccountActivities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import androidx.appcompat.app.AlertDialog
-import com.flexicharge.bolt.api.OrderClient
-import com.flexicharge.bolt.api.OrderPayload
+import com.flexicharge.bolt.R
+import com.flexicharge.bolt.payment.api.OrderClient
+import com.flexicharge.bolt.payment.api.OrderPayload
 import com.klarna.mobile.sdk.api.KlarnaMobileSDKCommon
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentCategory
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentView

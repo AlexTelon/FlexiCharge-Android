@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -36,9 +35,12 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.chaos.view.PinView
+import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedInActivity
+import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedOutActivity
 import com.flexicharge.bolt.adapters.ChargerListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.databinding.ActivityMainBinding
+import com.flexicharge.bolt.payment.KlarnaActivity
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -104,7 +106,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
         binding.userButton.setOnClickListener {
             if (isGuest) {
-                startActivity(Intent(this, SampleActivity::class.java))
+                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
             }
             else {
                 startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
@@ -218,6 +220,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         val klarna = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
         klarna.setOnClickListener {
             Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, KlarnaActivity::class.java))
         }
 
         setupChargerInput(bottomSheetView)

@@ -1,3 +1,3 @@
-package com.flexicharge.bolt.api
+package com.flexicharge.bolt.payment.api
 
 class Session(val client_token : String)

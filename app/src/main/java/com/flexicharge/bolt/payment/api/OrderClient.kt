@@ -1,4 +1,4 @@
-package com.flexicharge.bolt.api
+package com.flexicharge.bolt.payment.api
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

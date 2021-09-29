@@ -1,4 +1,4 @@
-package com.flexicharge.bolt.api
+package com.flexicharge.bolt.payment.api
 
 data class OrderPayload(
     val purchase_country: String,

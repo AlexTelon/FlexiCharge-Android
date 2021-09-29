@@ -1,4 +1,4 @@
-package com.flexicharge.bolt.api
+package com.flexicharge.bolt.payment.api
 
 import retrofit2.Call
 import retrofit2.http.Body

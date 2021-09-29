@@ -1,10 +1,11 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.payment
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.flexicharge.bolt.R
 
-class OrderCompletedActivity : AppCompatActivity() {
+class KlarnaOrderCompletedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -13,7 +14,7 @@ class OrderCompletedActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        startActivity(Intent(this, SampleActivity::class.java))
+        startActivity(Intent(this, KlarnaActivity::class.java))
     }
 
 }
