@@ -387,8 +387,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        chargerInputStatus.text = "Charger Not Identified"
-                        chargerInputStatus.setBackgroundResource(R.color.red)
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger not identified", 0)
                     }
                 }
             } catch (e: HttpException) {
@@ -396,13 +395,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
                 lifecycleScope.launch(Dispatchers.Main) {
-                    chargerInputStatus.text = "Unable to establish connection"
-                    chargerInputStatus.setBackgroundResource(R.color.red)
+                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
                 }
             }
         }
     }
-
 
     private suspend fun updateChargerStatusTextView(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
