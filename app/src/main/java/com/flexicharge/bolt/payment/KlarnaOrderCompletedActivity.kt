@@ -9,7 +9,7 @@ class KlarnaOrderCompletedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_order_completed)
+        setContentView(R.layout.activity_klarna_order_completed)
     }
 
     override fun onBackPressed() {

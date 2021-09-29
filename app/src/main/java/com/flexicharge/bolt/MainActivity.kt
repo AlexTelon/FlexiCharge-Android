@@ -220,7 +220,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         val klarna = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
         klarna.setOnClickListener {
             Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, KlarnaActivity::class.java))
+
+            val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
+            intent.putExtra("ChargerId",123456)
+            startActivity(intent)
+            //startActivity(Intent(this, KlarnaActivity::class.java))
         }
 
         setupChargerInput(bottomSheetView)
