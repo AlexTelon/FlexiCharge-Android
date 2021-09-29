@@ -35,8 +35,7 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     }
 
     interface panToMarkerInterface {
-        fun panToMarker (latitude: Double, longitude: Double, title: String, status: Int) {
-        }
+        fun panToMarker (latitude: Double, longitude: Double, title: String, status: Int) {}
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
