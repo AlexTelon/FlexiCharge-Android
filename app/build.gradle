@@ -22,13 +22,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
     buildFeatures {
         viewBinding true
     }
@@ -62,4 +65,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
     // PinView
     implementation 'io.github.chaosleung:pinview:1.4.4'
+    // Klarna
+    implementation 'com.klarna.mobile:sdk:2.0.44'
+
 }

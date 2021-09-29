@@ -15,6 +15,10 @@
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.3307291666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_order_completed.xml" value="0.16666666666666666" />
+        <entry key="app/src/main/res/layout/activity_profile_menu_logged_out.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_sample.xml" value="0.16666666666666666" />
+        <entry key="app/src/main/res/xml/network_security_config.xml" value="0.21014492753623187" />
       </map>
     </option>
   </component>

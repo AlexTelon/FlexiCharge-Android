@@ -23,9 +23,12 @@ class RetrofitInstance {
                 .build()
         }
 
-        val api by lazy {
+        val flexiChargeApi by lazy {
             retrofit.create(ApiInterface::class.java)
         }
+
+
+
     }
 
 }

@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
         binding.userButton.setOnClickListener {
             if (isGuest) {
-                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
+                startActivity(Intent(this, SampleActivity::class.java))
             }
             else {
                 startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
@@ -226,19 +226,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
 
     private fun displayChargerList(bottomSheetView: View, arrow: ImageView){
-        var distanceToCharger = mutableListOf<String>()
-        chargers.forEach {
-            var dist = FloatArray(1)
-            Location.distanceBetween(it.location[0], it.location[1], currentLocation.latitude, currentLocation.longitude, dist)
-            val df = DecimalFormat("#.##")
-            val distanceStr = df.format(dist[0] / 1000).toString()
-            distanceToCharger.add(distanceStr)
-        }
 
         val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this)
-        if (this::chargers.isInitialized)
+        if (this::chargers.isInitialized) {
+            var distanceToCharger = mutableListOf<String>()
+            chargers.forEach {
+                var dist = FloatArray(1)
+                Location.distanceBetween(it.location[0], it.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+                val df = DecimalFormat("#.##")
+                val distanceStr = df.format(dist[0] / 1000).toString()
+                distanceToCharger.add(distanceStr)
+            }
             listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers, this, distanceToCharger)
+        }
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers.map { it.chargePointAddress }, chargers.map {it.chargePointId}, chargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
 
@@ -268,7 +269,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun updateChargerList() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getChargerList()
+                val response = RetrofitInstance.flexiChargeApi.getChargerList()
                 if (response.isSuccessful) {
                     val chargers = response.body() as Chargers
                     Log.d("validateConnection", "Connected to charger ")
@@ -292,7 +293,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun setChargerStatus(chargerId: Int, status: Int) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.setChargerStatus(chargerId, status)
+                val response = RetrofitInstance.flexiChargeApi.setChargerStatus(chargerId, status)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
                     Log.d("validateConnection", "Charger:" + charger.chargerID +  " status set to" + status)
@@ -313,7 +314,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun validateConnectionToDataApi(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getCharger(chargerId)
+                val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
 

@@ -1,40 +1,37 @@
 package com.flexicharge.bolt
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebView
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.klarna.mobile.sdk.api.payments.*
 import com.flexicharge.bolt.api.OrderClient
 import com.flexicharge.bolt.api.OrderPayload
-import com.klarna.mobile.sdk.api.KlarnaMobileSDKCommon
-import com.klarna.mobile.sdk.api.payments.KlarnaPaymentCategory
-import com.klarna.mobile.sdk.api.payments.KlarnaPaymentView
-import com.klarna.mobile.sdk.api.payments.KlarnaPaymentViewCallback
-import com.klarna.mobile.sdk.api.payments.KlarnaPaymentsSDKError
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
+class SampleActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
 
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
-    //private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
-    //private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
-    //private val orderButton by lazy { findViewById<Button>(R.id.orderButton) }
+    private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
+    private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
+    private val orderButton by lazy { findViewById<Button>(R.id.orderButton) }
+
+    private val paymentCategory = KlarnaPaymentCategory.PAY_NOW // please update this value if needed
+
     private var job: Job? = null
-    private val paymentCategory = KlarnaPaymentCategory.PAY_NOW
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile_menu_logged_out)
-        val deviceIdentifier: String = KlarnaMobileSDKCommon.deviceIdentifier()
+        setContentView(R.layout.activity_sample)
         initialize()
-        klarnaPaymentView.category = paymentCategory }
-
-    override fun onPause() {
-        super.onPause()
-        klarnaPaymentView.unregisterPaymentViewCallback(this)
-        job?.cancel()
+        setupButtons()
+        klarnaPaymentView.category = paymentCategory
     }
 
     private fun initialize() {
@@ -62,6 +59,41 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallb
         }
     }
 
+    private fun createOrder() {
+        job = GlobalScope.launch {
+
+            // create the order using the auth token received in the authorization response
+            val orderCall = OrderClient.instance.createOrder(orderButton.tag as String, OrderPayload.defaultPayload)
+            try {
+                val response = orderCall.execute()
+                if (response.isSuccessful) {
+                    runOnUiThread {
+                        startActivity(Intent(this@SampleActivity, OrderCompletedActivity::class.java))
+                        finish()
+                    }
+                } else {
+                    showError(null)
+                }
+            } catch (exception: Exception) {
+                showError(exception.message)
+            }
+        }
+    }
+
+    private fun setupButtons() {
+        authorizeButton.setOnClickListener {
+            klarnaPaymentView.authorize(true, null)
+        }
+
+        finalizeButton.setOnClickListener {
+            klarnaPaymentView.finalize(null)
+        }
+
+        orderButton.setOnClickListener {
+            createOrder()
+        }
+    }
+
     private fun showError(message: String?) {
         runOnUiThread {
             val alertDialog = AlertDialog.Builder(this).create()
@@ -73,6 +105,11 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallb
         }
     }
 
+    private fun runOnUiThread(action: () -> Unit) {
+        GlobalScope.launch(Dispatchers.Main) {
+            action.invoke()
+        }
+    }
 
     override fun onInitialized(view: KlarnaPaymentView) {
 
@@ -83,7 +120,7 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallb
     override fun onLoaded(view: KlarnaPaymentView) {
 
         // enable the authorization after the payment view is loaded
-        //authorizeButton.isEnabled = true
+        authorizeButton.isEnabled = true
     }
 
     override fun onLoadPaymentReview(view: KlarnaPaymentView, showForm: Boolean) {}
@@ -94,9 +131,9 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallb
         authToken: String?,
         finalizedRequired: Boolean?
     ) {
-        //finalizeButton.isEnabled = finalizedRequired ?: false
-        //orderButton.isEnabled = approved && !(finalizedRequired ?: false)
-        //orderButton.tag = authToken
+        finalizeButton.isEnabled = finalizedRequired ?: false
+        orderButton.isEnabled = approved && !(finalizedRequired ?: false)
+        orderButton.tag = authToken
     }
 
     override fun onReauthorized(view: KlarnaPaymentView, approved: Boolean, authToken: String?) {}
@@ -109,12 +146,19 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallb
     }
 
     override fun onFinalized(view: KlarnaPaymentView, approved: Boolean, authToken: String?) {
-        //orderButton.isEnabled = approved
-        //orderButton.tag = authToken
+        orderButton.isEnabled = approved
+        orderButton.tag = authToken
     }
 
-    fun aboutClick(view: View) {}
-    fun loginClick(view: View) {
-        klarnaPaymentView.authorize(true, null)
+    override fun onResume() {
+        super.onResume()
+        klarnaPaymentView.registerPaymentViewCallback(this)
     }
+
+    override fun onPause() {
+        super.onPause()
+        klarnaPaymentView.unregisterPaymentViewCallback(this)
+        job?.cancel()
+    }
+
 }
