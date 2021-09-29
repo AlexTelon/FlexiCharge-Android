@@ -6,6 +6,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Location
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Fade
@@ -18,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +29,12 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.budiyev.android.codescanner.AutoFocusMode
+import com.budiyev.android.codescanner.CodeScanner
+import com.budiyev.android.codescanner.CodeScannerView
+import com.budiyev.android.codescanner.DecodeCallback
+import com.budiyev.android.codescanner.ErrorCallback
+import com.budiyev.android.codescanner.ScanMode
 import com.chaos.view.PinView
 import com.flexicharge.bolt.adapters.ChargerListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
@@ -51,6 +59,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
     private lateinit var chargers: Chargers
+    private lateinit var codeScanner : CodeScanner
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -74,6 +83,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
             } else {
                 Toast.makeText(this, "Location permissions are required for this feature.", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.cameraButton.setOnClickListener {
+            binding.scannerView.visibility = View.VISIBLE
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_DENIED){
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 123)
+            }else {
+                scanQR()
             }
         }
 
@@ -197,6 +215,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             displayChargerList(bottomSheetView,arrow)
         }
 
+        val klarna = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
+        klarna.setOnClickListener {
+            Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
+        }
+
         setupChargerInput(bottomSheetView)
 
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -248,10 +271,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
             listOfChargersRecyclerView.visibility = View.VISIBLE
             chargersNearMe.visibility = View.GONE
+            bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button).visibility = View.INVISIBLE
         } else {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
+            bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button).visibility = View.VISIBLE
         }
     }
 
@@ -307,6 +332,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
             }
+        }
+    }
+
+    private fun scanQR(){
+        val scannerView : CodeScannerView = findViewById(R.id.scanner_view)
+        codeScanner = CodeScanner(this, scannerView)
+        codeScanner.camera = CodeScanner.CAMERA_BACK
+        codeScanner.formats = CodeScanner.ALL_FORMATS
+        codeScanner.startPreview()
+
+        codeScanner.autoFocusMode = AutoFocusMode.SAFE
+        codeScanner.scanMode = ScanMode.SINGLE
+        codeScanner.isAutoFocusEnabled = true
+        codeScanner.isFlashEnabled = false
+        codeScanner.decodeCallback = DecodeCallback {
+            runOnUiThread {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it.text))
+                startActivity(browserIntent)
+            }
+        }
+        codeScanner.errorCallback = ErrorCallback {
+            runOnUiThread {
+                Toast.makeText(this, "Camera initialization error : ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+        scannerView.setOnClickListener{
+            codeScanner.startPreview()
         }
     }
 
