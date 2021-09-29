@@ -67,5 +67,6 @@ dependencies {
     implementation 'io.github.chaosleung:pinview:1.4.4'
     // Klarna
     implementation 'com.klarna.mobile:sdk:2.0.44'
-
+    // QR scanner
+    implementation 'com.budiyev.android:code-scanner:2.1.0'
 }

@@ -73,5 +73,28 @@
         map:layout_constraintEnd_toEndOf="@+id/camera_button"
         map:layout_constraintStart_toStartOf="@+id/camera_button" />
 
+    <com.budiyev.android.codescanner.CodeScannerView
+        android:visibility="invisible"
+        android:id="@+id/scanner_view"
+        map:layout_constraintTop_toTopOf="parent"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        map:autoFocusButtonColor="@color/white"
+        map:autoFocusButtonVisible="true"
+        map:flashButtonColor="@color/white"
+        map:flashButtonVisible="true"
+        map:frameColor="@color/white"
+        map:frameCornersSize="50dp"
+        map:frameCornersRadius="0dp"
+        map:frameAspectRatioHeight="1"
+        map:frameAspectRatioWidth="1"
+        map:frameSize="0.75"
+        map:frameThickness="2dp"
+        map:maskColor="#77000000"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
