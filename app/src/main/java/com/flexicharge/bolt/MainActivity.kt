@@ -19,6 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.util.Log
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -214,6 +215,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             displayChargerList(bottomSheetView,arrow)
         }
 
+        val klarna = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
+        klarna.setOnClickListener {
+            Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
+        }
+
         setupChargerInput(bottomSheetView)
 
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -265,10 +271,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
             listOfChargersRecyclerView.visibility = View.VISIBLE
             chargersNearMe.visibility = View.GONE
+            bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button).visibility = View.INVISIBLE
         } else {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
             listOfChargersRecyclerView.visibility = View.GONE
             chargersNearMe.visibility = View.VISIBLE
+            bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button).visibility = View.VISIBLE
         }
     }
 
