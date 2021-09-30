@@ -8,6 +8,9 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Layout
+import android.transition.AutoTransition
+import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
 import android.view.LayoutInflater
@@ -19,11 +22,7 @@ import android.util.Log
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -249,11 +248,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
         val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
         klarnaButton.setOnClickListener {
+
             Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
             intent.putExtra("ChargerId",123456)
             startActivity(intent)
+        }
+
+        val backButton = bottomSheetView.findViewById<ImageButton>(R.id.backButton)
+        backButton.setOnClickListener {
+            exchangeCheckoutAndChargerList()
         }
 
         setupChargerInput(bottomSheetView)
@@ -401,18 +406,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                             0 -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0) }
                             1 -> {
                                 setChargerButtonStatus(chargerInputStatus, true, "Begin Charging", 1)
-                                klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
-                                    width = dpToPx(100)
-                                    height = dpToPx(100)
-                                }
-                                klarnaButton.visibility = View.VISIBLE
 
-                                klarnaButton.setOnClickListener {
-                                    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
-                                    intent.putExtra("ChargerId",chargerId)
-                                    startActivity(intent)
-                                }
+                                //klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
+                                //    width = dpToPx(100)
+                                //    height = dpToPx(100)
+                                //}
+                                //klarnaButton.visibility = View.VISIBLE
 
+                                //klarnaButton.setOnClickListener {
+                                //    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
+                                //    intent.putExtra("ChargerId",chargerId)
+                                //    startActivity(intent)
+                                //}
+
+
+
+                                exchangeCheckoutAndChargerList()
 
                                 chargerInputStatus.setOnClickListener {
                                     lifecycleScope.launch {
@@ -439,6 +448,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
+    //TODO: Update this function. Case 1 should not be in updateChargerStatusTextView
     private suspend fun updateChargerStatusTextView(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -479,6 +489,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             1 -> { chargerInputStatus.setBackgroundResource(R.color.green)}
             2 -> { chargerInputStatus.setBackgroundResource(R.color.dark_grey)}
             3 -> { chargerInputStatus.setBackgroundResource(R.color.yellow)}
+        }
+    }
+    private fun exchangeCheckoutAndChargerList(){
+        val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
+        val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargers_near_me_layout)
+        val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.charger_input_pinview)
+        val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.charger_input_status)
+        val chargerInputView = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargerInputLayout)
+        TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
+
+        if(chargersNearMeLayout?.visibility == View.GONE){
+            chargersNearMeLayout.visibility = View.VISIBLE
+            checkoutLayout?.visibility = View.GONE
+            chargerInput?.isEnabled = true
+            chargerInput?.text?.clear()
+            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
+        }
+        else {
+            chargersNearMeLayout?.visibility = View.GONE
+            checkoutLayout?.visibility =View.VISIBLE
+            chargerInput?.isEnabled = false
         }
     }
 }
