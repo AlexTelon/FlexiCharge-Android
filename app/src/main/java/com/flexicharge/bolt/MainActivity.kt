@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
     private lateinit var chargers: Chargers
+    private lateinit var chargerInputDialog: BottomSheetDialog
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -84,8 +85,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         mapFragment.getMapAsync(this)
 
         binding.identifyChargerButton.setOnClickListener {
-            //setupChargerDialog() Change back to!!
-            setupChargerInProgress()
+            setupChargerDialog()
         }
         binding.userButton.setOnClickListener {
             if (isGuest) {
@@ -186,42 +186,39 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
     }
 
-    private fun setupChargerInProgress() {
-
-        //val bottomSheet = findViewById<View>(R.id.chargerInformationLayout)
-        //val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+    private fun setupChargerInProgress(charger: Charger) {
 
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity
         )
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetDialog.behavior.peekHeight = 140
+        bottomSheetDialog.setCancelable(false)
 
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
             R.layout.layout_charger_in_progress,
             findViewById<ConstraintLayout>(R.id.chargerInProgress)
         )
-
-        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.behavior.peekHeight = 140;
-
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.progressbar)
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.progressbarPercent)
+
         var progress = 67;
+
         bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
-            progress += 10;
-            progressbar.progress = progress;
-            progressbarPercent.text = progress.toString();
+            setChargerStatus(charger.chargerID,1)
+            bottomSheetDialog.dismiss()
         }
+
         progressbar.progress = progress;
         progressbarPercent.text = progress.toString();
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-        //getAllChargersFromDataApi()
     }
 
 
     private fun setupChargerDialog() {
-        val bottomSheetDialog = BottomSheetDialog(
+        chargerInputDialog = BottomSheetDialog(
             this@MainActivity
         )
 
@@ -237,8 +234,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 
         setupChargerInput(bottomSheetView)
 
-        bottomSheetDialog.setContentView(bottomSheetView)
-        bottomSheetDialog.show()
+        chargerInputDialog.setContentView(bottomSheetView)
+        chargerInputDialog.show()
         //getAllChargersFromDataApi()
     }
     private fun setupChargerInput(bottomSheetView: View) {
@@ -369,18 +366,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                                 chargerInputStatus.setBackgroundResource(R.color.green)
                                 chargerInputStatus.setOnClickListener {
                                     setChargerStatus(charger.chargerID,0)
-                                    chargerInputStatus.isClickable=true
-                                    chargerInputStatus.setBackgroundResource(R.color.yellow)
-                                    chargerInputStatus.text = "Tap to disconnect"
-                                    chargerInputStatus.setOnClickListener {
-                                        setChargerStatus(charger.chargerID,1)
-                                        chargerInputStatus.text = "You disconnected from charger " + charger.chargerID + ". Have a nice day!"
-                                        chargerInputStatus.setBackgroundResource(R.color.green)
-                                        chargerInputStatus.isClickable=false
-                                    }
+                                    chargerInputDialog.dismiss()
+                                    setupChargerInProgress(charger)
                                 }
-
-                                //chargerInputStatus.setBackgroundResource(R.color.green)
                             }
                             2 -> {
                                 chargerInputStatus.text = "Charger Out of Order"
