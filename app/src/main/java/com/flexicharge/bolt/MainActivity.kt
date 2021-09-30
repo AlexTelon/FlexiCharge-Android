@@ -10,6 +10,8 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Layout
+import android.transition.AutoTransition
+import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
 import android.view.LayoutInflater
@@ -458,12 +460,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargers_near_me_layout)
         val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.charger_input_pinview)
+        val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.charger_input_status)
+        val chargerInputView = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargerInputLayout)
+        TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
 
         if(chargersNearMeLayout?.visibility == View.GONE){
             chargersNearMeLayout.visibility = View.VISIBLE
             checkoutLayout?.visibility = View.GONE
             chargerInput?.isEnabled = true
             chargerInput?.text?.clear()
+            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
         }
         else {
             chargersNearMeLayout?.visibility = View.GONE
