@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +18,7 @@ import android.util.Log
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -37,6 +37,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -82,7 +84,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         mapFragment.getMapAsync(this)
 
         binding.identifyChargerButton.setOnClickListener {
-            setupChargerDialog()
+            //setupChargerDialog() Change back to!!
+            setupChargerInProgress()
         }
         binding.userButton.setOnClickListener {
             if (isGuest) {
@@ -182,9 +185,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
 //        mMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude)).title(title)).setIcon(icon)
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
     }
+
+    private fun setupChargerInProgress() {
+
+        //val bottomSheet = findViewById<View>(R.id.chargerInformationLayout)
+        //val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+
+        val bottomSheetDialog = BottomSheetDialog(
+            this@MainActivity
+        )
+
+        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
+            R.layout.layout_charger_in_progress,
+            findViewById<ConstraintLayout>(R.id.chargerInProgress)
+        )
+
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetDialog.behavior.peekHeight = 140;
+
+        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.progressbar)
+        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.progressbarPercent)
+        var progress = 67;
+        bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
+            progress += 10;
+            progressbar.progress = progress;
+            progressbarPercent.text = progress.toString();
+        }
+        progressbar.progress = progress;
+        progressbarPercent.text = progress.toString();
+
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
+        //getAllChargersFromDataApi()
+    }
+
+
     private fun setupChargerDialog() {
         val bottomSheetDialog = BottomSheetDialog(
-            this@MainActivity, R.style.BottomSheetDialogTheme
+            this@MainActivity
         )
 
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
