@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.flexicharge.bolt.R
@@ -87,8 +88,10 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 if (response.isSuccessful) {
                     runOnUiThread {
                         val intent = Intent(this@KlarnaActivity, KlarnaOrderCompletedActivity::class.java)
-                        intent.putExtra("message","Charged 300SEK for Charger: " + chargerId)
-                        startActivity(intent)
+                        //intent.putExtra("message","Charged 300SEK for Charger: " + chargerId)
+                        Toast.makeText(this@KlarnaActivity,"Charged 300SEK for Charger: " + chargerId,
+                            Toast.LENGTH_SHORT).show()
+                        //startActivity(intent)
                         finish()
                     }
                 } else {
@@ -108,7 +111,6 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         finalizeButton.setOnClickListener {
             klarnaPaymentView.finalize(null)
         }
-
         orderButton.setOnClickListener {
             createOrder()
         }
