@@ -317,7 +317,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun setChargerStatus(chargerId: Int, status: Int) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.setChargerStatus(chargerId, status)
+                val requestParams: MutableMap<String, Int> = HashMap()
+                requestParams.put("status", status)
+                val response = RetrofitInstance.api.setChargerStatus(chargerId, requestParams)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
                     Log.d("validateConnection", "Charger:" + charger.chargerID +  " status set to" + status)
