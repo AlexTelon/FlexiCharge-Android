@@ -389,14 +389,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                                     setupChargerInProgressDialog(charger)
                                 }
                             }
-                            2 -> {
-                                chargerInputStatus.text = "Charger Out of Order"
-                                chargerInputStatus.setBackgroundResource(R.color.red)
-                                    lifecycleScope.launch {
-                                        updateChargerStatusTextView(chargerId, chargerInputStatus)
-                                    }
-                                }
-                            }
                             2 -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Out of Order", 2) }
                         }
                     }
@@ -412,36 +404,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 lifecycleScope.launch(Dispatchers.Main) {
                     setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
                 }
-            }
-        }
-    }
-
-    private suspend fun updateChargerStatusTextView(chargerId: Int, chargerInputStatus: TextView) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.api.getCharger(chargerId)
-                if (response.isSuccessful) {
-                    val charger = response.body() as Charger
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        when (charger.status) {
-                            0 -> { setChargerButtonStatus(chargerInputStatus, true, "Occupied Charger",0) }
-                            1 -> {
-                                setChargerStatus(charger.chargerID, 0)
-                                setChargerButtonStatus(chargerInputStatus, true, "Tap to Disconnect", 3)
-
-                                chargerInputStatus.setOnClickListener {
-                                    setChargerStatus(charger.chargerID, 1)
-                                    setChargerButtonStatus(chargerInputStatus, false, "You Disconnected from Charger " + charger.chargerID + ". Have a nice day!", 1)
-                                }
-                            }
-                            2 -> {  setChargerButtonStatus(chargerInputStatus, false, "Charger Out of Order", 2) }
-                        }
-                    }
-                }
-            } catch (e: HttpException) {
-
-            } catch (e: IOException) {
-
             }
         }
     }
