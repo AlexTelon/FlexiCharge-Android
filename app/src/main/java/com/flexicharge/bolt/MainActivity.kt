@@ -50,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.io.Serializable
 import java.lang.Exception
 import java.text.DecimalFormat
 
@@ -60,7 +61,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var currentLocation: Location
     private lateinit var chargers: Chargers
-    private lateinit var codeScanner : CodeScanner
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -88,13 +88,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             }
         }
         binding.cameraButton.setOnClickListener {
-            binding.scannerView.visibility = View.VISIBLE
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
-                    PackageManager.PERMISSION_DENIED){
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 123)
-            }else {
-                scanQR()
-            }
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
         }
 
         val mapFragment = supportFragmentManager
@@ -130,7 +125,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_CODE ->
@@ -334,33 +329,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             } catch (e: IOException) {
                 Log.d("validateConnection", "You might not have internet connection")
             }
-        }
-    }
-
-    private fun scanQR(){
-        val scannerView : CodeScannerView = findViewById(R.id.scanner_view)
-        codeScanner = CodeScanner(this, scannerView)
-        codeScanner.camera = CodeScanner.CAMERA_BACK
-        codeScanner.formats = CodeScanner.ALL_FORMATS
-        codeScanner.startPreview()
-
-        codeScanner.autoFocusMode = AutoFocusMode.SAFE
-        codeScanner.scanMode = ScanMode.SINGLE
-        codeScanner.isAutoFocusEnabled = true
-        codeScanner.isFlashEnabled = false
-        codeScanner.decodeCallback = DecodeCallback {
-            runOnUiThread {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it.text))
-                startActivity(browserIntent)
-            }
-        }
-        codeScanner.errorCallback = ErrorCallback {
-            runOnUiThread {
-                Toast.makeText(this, "Camera initialization error : ${it.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-        scannerView.setOnClickListener{
-            codeScanner.startPreview()
         }
     }
 
