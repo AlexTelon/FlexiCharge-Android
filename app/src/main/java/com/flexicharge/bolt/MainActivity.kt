@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         mapFragment.getMapAsync(this)
 
         binding.identifyChargerButton.setOnClickListener {
-            setupChargerDialog()
+            setupChargerInputDialog()
         }
         binding.userButton.setOnClickListener {
             if (isGuest) {
@@ -204,7 +204,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
     }
 
-    private fun setupChargerInProgress(charger: Charger) {
+    private fun setupChargerInProgressDialog(charger: Charger) {
 
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity
@@ -235,9 +235,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     }
 
 
-    private fun setupChargerDialog() {
+    private fun setupChargerInputDialog() {
         chargerInputDialog = BottomSheetDialog(
-            this@MainActivity
+            this@MainActivity, R.style.BottomSheetDialogTheme
         )
 
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
@@ -419,7 +419,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                                 chargerInputStatus.setOnClickListener {
                                     setChargerStatus(charger.chargerID,0)
                                     chargerInputDialog.dismiss()
-                                    setupChargerInProgress(charger)
+                                    setupChargerInProgressDialog(charger)
                                 }
                             }
                             2 -> {
