@@ -6,7 +6,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.location.Location
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Fade
@@ -31,12 +30,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
-import com.budiyev.android.codescanner.CodeScannerView
-import com.budiyev.android.codescanner.DecodeCallback
-import com.budiyev.android.codescanner.ErrorCallback
-import com.budiyev.android.codescanner.ScanMode
 import com.chaos.view.PinView
 import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedInActivity
 import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedOutActivity
@@ -56,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import java.io.Serializable
 import java.lang.Exception
 import java.text.DecimalFormat
 
@@ -254,14 +247,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             displayChargerList(bottomSheetView,arrow)
         }
 
-        val klarna = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
-        klarna.setOnClickListener {
+        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
+        klarnaButton.setOnClickListener {
             Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
             intent.putExtra("ChargerId",123456)
             startActivity(intent)
-            //startActivity(Intent(this, KlarnaActivity::class.java))
         }
 
         setupChargerInput(bottomSheetView)
@@ -273,13 +265,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun setupChargerInput(bottomSheetView: View) {
         val pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
         val chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
-
+        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
+        klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
+            width = 0
+            height = 0
+        }
+        klarnaButton.visibility = View.INVISIBLE
         pinView.doOnTextChanged { text, start, before, count ->
             if (text?.length == 6) {
                 val chargerId = text.toString().toUInt().toInt()
 
                 if (validateChargerId(text.toString())) {
-                    validateChargerConnection(chargerId,chargerInputStatus)
+                    validateChargerConnection(chargerId,chargerInputStatus, klarnaButton)
                     hideKeyboard(bottomSheetView)
                 } else {
                     setChargerButtonStatus(chargerInputStatus, false, "ChargerId has to consist of 6 digits", 0)
@@ -360,8 +357,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             try {
                 val requestParams: MutableMap<String, Int> = HashMap()
                 requestParams.put("status", status)
-                val response = RetrofitInstance.api.setChargerStatus(chargerId, requestParams)
-
+                val response = RetrofitInstance.flexiChargeApi.setChargerStatus(chargerId, requestParams)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
                     Log.d("validateConnection", "Charger:" + charger.chargerID +  " status set to" + status)
@@ -379,7 +375,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    private fun validateChargerConnection(chargerId: Int, chargerInputStatus: TextView) {
+
+    fun dpToPx(dp: Int): Int {
+        val density: Float = this.resources
+            .getDisplayMetrics().density
+        return Math.round(dp.toFloat() * density)
+    }
+
+
+    private fun validateChargerConnection(
+        chargerId: Int,
+        chargerInputStatus: TextView,
+        klarnaButton: ImageButton
+    ) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
@@ -393,6 +401,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                             0 -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0) }
                             1 -> {
                                 setChargerButtonStatus(chargerInputStatus, true, "Begin Charging", 1)
+                                klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
+                                    width = dpToPx(100)
+                                    height = dpToPx(100)
+                                }
+                                klarnaButton.visibility = View.VISIBLE
+
+                                klarnaButton.setOnClickListener {
+                                    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
+                                    intent.putExtra("ChargerId",chargerId)
+                                    startActivity(intent)
+                                }
+
+
                                 chargerInputStatus.setOnClickListener {
                                     lifecycleScope.launch {
                                         updateChargerStatusTextView(chargerId, chargerInputStatus)
@@ -421,7 +442,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private suspend fun updateChargerStatusTextView(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getCharger(chargerId)
+                val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
                 if (response.isSuccessful) {
                     val charger = response.body() as Charger
                     lifecycleScope.launch(Dispatchers.Main) {

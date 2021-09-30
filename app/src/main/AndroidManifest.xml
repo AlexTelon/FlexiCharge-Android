@@ -20,16 +20,17 @@
         android:theme="@style/Theme.Bolt"
         android:networkSecurityConfig="@xml/network_security_config">
         <activity
-            android:name=".AccountActivities.ProfileMenuLoggedOutActivity"
             android:name=".CameraActivity"
             android:exported="true" />
-        
+
         <activity
-            android:name=".ProfileMenuLoggedOutActivity"
+            android:name=".AccountActivities.ProfileMenuLoggedOutActivity"
             android:exported="true" />
         <activity
             android:name=".AccountActivities.ProfileMenuLoggedInActivity"
             android:exported="true" />
+
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

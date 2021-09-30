@@ -33,7 +33,6 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_klarna)
         chargerId = intent.getIntExtra("ChargerId", 0)
-        Log.d("Logggggggg", chargerId.toString())
 
         initialize()
 
@@ -72,22 +71,24 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
             val orderLIne = OrderLine(
                 "https://demo.klarna.se/fashion/kp/media/wysiwyg/Accessoriesbagimg.jpg",
                 "physical",
-                "ChargerId" + chargerId.toString(),
+                "ChargerId: " + chargerId.toString(),
                 "FlexiCharge Charge Reservation",
                 1,
-                10000,
+                30000,
                 0,
-                10000,
+                30000,
                 0
             )
-            val orderPayload = OrderPayload("SE", "SEK", "en-US", 10000, 0, listOf(orderLIne))
+            val orderPayload = OrderPayload("SE", "SEK", "en-US", 30000, 0, listOf(orderLIne))
             // create the order using the auth token received in the authorization response
             val orderCall = OrderClient.instance.createOrder(orderButton.tag as String, orderPayload)
             try {
                 val response = orderCall.execute()
                 if (response.isSuccessful) {
                     runOnUiThread {
-                        startActivity(Intent(this@KlarnaActivity, KlarnaOrderCompletedActivity::class.java))
+                        val intent = Intent(this@KlarnaActivity, KlarnaOrderCompletedActivity::class.java)
+                        intent.putExtra("message","Charged 300SEK for Charger: " + chargerId)
+                        startActivity(intent)
                         finish()
                     }
                 } else {
