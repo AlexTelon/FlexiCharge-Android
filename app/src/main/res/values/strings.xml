@@ -5,7 +5,6 @@
     <string name="chargers_near_me">Chargers Near Me</string>
     <string name="no_chargers_available">No Chargers Available</string>
     <string name="title_activity_maps">MapsActivity</string>
-
     <string name="authorize">Authorize</string>
     <string name="finalize">Finalize</string>
     <string name="create_order">Order</string>
@@ -15,5 +14,5 @@
     <string name="return_url_scheme">kp-sample</string>
     <string name="error_credentials">Please enter your credentials first.</string>
     <string name="error_server">Error: The server responded with status code %1$d. Check the credentials in OrderClient.</string>
-
+    <string name="stop_charging">Stop Charging</string>
 </resources>

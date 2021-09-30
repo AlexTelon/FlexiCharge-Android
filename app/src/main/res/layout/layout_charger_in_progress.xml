@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:id="@+id/chargerInProgress"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:background="@color/dark_grey"
+app:layout_anchorGravity="bottom">
+
+    <ImageView
+        android:id="@+id/progressbar_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressbarPercent"
+        app:layout_constraintEnd_toEndOf="@+id/progressbarPercent"
+        app:layout_constraintStart_toStartOf="@+id/progressbarPercent"
+        android:background="@drawable/ic_lightning" />
+
+    <TextView
+        android:id="@+id/progressbarPercent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="67"
+        android:textColor="@color/white"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toBottomOf="@+id/progressbar"
+        app:layout_constraintEnd_toEndOf="@+id/progressbar"
+        app:layout_constraintStart_toStartOf="@+id/progressbar"
+        app:layout_constraintTop_toTopOf="@+id/progressbar" />
+
+    <TextView
+        android:id="@+id/progressbarPercentUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="%"
+        android:textColor="@color/white"
+        android:textSize="15dp"
+        app:layout_constraintStart_toEndOf="@+id/progressbarPercent"
+        app:layout_constraintTop_toBottomOf="@+id/progressbar_icon" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginStart="10dp"
+        android:indeterminateOnly="false"
+        android:progress="70"
+        android:progressDrawable="@drawable/circularprogressbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chargerInformation" />
+
+    <TextView
+        android:id="@+id/chargerInformation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Charger In Progress"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:fontFamily="sans-serif-medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chargingLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:text="Kungsgatan 5, Jönköping"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chargerInformation" />
+
+    <TextView
+        android:id="@+id/chargingTimeStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="1h 21min until full"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/chargingLocation"
+        app:layout_constraintTop_toBottomOf="@+id/chargingLocation" />
+
+    <TextView
+        android:id="@+id/chargingSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="5.72kwh at 3kwh"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/chargingTimeStatus"
+        app:layout_constraintTop_toBottomOf="@+id/chargingTimeStatus" />
+
+    <ImageView
+        android:id="@+id/locationIcon"
+        android:layout_width="21dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/ic_position_pin"
+        app:layout_constraintBottom_toBottomOf="@+id/chargingLocation"
+        app:layout_constraintEnd_toStartOf="@+id/chargingLocation"
+        app:layout_constraintTop_toTopOf="@+id/chargingLocation" />
+
+    <ImageView
+        android:id="@+id/timeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/ic_clock"
+        app:layout_constraintBottom_toBottomOf="@+id/chargingTimeStatus"
+        app:layout_constraintEnd_toStartOf="@+id/chargingTimeStatus"
+        app:layout_constraintTop_toTopOf="@+id/chargingTimeStatus" />
+
+    <ImageView
+        android:id="@+id/lightningIcon"
+        android:layout_width="17dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/ic_lightning"
+        app:layout_constraintBottom_toBottomOf="@+id/chargingSpeed"
+        app:layout_constraintEnd_toStartOf="@+id/chargingSpeed"
+        app:layout_constraintTop_toTopOf="@+id/chargingSpeed" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/stopCharging"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="10dp"
+        android:padding="18dp"
+        android:text="@string/stop_charging"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:theme="@style/CustomMaterialButton"
+        app:cornerRadius="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chargingSpeed"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
