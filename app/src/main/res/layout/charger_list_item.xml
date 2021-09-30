@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:focusable="true"
+    android:background="@color/dark_grey"
     android:clickable="true"
-    android:padding="10dp"
-    android:foreground="?android:attr/selectableItemBackground"
-    android:background="@color/dark_grey">
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/charger_distance"
@@ -18,12 +17,13 @@
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/charger_address" />
 
     <TextView
         android:id="@+id/charger_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:text="Gata"
         android:textColor="@color/white"
         android:textSize="20sp"
