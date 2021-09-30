@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             displayChargerList(bottomSheetView,arrow)
         }
 
-        val klarna = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
+        val klarna = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
         klarna.setOnClickListener {
             Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
         }
