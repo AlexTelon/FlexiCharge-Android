@@ -5,6 +5,15 @@
     <string name="chargers_near_me">Chargers Near Me</string>
     <string name="no_chargers_available">No Chargers Available</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="authorize">Enter Details</string>
+    <string name="finalize">Finalize</string>
+    <string name="create_order">Pay Now</string>
+    <string name="order_completed">Order completed!</string>
+    <string name="error_general">Something went wrong. Please try again later.</string>
+    <string name="return_url_host">kp</string>
+    <string name="return_url_scheme">kp-sample</string>
+    <string name="error_credentials">Please enter your credentials first.</string>
+    <string name="error_server">Error: The server responded with status code %1$d. Check the credentials in OrderClient.</string>
     <string name="charger_identifier">Charger Identifier</string>
     <string name="payment">Payment</string>
     <string name="stop_charging">Stop Charging</string>

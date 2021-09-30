@@ -18,16 +18,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Bolt"
-        android:usesCleartextTraffic="true">
+        android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".CameraActivity"
             android:exported="true" />
+
         <activity
-            android:name=".ProfileMenuLoggedOutActivity"
+            android:name=".AccountActivities.ProfileMenuLoggedOutActivity"
             android:exported="true" />
         <activity
-            android:name=".ProfileMenuLoggedInActivity"
+            android:name=".AccountActivities.ProfileMenuLoggedInActivity"
             android:exported="true" />
+
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -53,11 +56,24 @@
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".payment.KlarnaActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="@string/return_url_scheme"/>
+                <data android:host="@string/return_url_host"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".payment.KlarnaOrderCompletedActivity"/>
     </application>
 
 </manifest>

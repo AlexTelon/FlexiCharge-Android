@@ -1,10 +1,10 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.AccountActivities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.flexicharge.bolt.AccountActivities.RegisterActivity
+import com.flexicharge.bolt.R
 
 class ProfileMenuLoggedInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
