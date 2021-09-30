@@ -5,4 +5,6 @@
     <string name="chargers_near_me">Chargers Near Me</string>
     <string name="no_chargers_available">No Chargers Available</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="charger_identifier">Charger Identifier</string>
+    <string name="payment">Payment</string>
 </resources>

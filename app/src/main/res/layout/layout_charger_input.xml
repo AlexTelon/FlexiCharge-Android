@@ -7,63 +7,31 @@
     android:layout_height="wrap_content"
     android:background="@color/dark_grey">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/charger_input_list_recyclerview"
-        android:layout_width="0dp"
+    <include
+        android:id="@+id/chargers_near_me_layout"
+        layout="@layout/layout_chargers_near_me"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="25dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/charger_input_pinview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargers_near_me"
-        tools:listitem="@layout/charger_list_item" />
-
-    <TextView
-        android:id="@+id/chargers_near_me"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-10dp"
-        android:text="@string/chargers_near_me"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/arrow" />
-
-    <ImageView
-        android:id="@+id/arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ic_arrow_up_48"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:clickable="true"
-        />
-
-
-    <ImageButton
-        android:id="@+id/Klarna_Button"
+        android:layout_marginBottom="25dp"
         android:visibility="visible"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@drawable/klarna"
-        app:layout_constraintBottom_toTopOf="@id/charger_input_pinview"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chargers_near_me"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toTopOf="@+id/charger_checkout_layout"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/charger_checkout_layout"
+        layout="@layout/layout_charger_checkout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/chargerIdentfierText"
+        tools:layout_editor_absoluteX="-16dp" />
 
     <com.chaos.view.PinView
         android:id="@+id/charger_input_pinview"
         style="@style/PinWidget.PinView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="20dp"
         android:cursorVisible="true"
         android:hint="------"
         android:inputType="number"
@@ -84,16 +52,13 @@
         app:layout_constraintBottom_toTopOf="@+id/charger_input_status"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/charger_input_list_recyclerview"
         app:viewType="rectangle" />
 
     <TextView
         android:id="@+id/charger_input_status"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="15dp"
         android:layout_weight="1"
         android:background="@android:color/transparent"
         android:gravity="center"
@@ -101,6 +66,18 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/chargerIdentfierText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:text="@string/charger_identifier"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/charger_input_pinview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
