@@ -246,15 +246,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
             displayChargerList(bottomSheetView,arrow)
         }
 
-        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
-        klarnaButton.setOnClickListener {
-
-            Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
-            intent.putExtra("ChargerId",123456)
-            startActivity(intent)
-        }
+        //val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
+        //klarnaButton.setOnClickListener {
+        //    Toast.makeText(this, "You have chosen Klarna as your payment service", Toast.LENGTH_SHORT).show()
+        //    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
+        //    intent.putExtra("ChargerId",123456)
+        //    startActivity(intent)
+        //}
 
         val backButton = bottomSheetView.findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
@@ -270,12 +268,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
     private fun setupChargerInput(bottomSheetView: View) {
         val pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
         val chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
-        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.Klarna_Button)
-        klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
-            width = 0
-            height = 0
-        }
-        klarnaButton.visibility = View.INVISIBLE
+        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
+        //klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
+        //    width = 0
+        //    height = 0
+        //}
+        //klarnaButton.visibility = View.INVISIBLE
         pinView.doOnTextChanged { text, start, before, count ->
             if (text?.length == 6) {
                 val chargerId = text.toString().toUInt().toInt()
@@ -309,9 +307,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
         //listOfChargersRecyclerView.adapter = ChargerListAdapter(chargers.map { it.chargePointAddress }, chargers.map {it.chargePointId}, chargers.map { it.chargePointId})
         val chargersNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
-
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
-
         if (listOfChargersRecyclerView.visibility == View.GONE) {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
             listOfChargersRecyclerView.visibility = View.VISIBLE
@@ -406,23 +402,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                             0 -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0) }
                             1 -> {
                                 setChargerButtonStatus(chargerInputStatus, true, "Begin Charging", 1)
-
-                                //klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
-                                //    width = dpToPx(100)
-                                //    height = dpToPx(100)
-                                //}
-                                //klarnaButton.visibility = View.VISIBLE
-
-                                //klarnaButton.setOnClickListener {
-                                //    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
-                                //    intent.putExtra("ChargerId",chargerId)
-                                //    startActivity(intent)
-                                //}
-
-
-
+                                klarnaButton.setOnClickListener {
+                                    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
+                                    intent.putExtra("ChargerId",chargerId)
+                                    startActivity(intent)
+                                }
                                 exchangeCheckoutAndChargerList()
-
                                 chargerInputStatus.setOnClickListener {
                                     lifecycleScope.launch {
                                         updateChargerStatusTextView(chargerId, chargerInputStatus)
