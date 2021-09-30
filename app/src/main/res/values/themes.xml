@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Bolt" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Bolt" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/mild_grey</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -22,5 +22,11 @@
     </style>
     <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="CustomMaterialButton" parent="Theme.MaterialComponents">
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/dark_grey</item>
+        <item name="colorOnSurface">@color/white</item>
     </style>
 </resources>
