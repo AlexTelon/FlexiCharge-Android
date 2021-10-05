@@ -17,6 +17,16 @@
         map:layout_constraintTop_toTopOf="parent"
         tools:context=".MapsActivity" />
 
+    <Button
+        android:id="@+id/hello_lad_btn"
+        android:text="Charging summary test"
+        map:layout_constraintTop_toTopOf="parent"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <ImageButton
         android:id="@+id/identify_charger_button"
         android:layout_width="wrap_content"

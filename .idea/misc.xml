@@ -3,39 +3,38 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable-anydpi/cable.xml" value="0.18020833333333333" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/circularprogressbar.xml" value="0.11145833333333334" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/custom_button.xml" value="0.1638888888888889" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/ic_arrow_down_24.xml" value="0.1" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/ic_arrow_down_32.xml" value="0.1" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/ic_black_arrow_right.xml" value="0.18020833333333333" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/ic_black_arrow_right_2.xml" value="0.18020833333333333" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/rounded_edittext.xml" value="1.0214285714285714" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_charger_id.xml" value="0.3333333333333333" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_charger_input.xml" value="0.22" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_in.xml" value="0.1331521739130435" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_register.xml" value="0.1" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.3333333333333333" />
-        <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/layout_charger_information.xml" value="0.3333333333333333" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable-anydpi/ic_charger.xml" value="0.11666666666666667" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/ic_cross_2x.xml" value="0.25625" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/ic_green_marker.xml" value="0.11666666666666667" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/ic_red_cross.xml" value="0.25625" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/ic_red_marker.xml" value="0.25625" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/rounded_edittext.xml" value="0.11666666666666667" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/activity_camera.xml" value="0.24010416666666667" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.17831813576494426" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_in.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/chargepoint_list_item.xml" value="0.24010416666666667" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_charger_checkout.xml" value="0.24010416666666667" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_charger_in_progress.xml" value="0.24010416666666667" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_chargerpoints_near_me.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_payment_price.xml" value="0.5" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.2" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_price.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/payment_summary.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.3307291666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_order_completed.xml" value="0.16666666666666666" />
-        <entry key="app/src/main/res/layout/activity_profile_menu_logged_out.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_sample.xml" value="0.16666666666666666" />
-        <entry key="app/src/main/res/xml/network_security_config.xml" value="0.21014492753623187" />
       </map>
     </option>
   </component>
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

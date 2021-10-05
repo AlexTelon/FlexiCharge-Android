@@ -44,10 +44,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.internal.checkDuration
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
 import java.text.DecimalFormat
+import java.util.*
+import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface {
 
@@ -58,6 +61,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
+    private lateinit var paymentSummaryDialog: BottomSheetDialog
+    private lateinit var chargerInProgressDialog : BottomSheetDialog
+    private lateinit var hours : String
+    private lateinit var minutes : String
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -97,6 +104,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInputDialog()
         }
+
+        binding.helloLadBtn.setOnClickListener {
+            displayPaymentSummaryDialog()
+        }
+
         binding.userButton.setOnClickListener {
             if (isGuest) {
                 startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
@@ -201,12 +213,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun setupChargerInProgressDialog(charger: Charger) {
 
-        val bottomSheetDialog = BottomSheetDialog(
+         chargerInProgressDialog = BottomSheetDialog(
             this@MainActivity
         )
-        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.behavior.peekHeight = 140
-        bottomSheetDialog.setCancelable(false)
+        chargerInProgressDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        chargerInProgressDialog.behavior.peekHeight = 140
+        chargerInProgressDialog.setCancelable(false)
 
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
             R.layout.layout_charger_in_progress,
@@ -219,16 +231,46 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
             setChargerStatus(charger.chargerID,"Available")
-            bottomSheetDialog.dismiss()
+            hours = Calendar.getInstance().time.hours.toString()
+            minutes = Calendar.getInstance().time.minutes.toString()
+            displayPaymentSummaryDialog()
+            //bottomSheetDialog.dismiss()
         }
 
         progressbar.progress = progress;
         progressbarPercent.text = progress.toString();
 
-        bottomSheetDialog.setContentView(bottomSheetView)
-        bottomSheetDialog.show()
+        chargerInProgressDialog.setContentView(bottomSheetView)
+        chargerInProgressDialog.show()
     }
 
+    private fun displayPaymentSummaryDialog(){
+        paymentSummaryDialog = BottomSheetDialog(
+            this@MainActivity, R.style.BottomSheetDialogTheme
+        )
+        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
+            R.layout.layout_payment_summary,
+            findViewById<ConstraintLayout>(R.id.paymentSummaryLayout)
+        )
+        val energyUsed = bottomSheetView.findViewById<TextView>(R.id.energy_used_value)
+        val duration = bottomSheetView.findViewById<TextView>(R.id.duration_value)
+        val chargingStopTime = bottomSheetView.findViewById<TextView>(R.id.charging_stop_time)
+        //energyUsed.text = ""
+        //duration.text = ""
+        chargingStopTime.text = "Charging stopped at " + hours + ":" + minutes
+
+
+        val cross = bottomSheetView.findViewById<ImageButton>(R.id.close_button)
+        cross.setOnClickListener {
+            paymentSummaryDialog.dismiss()
+            chargerInProgressDialog.dismiss()
+
+        }
+
+        paymentSummaryDialog.setContentView(bottomSheetView)
+        paymentSummaryDialog.show()
+
+    }
 
     private fun setupChargerInputDialog() {
         chargerInputDialog = BottomSheetDialog(
