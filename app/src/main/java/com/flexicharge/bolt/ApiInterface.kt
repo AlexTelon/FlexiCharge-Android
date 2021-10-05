@@ -22,7 +22,7 @@ interface ApiInterface {
     @PUT("chargers/{chargerId}")
     suspend fun setChargerStatus(
         @Path("chargerId") chargerId: Int,
-        @Body body: MutableMap<String, Int>
+        @Body body: MutableMap<String, String>
     ): Response<Charger>
 
 }
