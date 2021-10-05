@@ -13,10 +13,16 @@ interface ApiInterface {
     @GET("chargers")
     suspend fun getChargerList(): Response<Chargers>
 
+    @GET("chargePoints")
+    suspend fun getChargePointList(): Response<ChargePoints>
+
+    @GET("chargers/{chargerPointId}")
+    suspend fun getChargePoint(@Path("chargerPointId") chargerPointId: Int): Response<ChargePoint>
+
     @PUT("chargers/{chargerId}")
     suspend fun setChargerStatus(
         @Path("chargerId") chargerId: Int,
-        @Body body: MutableMap<String, Int>
+        @Body body: MutableMap<String, String>
     ): Response<Charger>
 
 }

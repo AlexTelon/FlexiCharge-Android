@@ -10,17 +10,17 @@
     android:foreground="?android:attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/charger_distance"
+        android:id="@+id/chargepoint_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Distans i nummer"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/charger_address" />
+        app:layout_constraintTop_toTopOf="@+id/chargepoinnt_address" />
 
     <TextView
-        android:id="@+id/charger_address"
+        android:id="@+id/chargepoinnt_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -39,7 +39,7 @@
         android:paddingEnd="5dp"
         android:src="@drawable/cable"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/charger_address" />
+        app:layout_constraintTop_toBottomOf="@+id/chargepoinnt_address" />
 
     <TextView
         android:id="@+id/charger_number_of_available"
