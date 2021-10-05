@@ -7,6 +7,28 @@
     android:background="@color/dark_grey">
 
     <TextView
+        android:id="@+id/currentLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Current Location"
+        android:textColor="@color/green"
+        app:layout_constraintEnd_toEndOf="@+id/locationText"
+        app:layout_constraintStart_toStartOf="@+id/locationText"
+        app:layout_constraintTop_toBottomOf="@+id/locationText" />
+
+    <ImageView
+        android:id="@+id/positionPin"
+        android:layout_width="14dp"
+        android:layout_height="15dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/currentLocation"
+        app:layout_constraintEnd_toStartOf="@+id/currentLocation"
+        app:layout_constraintTop_toTopOf="@+id/currentLocation"
+        app:srcCompat="@drawable/ic_position_pin"
+        app:tint="@color/green" />
+
+    <TextView
         android:id="@+id/locationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,37 +40,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chargerListRecyclerView"
+        android:layout_width="400dp"
+        android:layout_height="101dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="11dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currentLocation" />
+
     <TextView
         android:id="@+id/paymentText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="25dp"
         android:text="@string/payment"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/backButton" />
+        app:layout_constraintTop_toBottomOf="@+id/chargerListRecyclerView" />
 
     <ImageButton
         android:id="@+id/klarnaButton"
         android:layout_width="176dp"
         android:layout_height="54dp"
-        app:cornerRadius="25dp"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="15dp"
         android:adjustViewBounds="true"
         android:background="@drawable/rounded_background"
         android:padding="10dp"
         android:scaleType="centerInside"
+        android:src="@drawable/ic_klarna_logo_black"
+        app:cornerRadius="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/paymentText"
-        android:src="@drawable/ic_klarna_logo_black" />
+        app:layout_constraintTop_toBottomOf="@+id/paymentText" />
 
     <ImageButton
-        app:cornerRadius="15dp"
         android:id="@+id/backButton"
         android:layout_width="42dp"
         android:layout_height="42dp"
@@ -58,6 +90,7 @@
         android:background="@android:color/transparent"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_arrow_back_48"
+        app:cornerRadius="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

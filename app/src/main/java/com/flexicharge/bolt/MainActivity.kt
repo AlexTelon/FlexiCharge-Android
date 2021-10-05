@@ -32,6 +32,7 @@ import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedInActivity
 import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedOutActivity
 import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
+import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.payment.KlarnaActivity
 import com.google.android.gms.location.*
@@ -287,7 +288,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    private fun displayChargerList(bottomSheetView: View){
+        val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargerListRecyclerView)
 
+        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers)
+    }
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
@@ -516,6 +523,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         else {
             chargersNearMeLayout?.visibility = View.GONE
             checkoutLayout?.visibility =View.VISIBLE
+            if (chargerInputView != null) {
+                displayChargerList(chargerInputView)
+            }
             chargerInput?.isEnabled = false
         }
     }
