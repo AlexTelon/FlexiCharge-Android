@@ -7,10 +7,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.flexicharge.bolt.Chargers
+import com.flexicharge.bolt.ChargePoints
 import com.flexicharge.bolt.R
 
-class ChargerListAdapter(private var chargers: Chargers, private var act: panToMarkerInterface, private var distance : MutableList<String>) :
+class ChargerListAdapter(private var chargePoints: ChargePoints, private var act: panToMarkerInterface, private var distance : MutableList<String>) :
 RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -24,18 +24,15 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
                 act.panToMarker(
-                    chargers[position].location[0],
-                    chargers[position].location[1],
-                    chargers[position].chargerID.toString(),
-                    chargers[position].status
+                    chargePoints[position].location[0],
+                    chargePoints[position].location[1],
                 )
             }
         }
-
     }
 
     interface panToMarkerInterface {
-        fun panToMarker (latitude: Double, longitude: Double, title: String, status: Int) {}
+        fun panToMarker (latitude: Double, longitude: Double) {}
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -46,18 +43,18 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.itemDistance.text = distance[position] + "km"
-        holder.itemAddress.text = "Charger " + chargers[position].chargerID.toString()
-        if(chargers.size > 0 ){
+        holder.itemAddress.text = chargePoints[position].name
+        if(chargePoints.size > 0 ){
             holder.itemNumberOfChargers.text = "1 charger"
         } else {
-            holder.itemNumberOfChargers.text =holder.itemView.context.getString(R.string.no_chargers_available)
+            holder.itemNumberOfChargers.text = holder.itemView.context.getString(R.string.no_chargers_available)
             holder.itemNumberOfChargers.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))
             holder.itemImage.visibility = View.GONE
         }
     }
 
     override fun getItemCount(): Int {
-        return chargers.size
+        return chargePoints.size
     }
 
 }

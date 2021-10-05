@@ -7,5 +7,16 @@ data class Charger(
     val chargerID: Int,
     val location: List<Double>,
     val serialNumber: String,
-    val status: Int
+    val status: String
 )
+
+class ChargePoints : ArrayList<ChargePoint>()
+data class ChargePoint(
+    val chargePointID: Int,
+    val klarnaReservationAmount: Int,
+    val location: List<Double>,
+    val name: String,
+    val price: String
+)
+
+
