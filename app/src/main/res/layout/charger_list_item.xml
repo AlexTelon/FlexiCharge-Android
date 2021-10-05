@@ -47,16 +47,16 @@
         app:layout_constraintStart_toStartOf="@+id/chargerCost"
         app:layout_constraintTop_toBottomOf="@+id/chargerCost" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageView2"
         android:layout_width="47dp"
         android:layout_height="48dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="5dp"
+        android:src="@drawable/cable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/cable"
-        app:tint="@color/black" />
+        android:tint="@color/black" />
 
     <TextView
         android:id="@+id/chargerType"

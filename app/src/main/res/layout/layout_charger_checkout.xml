@@ -17,16 +17,16 @@
         app:layout_constraintStart_toStartOf="@+id/locationText"
         app:layout_constraintTop_toBottomOf="@+id/locationText" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/positionPin"
-        android:layout_width="14dp"
+        android:layout_width="17dp"
         android:layout_height="15dp"
         android:layout_marginEnd="5dp"
+        android:src="@drawable/ic_position_pin"
         app:layout_constraintBottom_toBottomOf="@+id/currentLocation"
         app:layout_constraintEnd_toStartOf="@+id/currentLocation"
         app:layout_constraintTop_toTopOf="@+id/currentLocation"
-        app:srcCompat="@drawable/ic_position_pin"
-        app:tint="@color/green" />
+        android:tint="@color/green" />
 
     <TextView
         android:id="@+id/locationText"
@@ -41,6 +41,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
+        tools:listitem="@layout/charger_list_item"
         android:id="@+id/chargerListRecyclerView"
         android:layout_width="400dp"
         android:layout_height="101dp"

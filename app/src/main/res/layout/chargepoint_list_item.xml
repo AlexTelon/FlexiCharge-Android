@@ -30,8 +30,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        app:tint="@color/green"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:tint="@color/green"
         android:id="@+id/charger_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
