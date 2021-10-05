@@ -295,14 +295,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         Log.d("CHARGEPONTS", chargePoints.toString() )
         if (this::chargePoints.isInitialized) {
             var distanceToChargePoint = mutableListOf<String>()
-            chargePoints.forEach {
+            var chargerCount = mutableListOf<Int>()
+
+            chargePoints.forEachIndexed { index, chargePoint ->
                 var dist = FloatArray(1)
-                Location.distanceBetween(it.location[0], it.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+                Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
                 val df = DecimalFormat("#.##")
                 val distanceStr = df.format(dist[0] / 1000).toString()
+                val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
                 distanceToChargePoint.add(distanceStr)
+                chargerCount.add(count)
             }
-            listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint)
+            listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint, chargerCount)
         }
         //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargepoints_near_me)

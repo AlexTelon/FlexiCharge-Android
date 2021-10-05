@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.ChargePoints
 import com.flexicharge.bolt.R
 
-class ChargePointListAdapter(private var chargePoints: ChargePoints, private var act: panToMarkerInterface, private var distance : MutableList<String>) :
+class ChargePointListAdapter(private var chargePoints: ChargePoints, private var act: panToMarkerInterface, private var distance : MutableList<String>, private var chargerCount : MutableList<Int>) :
 RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,8 +44,8 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
         holder.itemDistance.text = distance[position] + "km"
         holder.itemAddress.text = chargePoints[position].name
-        if(chargePoints.size > 0 ){
-            holder.itemNumberOfChargers.text = "1 charger"
+        if(chargerCount[position] > 0 ){
+            holder.itemNumberOfChargers.text = chargerCount[position].toString() + " chargers"
         } else {
             holder.itemNumberOfChargers.text = holder.itemView.context.getString(R.string.no_chargers_available)
             holder.itemNumberOfChargers.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))
