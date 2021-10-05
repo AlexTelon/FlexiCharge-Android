@@ -32,7 +32,7 @@
         android:id="@+id/locationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:text="Asecs Röd, Jönköping"
         android:textColor="@color/white"
         android:textSize="18sp"
@@ -41,25 +41,24 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        tools:listitem="@layout/charger_list_item"
         android:id="@+id/chargerListRecyclerView"
-        android:layout_width="400dp"
-        android:layout_height="101dp"
-        android:layout_marginStart="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="11dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/currentLocation" />
+        app:layout_constraintTop_toBottomOf="@+id/currentLocation"
+        tools:listitem="@layout/charger_list_item" />
 
     <TextView
         android:id="@+id/paymentText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="5dp"
         android:text="@string/payment"
         android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chargerListRecyclerView" />
@@ -68,7 +67,7 @@
         android:id="@+id/klarnaButton"
         android:layout_width="176dp"
         android:layout_height="54dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
         android:adjustViewBounds="true"
         android:background="@drawable/rounded_background"
@@ -86,12 +85,12 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_arrow_back_48"
         app:cornerRadius="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/currentLocation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/locationText" />
 </androidx.constraintlayout.widget.ConstraintLayout>
