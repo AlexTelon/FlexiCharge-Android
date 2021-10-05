@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_background">
+
+    <TextView
+        android:id="@+id/chargerId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="5dp"
+        android:text="123456"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chargerAC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="AC 7kW"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/chargerId"
+        app:layout_constraintTop_toBottomOf="@+id/chargerId" />
+
+    <TextView
+        android:id="@+id/chargerCost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="3.00kr/kWh"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/chargerAC"
+        app:layout_constraintTop_toBottomOf="@+id/chargerAC" />
+
+    <TextView
+        android:id="@+id/chargerStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Available"
+        android:textColor="@color/green"
+        app:layout_constraintStart_toStartOf="@+id/chargerCost"
+        app:layout_constraintTop_toBottomOf="@+id/chargerCost" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="47dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/cable"
+        app:tint="@color/black" />
+
+    <TextView
+        android:id="@+id/chargerType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Type 2"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/imageView2"
+        app:layout_constraintStart_toStartOf="@+id/imageView2"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+</androidx.constraintlayout.widget.ConstraintLayout>
