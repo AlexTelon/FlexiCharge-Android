@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chaos.view.PinView
 import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedInActivity
 import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedOutActivity
-import com.flexicharge.bolt.adapters.ChargerListAdapter
+import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.payment.KlarnaActivity
@@ -49,7 +49,7 @@ import java.io.IOException
 import java.lang.Exception
 import java.text.DecimalFormat
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter.panToMarkerInterface {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         var progress = 67;
 
         bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
-            setChargerStatus(charger.chargerID,1)
+            setChargerStatus(charger.chargerID,"Available")
             bottomSheetDialog.dismiss()
         }
 
@@ -302,10 +302,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                 val distanceStr = df.format(dist[0] / 1000).toString()
                 distanceToChargePoint.add(distanceStr)
             }
-            listOfChargePointsRecyclerView.adapter = ChargerListAdapter(chargePoints, this, distanceToChargePoint)
+            listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint)
         }
         //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
-        val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargers_near_me)
+        val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargepoints_near_me)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
         if (listOfChargePointsRecyclerView.visibility == View.GONE) {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
@@ -379,10 +379,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-    private fun setChargerStatus(chargerId: Int, status: Int) {
+    private fun setChargerStatus(chargerId: Int, status: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val requestParams: MutableMap<String, Int> = HashMap()
+                val requestParams: MutableMap<String, String> = HashMap()
                 requestParams.put("status", status)
                 val response = RetrofitInstance.flexiChargeApi.setChargerStatus(chargerId, requestParams)
                 if (response.isSuccessful) {
@@ -402,14 +402,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
         }
     }
 
-
-    fun dpToPx(dp: Int): Int {
-        val density: Float = this.resources
-            .getDisplayMetrics().density
-        return Math.round(dp.toFloat() * density)
-    }
-
-
     private fun validateChargerConnection(
         chargerId: Int,
         chargerInputStatus: TextView,
@@ -425,7 +417,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     lifecycleScope.launch(Dispatchers.Main) {
                         panToMarker(charger.location[0], charger.location[1])
                         when (charger.status) {
-                            "Occupied" -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0) }
+                            "Unavailable" -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0) }
                             "Available" -> {
                                 setChargerButtonStatus(chargerInputStatus, true, "Begin Charging", 1)
                                 klarnaButton.setOnClickListener {
@@ -468,15 +460,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargerListAdapter
                     val charger = response.body() as Charger
                     lifecycleScope.launch(Dispatchers.Main) {
                         when (charger.status) {
-                            "Occupied" -> { setChargerButtonStatus(chargerInputStatus, true, "Occupied Charger",0) }
+                            "Unavailable" -> { setChargerButtonStatus(chargerInputStatus, true, "Occupied Charger",0) }
                             "Available" -> {
                                 chargerInputDialog.dismiss()
                                 setupChargerInProgressDialog(charger)
-                                setChargerStatus(charger.chargerID, 0)
+                                setChargerStatus(charger.chargerID, "Unavailable")
 //                                setChargerButtonStatus(chargerInputStatus, true, "Tap to Disconnect", 3)
 //
 //                                chargerInputStatus.setOnClickListener {
-//                                    setChargerStatus(charger.chargerID, 1)
+//                                    setChargerStatus(charger.chargerID, "Available")
 //                                    setChargerButtonStatus(chargerInputStatus, false, "You Disconnected from Charger " + charger.chargerID + ". Have a nice day!", 1)
 //                                }
                             }

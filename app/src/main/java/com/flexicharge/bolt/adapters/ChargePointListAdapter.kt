@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.ChargePoints
 import com.flexicharge.bolt.R
 
-class ChargerListAdapter(private var chargePoints: ChargePoints, private var act: panToMarkerInterface, private var distance : MutableList<String>) :
-RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
+class ChargePointListAdapter(private var chargePoints: ChargePoints, private var act: panToMarkerInterface, private var distance : MutableList<String>) :
+RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itemAddress: TextView = itemView.findViewById(R.id.charger_address)
-        val itemDistance: TextView = itemView.findViewById(R.id.charger_distance)
+        val itemAddress: TextView = itemView.findViewById(R.id.chargepoinnt_address)
+        val itemDistance: TextView = itemView.findViewById(R.id.chargepoint_distance)
         val itemImage : ImageView = itemView.findViewById(R.id.charger_icon)
         val itemNumberOfChargers: TextView = itemView.findViewById(R.id.charger_number_of_available)
 
@@ -36,7 +36,7 @@ RecyclerView.Adapter<ChargerListAdapter.ViewHolder>(){
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.charger_list_item, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.chargepoint_list_item, parent, false)
         return ViewHolder(v)
     }
 

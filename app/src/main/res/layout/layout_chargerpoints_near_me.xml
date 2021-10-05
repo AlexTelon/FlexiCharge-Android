@@ -16,15 +16,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargers_near_me"
-        tools:listitem="@layout/charger_list_item" />
+        app:layout_constraintTop_toBottomOf="@+id/chargepoints_near_me"
+        tools:listitem="@layout/chargepoint_list_item" />
 
     <TextView
-        android:id="@+id/chargers_near_me"
+        android:id="@+id/chargepoints_near_me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="-15dp"
-        android:text="@string/chargers_near_me"
+        android:text="@string/chargepoints_near_me"
         android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_arrow_up_48"
         android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/chargers_near_me"
+        app:layout_constraintBottom_toTopOf="@+id/chargepoints_near_me"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
