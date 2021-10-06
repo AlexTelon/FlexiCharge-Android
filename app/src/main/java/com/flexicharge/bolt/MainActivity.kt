@@ -385,12 +385,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     //TODO Backend Order/Session Request if successful
 
                     val status = response.body() as String
-
-                    when (status) {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                                            when (status) {
                         "Accepted" -> {
+
                             chargerInputDialog.dismiss()
                             setupChargerInProgressDialog()
-                            reserveCharger(chargerId, chargerInputStatus)
+                            //reserveCharger(chargerId, chargerInputStatus)
                         }
                         "Faulted" -> {
                             setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
@@ -408,10 +409,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 0)
                         }
                     }
+                    }
                     Log.d("validateConnection", "Charger:" + chargerId +  " got status" + status)
                 } else {
                     Log.d("validateConnection", "Could not change status")
-                    setChargerButtonStatus(chargerInputStatus, false, "Communication Error", 0)
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        chargerInputDialog.dismiss()
+                        setupChargerInProgressDialog()
+
+                    }
+                    //setChargerButtonStatus(chargerInputStatus, false, "Communication Error", 0)
                 }
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Crashed with Exception")
