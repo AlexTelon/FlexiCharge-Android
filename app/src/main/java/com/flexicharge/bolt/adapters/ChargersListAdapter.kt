@@ -20,21 +20,10 @@ class ChargersListAdapter(private val chargers: Chargers, private val enteredCha
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val chargerId: TextView = itemView.findViewById(R.id.chargerId)
         val chargerStatus: TextView = itemView.findViewById(R.id.chargerStatus)
-
         val chargerCost: TextView = itemView.findViewById(R.id.chargerCost)
         val chargerAC : TextView = itemView.findViewById(R.id.chargerAC)
         val chargerType: TextView = itemView.findViewById(R.id.chargerType)
         val chargerCableIcon: AppCompatImageView = itemView.findViewById(R.id.chargerCableIcon)
-
-
-    }
-
-    interface ChangeInputInterface {
-        fun changeInput(newInput: String){}
-    }
-
-    override fun getItemCount(): Int {
-        return chargers.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -45,7 +34,7 @@ class ChargersListAdapter(private val chargers: Chargers, private val enteredCha
             holder.itemView.setBackgroundResource(R.drawable.rounded_background_selected)
         }
 
-        if(holder.chargerStatus.text == "Available"){
+        if(chargers[position].status == "Available"){
             holder.itemView.setOnClickListener{
                 act.changeInput(holder.chargerId.text.toString())
             }
@@ -59,5 +48,21 @@ class ChargersListAdapter(private val chargers: Chargers, private val enteredCha
             holder.chargerCableIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
             holder.chargerCost.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
         }
+    }
+
+    interface ChangeInputInterface {
+        fun changeInput(newInput: String){}
+    }
+
+    override fun getItemCount(): Int {
+        return chargers.size
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 }
