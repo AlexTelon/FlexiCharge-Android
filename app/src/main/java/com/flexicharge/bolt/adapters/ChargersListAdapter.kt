@@ -24,7 +24,7 @@ class ChargersListAdapter(private val chargers: Chargers, private val enteredCha
         val chargerCost: TextView = itemView.findViewById(R.id.chargerCost)
         val chargerAC : TextView = itemView.findViewById(R.id.chargerAC)
         val chargerType: TextView = itemView.findViewById(R.id.chargerType)
-        //val chargerIcon: AppCompatImageView = itemView.findViewById(R.id.chargerCableIcon)
+        val chargerCableIcon: AppCompatImageView = itemView.findViewById(R.id.chargerCableIcon)
 
 
     }
@@ -56,7 +56,7 @@ class ChargersListAdapter(private val chargers: Chargers, private val enteredCha
             holder.chargerStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))
             holder.chargerAC.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
             holder.chargerType.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
-            //holder.chargerIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
+            holder.chargerCableIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
             holder.chargerCost.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
         }
     }
