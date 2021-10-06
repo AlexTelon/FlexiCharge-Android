@@ -522,7 +522,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.charger_input_pinview)
         val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.charger_input_status)
         val chargerInputView = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargerInputLayout)
-        val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.locationText)
+        val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.currentLocation)
         TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
 
         if(bool) {

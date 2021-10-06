@@ -7,15 +7,15 @@
     android:background="@color/dark_grey">
 
     <TextView
-        android:id="@+id/currentLocation"
+        android:id="@+id/locationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="@string/current_location"
         android:textColor="@color/green"
-        app:layout_constraintEnd_toEndOf="@+id/locationText"
-        app:layout_constraintStart_toStartOf="@+id/locationText"
-        app:layout_constraintTop_toBottomOf="@+id/locationText" />
+        app:layout_constraintEnd_toEndOf="@+id/currentLocation"
+        app:layout_constraintStart_toStartOf="@+id/currentLocation"
+        app:layout_constraintTop_toBottomOf="@+id/currentLocation" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/positionPin"
@@ -24,12 +24,12 @@
         android:layout_marginEnd="5dp"
         android:src="@drawable/ic_position_pin"
         android:tint="@color/green"
-        app:layout_constraintBottom_toBottomOf="@+id/currentLocation"
-        app:layout_constraintEnd_toStartOf="@+id/currentLocation"
-        app:layout_constraintTop_toTopOf="@+id/currentLocation" />
+        app:layout_constraintBottom_toBottomOf="@+id/locationText"
+        app:layout_constraintEnd_toStartOf="@+id/locationText"
+        app:layout_constraintTop_toTopOf="@+id/locationText" />
 
     <TextView
-        android:id="@+id/locationText"
+        android:id="@+id/currentLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -48,7 +48,7 @@
         android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/currentLocation"
+        app:layout_constraintTop_toBottomOf="@+id/locationText"
         tools:itemCount="3"
         tools:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/charger_list_item"
@@ -94,7 +94,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_arrow_back_48"
         app:cornerRadius="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/currentLocation"
+        app:layout_constraintBottom_toTopOf="@+id/locationText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/locationText" />
+        app:layout_constraintTop_toTopOf="@+id/currentLocation" />
 </androidx.constraintlayout.widget.ConstraintLayout>
