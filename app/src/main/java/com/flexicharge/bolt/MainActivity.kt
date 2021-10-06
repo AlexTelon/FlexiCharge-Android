@@ -49,12 +49,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
 import java.text.DecimalFormat
-import androidx.recyclerview.widget.DividerItemDecoration
 
 
-
-
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface, ChargersListAdapter.ChangeInputInterface {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
@@ -63,6 +60,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
+    private lateinit var pinView: PinView
+    private lateinit var chargerInputStatus: TextView
+    private lateinit var klarnaButton: ImageButton
+    private lateinit var listOfChargersRecyclerView: RecyclerView
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
     }
 
-   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_CODE ->
@@ -234,7 +235,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.show()
     }
 
-
     private fun setupChargerInputDialog() {
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
@@ -260,7 +260,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         val backButton = bottomSheetView.findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
-            exchangeCheckoutAndChargerList(-1)
+            showCheckout(false, -1)
         }
 
         setupChargerInput(bottomSheetView)
@@ -268,10 +268,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         chargerInputDialog.setContentView(bottomSheetView)
         chargerInputDialog.show()
     }
+
     private fun setupChargerInput(bottomSheetView: View) {
-        val pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
-        val chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
-        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
+        pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
+        chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
+        klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
         //klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
         //    width = 0
         //    height = 0
@@ -292,12 +293,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun displayChargerList(bottomSheetView: View){
-        val listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargerListRecyclerView)
+    override fun changeInput(newInput: String){
+        pinView.setText(newInput)
+    }
 
-        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
-        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers)
+    private fun displayChargerList(bottomSheetView: View){
+        if(!this::listOfChargersRecyclerView.isInitialized){
+            listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargerListRecyclerView)
+            listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+        }
+        val chargerId = pinView.text.toString()
+        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers,chargerId,this)
     }
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
@@ -417,11 +424,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun validateChargerConnection(
-        chargerId: Int,
-        chargerInputStatus: TextView,
-        klarnaButton: ImageButton
-    ) {
+    private fun validateChargerConnection(chargerId: Int, chargerInputStatus: TextView, klarnaButton: ImageButton) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
@@ -440,7 +443,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                                     intent.putExtra("ChargerId",chargerId)
                                     startActivity(intent)
                                 }
-                                exchangeCheckoutAndChargerList(charger.chargePointID)
+                                showCheckout(true, charger.chargePointID)
                                 chargerInputStatus.setOnClickListener {
                                     lifecycleScope.launch {
                                         updateChargerStatusTextView(chargerId, chargerInputStatus)
@@ -509,7 +512,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             3 -> { chargerInputStatus.setBackgroundResource(R.color.yellow)}
         }
     }
-    private fun exchangeCheckoutAndChargerList(chargePointId: Int){
+
+    private fun showCheckout(bool: Boolean, chargePointId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargers_near_me_layout)
         val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.charger_input_pinview)
@@ -518,7 +522,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.locationText)
         TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
 
-        if(chargersNearMeLayout?.visibility == View.GONE){
+        if(!bool && chargersNearMeLayout?.visibility == View.GONE){
             chargersNearMeLayout.visibility = View.VISIBLE
             checkoutLayout?.visibility = View.GONE
             chargerInput?.isEnabled = true

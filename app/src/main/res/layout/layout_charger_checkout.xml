@@ -23,10 +23,10 @@
         android:layout_height="15dp"
         android:layout_marginEnd="5dp"
         android:src="@drawable/ic_position_pin"
+        android:tint="@color/green"
         app:layout_constraintBottom_toBottomOf="@+id/currentLocation"
         app:layout_constraintEnd_toStartOf="@+id/currentLocation"
-        app:layout_constraintTop_toTopOf="@+id/currentLocation"
-        android:tint="@color/green" />
+        app:layout_constraintTop_toTopOf="@+id/currentLocation" />
 
     <TextView
         android:id="@+id/locationText"
@@ -43,22 +43,28 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chargerListRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/currentLocation"
-        tools:listitem="@layout/charger_list_item" />
+        tools:itemCount="3"
+        tools:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/charger_list_item"
+        tools:orientation="horizontal"
+        tools:scrollbars="horizontal" />
 
     <TextView
         android:id="@+id/paymentText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/payment"
         android:textColor="@color/white"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/klarnaButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chargerListRecyclerView" />
@@ -67,7 +73,6 @@
         android:id="@+id/klarnaButton"
         android:layout_width="176dp"
         android:layout_height="54dp"
-        android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
         android:adjustViewBounds="true"
         android:background="@drawable/rounded_background"
@@ -77,8 +82,7 @@
         app:cornerRadius="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/paymentText" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/backButton"

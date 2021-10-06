@@ -3,16 +3,14 @@ package com.flexicharge.bolt.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.Chargers
 import com.flexicharge.bolt.R
 
-class ChargersListAdapter(private var chargers: Chargers): RecyclerView.Adapter<ChargersListAdapter.ViewHolder>() {
+class ChargersListAdapter(private val chargers: Chargers, private val enteredChargerId: String, private val act: ChangeInputInterface): RecyclerView.Adapter<ChargersListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.charger_list_item, parent, false)
@@ -28,16 +26,12 @@ class ChargersListAdapter(private var chargers: Chargers): RecyclerView.Adapter<
         val chargerType: TextView = itemView.findViewById(R.id.chargerType)
         //val chargerIcon: AppCompatImageView = itemView.findViewById(R.id.chargerCableIcon)
 
-        init {
-            if(chargerStatus.toString() == "Available"){
-                itemView.setOnClickListener { v: View ->
-                    //TODO: Selected charger
-                }
-            }
 
-        }
     }
 
+    interface ChangeInputInterface {
+        fun changeInput(newInput: String){}
+    }
 
     override fun getItemCount(): Int {
         return chargers.size
@@ -47,7 +41,17 @@ class ChargersListAdapter(private var chargers: Chargers): RecyclerView.Adapter<
         holder.chargerId.text = chargers[position].chargerID.toString()
         holder.chargerStatus.text = chargers[position].status
 
-        if(holder.chargerStatus.text != "Available"){
+        if(holder.chargerId.text == enteredChargerId){
+            holder.itemView.setBackgroundResource(R.drawable.rounded_background_selected)
+        }
+
+        if(holder.chargerStatus.text == "Available"){
+            holder.itemView.setOnClickListener{
+                act.changeInput(holder.chargerId.text.toString())
+            }
+
+        } else {
+            holder.itemView.isClickable = false
             holder.chargerId.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
             holder.chargerStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))
             holder.chargerAC.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.light_grey))
