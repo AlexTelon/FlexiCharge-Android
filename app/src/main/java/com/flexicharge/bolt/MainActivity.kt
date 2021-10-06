@@ -210,8 +210,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity
         )
+        
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.behavior.peekHeight = 140
+        bottomSheetDialog.behavior.isDraggable = false;
         bottomSheetDialog.setCancelable(false)
 
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
