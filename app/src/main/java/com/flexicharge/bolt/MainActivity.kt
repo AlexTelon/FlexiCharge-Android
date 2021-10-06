@@ -382,33 +382,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 requestParams.put("parentIdTag", "1")
                 val response = RetrofitInstance.flexiChargeApi.reserveCharger(chargerId, requestParams)
                 if (response.isSuccessful) {
-                    //TODO Backend Order/Session Request if successful
+
+                    //TODO Backend Klarna/Order/Session Request if successful
 
                     val status = response.body() as String
                     lifecycleScope.launch(Dispatchers.Main) {
-                                            when (status) {
-                        "Accepted" -> {
-
+                        when (status) {
+                            "Accepted" -> {
                             chargerInputDialog.dismiss()
                             setupChargerInProgressDialog()
                             //reserveCharger(chargerId, chargerInputStatus)
+                            }
+                            "Faulted" -> {
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
+                            }
+                            "Occupied" -> {
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
+                            }
+                            "Rejected" -> {
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
+                            }
+                            "Unavailable" -> {
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
+                            }
+                            else -> {
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 0)
+                            }
                         }
-                        "Faulted" -> {
-                            setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
-                        }
-                        "Occupied" -> {
-                            setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
-                        }
-                        "Rejected" -> {
-                            setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
-                        }
-                        "Unavailable" -> {
-                            setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
-                        }
-                        else -> {
-                            setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 0)
-                        }
-                    }
                     }
                     Log.d("validateConnection", "Charger:" + chargerId +  " got status" + status)
                 } else {
