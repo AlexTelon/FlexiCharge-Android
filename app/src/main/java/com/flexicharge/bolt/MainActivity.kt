@@ -298,13 +298,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun displayChargerList(bottomSheetView: View){
-        if(!this::listOfChargersRecyclerView.isInitialized){
-            listOfChargersRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargerListRecyclerView)
-            listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val chargerId = pinView.text.toString()
+
+        listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.chargerListRecyclerView)
+        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers,chargerId,this)
+
+        // Only add decoration on first-time display
+        if( listOfChargersRecyclerView.itemDecorationCount == 0) {
             listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
         }
-        val chargerId = pinView.text.toString()
-        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers,chargerId,this)
     }
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
@@ -522,21 +525,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.locationText)
         TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
 
-        if(!bool && chargersNearMeLayout?.visibility == View.GONE){
-            chargersNearMeLayout.visibility = View.VISIBLE
-            checkoutLayout?.visibility = View.GONE
-            chargerInput?.isEnabled = true
-            chargerInput?.text?.clear()
-            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
-        }
-        else {
-            chargerLocationText?.text = chargePoints[chargePointId].name
+        if(bool) {
+            chargerInput?.isEnabled = false
             chargersNearMeLayout?.visibility = View.GONE
             checkoutLayout?.visibility =View.VISIBLE
+            chargerLocationText?.text = chargePoints[chargePointId].name
             if (chargerInputView != null) {
                 displayChargerList(chargerInputView)
             }
-            chargerInput?.isEnabled = false
+        }
+        else {
+            chargerInput?.isEnabled = true
+            chargersNearMeLayout?.visibility = View.VISIBLE
+            checkoutLayout?.visibility = View.GONE
+            chargerInput?.text?.clear()
+            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
         }
     }
 }
