@@ -25,4 +25,10 @@ interface ApiInterface {
         @Body body: MutableMap<String, String>
     ): Response<Charger>
 
+    @PUT("reservations/{chargerId}")
+    suspend fun reserveCharger(
+        @Path("chargerId") chargerId: Int,
+        @Body body: MutableMap<String, String>
+    ): Response<String>
+
 }

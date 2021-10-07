@@ -79,7 +79,7 @@
         android:layout_marginBottom="15dp"
         android:text="@string/charger_identifier"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/charger_input_pinview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
