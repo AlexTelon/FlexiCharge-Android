@@ -32,6 +32,7 @@ import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedInActivity
 import com.flexicharge.bolt.AccountActivities.ProfileMenuLoggedOutActivity
 import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.AccountActivities.RegisterActivity
+import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.payment.KlarnaActivity
 import com.google.android.gms.location.*
@@ -49,7 +50,8 @@ import java.io.IOException
 import java.lang.Exception
 import java.text.DecimalFormat
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface {
+
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface, ChargersListAdapter.ChangeInputInterface {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
@@ -58,6 +60,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
+    private lateinit var pinView: PinView
+    private lateinit var chargerInputStatus: TextView
+    private lateinit var klarnaButton: ImageButton
+    private lateinit var listOfChargersRecyclerView: RecyclerView
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -124,7 +130,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
     }
 
-   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_CODE ->
@@ -193,8 +199,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val bottomSheetDialog = BottomSheetDialog(
             this@MainActivity
         )
+        
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.behavior.peekHeight = 140
+        bottomSheetDialog.behavior.isDraggable = false;
         bottomSheetDialog.setCancelable(false)
 
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
@@ -217,7 +224,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
     }
-
 
     private fun setupChargerInputDialog() {
         chargerInputDialog = BottomSheetDialog(
@@ -244,7 +250,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         val backButton = bottomSheetView.findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
-            exchangeCheckoutAndChargerList()
+            showCheckout(false, -1)
         }
 
         setupChargerInput(bottomSheetView)
@@ -252,10 +258,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         chargerInputDialog.setContentView(bottomSheetView)
         chargerInputDialog.show()
     }
+
     private fun setupChargerInput(bottomSheetView: View) {
-        val pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
-        val chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
-        val klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
+        pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
+        chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
+        klarnaButton = bottomSheetView.findViewById<ImageButton>(R.id.klarnaButton)
         //klarnaButton.layoutParams = klarnaButton.layoutParams.apply {
         //    width = 0
         //    height = 0
@@ -276,7 +283,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    override fun changeInput(newInput: String){
+        pinView.setText(newInput)
+    }
 
+    private fun displayChargerList(bottomSheetView: View){
+        val chargerId = pinView.text.toString()
+
+        listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.chargerListRecyclerView)
+        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers,chargerId,this)
+
+        // Only add decoration on first-time display
+        if( listOfChargersRecyclerView.itemDecorationCount == 0) {
+            listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+        }
+    }
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
@@ -428,11 +450,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun validateChargerConnection(
-        chargerId: Int,
-        chargerInputStatus: TextView,
-        klarnaButton: ImageButton
-    ) {
+    private fun validateChargerConnection(chargerId: Int, chargerInputStatus: TextView, klarnaButton: ImageButton) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
@@ -450,7 +468,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                                     intent.putExtra("ChargerId",chargerId)
                                     startActivity(intent)
                                 }
-                                exchangeCheckoutAndChargerList()
+                                showCheckout(true, charger.chargePointID)
                                 chargerInputStatus.setOnClickListener {
                                     reserveCharger(charger.chargerID, chargerInputStatus)
                                     //lifecycleScope.launch {
@@ -500,25 +518,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             3 -> { chargerInputStatus.setBackgroundResource(R.color.yellow)}
         }
     }
-    private fun exchangeCheckoutAndChargerList(){
+
+    private fun showCheckout(bool: Boolean, chargePointId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargers_near_me_layout)
         val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.charger_input_pinview)
         val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.charger_input_status)
         val chargerInputView = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargerInputLayout)
+        val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.currentLocation)
         TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
 
-        if(chargersNearMeLayout?.visibility == View.GONE){
-            chargersNearMeLayout.visibility = View.VISIBLE
-            checkoutLayout?.visibility = View.GONE
-            chargerInput?.isEnabled = true
-            chargerInput?.text?.clear()
-            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
-        }
-        else {
+        if(bool) {
+            chargerInput?.isEnabled = false
             chargersNearMeLayout?.visibility = View.GONE
             checkoutLayout?.visibility =View.VISIBLE
-            chargerInput?.isEnabled = false
+            chargerLocationText?.text = chargePoints[chargePointId].name
+            if (chargerInputView != null) {
+                displayChargerList(chargerInputView)
+            }
+        }
+        else {
+            chargerInput?.isEnabled = true
+            chargersNearMeLayout?.visibility = View.VISIBLE
+            checkoutLayout?.visibility = View.GONE
+            chargerInput?.text?.clear()
+            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
         }
     }
 }
