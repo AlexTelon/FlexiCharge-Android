@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
     private lateinit var paymentSummaryDialog: BottomSheetDialog
-    private lateinit var chargerInProgressDialog : BottomSheetDialog
     private lateinit var hours : String
     private lateinit var minutes : String
     private lateinit var pinView: PinView
@@ -109,10 +108,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         binding.identifyChargerButton.setOnClickListener {
             setupChargerInputDialog()
-        }
-
-        binding.helloLadBtn.setOnClickListener {
-            displayPaymentSummaryDialog()
         }
 
         binding.userButton.setOnClickListener {
@@ -208,30 +203,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun setupChargerInProgressDialog() {
 
-         chargerInProgressDialog = BottomSheetDialog(
-            this@MainActivity
-        )
+        val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
+
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetDialog.behavior.isDraggable = false;
+        bottomSheetDialog.setCancelable(false)
+
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
             R.layout.layout_charger_in_progress,
             findViewById<ConstraintLayout>(R.id.chargerInProgress)
         )
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.progressbarPercent)
-
+        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.progressbar)
         var progress = 67;
 
         bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
-            setChargerStatus(charger.chargerID,"Available")
+            //setChargerStatus(charger.chargerID,"Available")
             hours = Calendar.getInstance().time.hours.toString()
             minutes = Calendar.getInstance().time.minutes.toString()
+            bottomSheetDialog.dismiss()
             displayPaymentSummaryDialog()
-            //bottomSheetDialog.dismiss()
         }
 
         progressbar.progress = progress;
         progressbarPercent.text = progress.toString();
 
-        chargerInProgressDialog.setContentView(bottomSheetView)
-        chargerInProgressDialog.show()
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
     }
 
     private fun displayPaymentSummaryDialog(){
@@ -249,12 +247,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         //duration.text = ""
         chargingStopTime.text = "Charging stopped at " + hours + ":" + minutes
 
-
         val cross = bottomSheetView.findViewById<ImageButton>(R.id.close_button)
         cross.setOnClickListener {
             paymentSummaryDialog.dismiss()
-            chargerInProgressDialog.dismiss()
-
         }
 
         paymentSummaryDialog.setContentView(bottomSheetView)
