@@ -12,7 +12,7 @@ import com.flexicharge.bolt.R
 
 class ChargePointListAdapter(
     private var chargePoints: ChargePoints,
-    private var act: panToMarkerInterface,
+    private var act: showChargePointInterface,
     private var distance: MutableList<String>,
     private var chargerCount: MutableList<Int>
 ) :
@@ -27,7 +27,7 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
         init {
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
-                act.panToMarker(
+                act.showChargePoint(
                     chargePoints[position].location[0],
                     chargePoints[position].location[1],
                     chargePoints[position].chargePointID)
@@ -35,8 +35,8 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
         }
     }
 
-    interface panToMarkerInterface {
-        fun panToMarker (
+    interface showChargePointInterface {
+        fun showChargePoint (
             latitude: Double,
             longitude: Double,
             chargePointID: Int

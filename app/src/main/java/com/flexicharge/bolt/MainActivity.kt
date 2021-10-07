@@ -53,7 +53,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.panToMarkerInterface, ChargersListAdapter.ChangeInputInterface {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mMap: GoogleMap
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    override fun panToMarker (
+    override fun showChargePoint (
         latitude: Double,
         longitude: Double,
         chargePointID: Int
