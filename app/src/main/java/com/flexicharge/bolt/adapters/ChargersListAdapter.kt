@@ -7,10 +7,11 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.flexicharge.bolt.Chargers
+import com.flexicharge.bolt.ChargePoint
+import com.flexicharge.bolt.Charger
 import com.flexicharge.bolt.R
 
-class ChargersListAdapter(private val chargers: Chargers, private val enteredChargerId: String, private val act: ChangeInputInterface): RecyclerView.Adapter<ChargersListAdapter.ViewHolder>() {
+class ChargersListAdapter(private val chargers: List<Charger>, private val enteredChargerId: String, private val chargePoint: ChargePoint, private val act: ChangeInputInterface): RecyclerView.Adapter<ChargersListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.charger_list_item, parent, false)
@@ -29,6 +30,7 @@ class ChargersListAdapter(private val chargers: Chargers, private val enteredCha
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.chargerId.text = chargers[position].chargerID.toString()
         holder.chargerStatus.text = chargers[position].status
+        holder.chargerCost.text = chargePoint.price + "kr/kWh"
 
         if(holder.chargerId.text == enteredChargerId){
             holder.itemView.setBackgroundResource(R.drawable.rounded_background_selected)

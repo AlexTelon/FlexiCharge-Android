@@ -45,7 +45,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.internal.checkDuration
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
@@ -319,12 +318,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         pinView.setText(newInput)
     }
 
-    private fun displayChargerList(bottomSheetView: View){
+    private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
         val chargerId = pinView.text.toString()
 
         listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.chargerListRecyclerView)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargers,chargerId,this)
+
+
+        if (this::chargePoints.isInitialized) {
+            //var chargePointId = chargers.filter { it.chargerID == chargerId.toInt() }[0].chargePointID
+            var chargersInCp = chargers.filter {it.chargePointID == chargePointId}
+            var chargePoint = chargePoints.filter { it.chargePointID == chargePointId }[0]
+            //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint, chargerCount)
+            //listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp as Chargers, chargerId, chargePoint,  this)
+            listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
+        }
+
+
 
         // Only add decoration on first-time display
         if( listOfChargersRecyclerView.itemDecorationCount == 0) {
@@ -335,7 +345,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
         listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
-        Log.d("CHARGEPONTS", chargePoints.toString() )
         if (this::chargePoints.isInitialized) {
             var distanceToChargePoint = mutableListOf<String>()
             var chargerCount = mutableListOf<Int>()
@@ -564,9 +573,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargerInput?.isEnabled = false
             chargersNearMeLayout?.visibility = View.GONE
             checkoutLayout?.visibility =View.VISIBLE
-            chargerLocationText?.text = chargePoints[chargePointId].name
+            chargerLocationText?.text = chargePoints.filter { it.chargePointID == chargePointId }[0].name
             if (chargerInputView != null) {
-                displayChargerList(chargerInputView)
+                displayChargerList(chargerInputView, chargePointId)
             }
         }
         else {
