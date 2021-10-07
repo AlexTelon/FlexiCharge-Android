@@ -168,9 +168,9 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 if (response.isSuccessful) {
                     //TODO Backend Klarna/Order/Session Request if successful
                     val transaction = response.body() as TransactionList
+                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
                     lifecycleScope.launch(Dispatchers.Main) {
-                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                        sharedPreferences.edit().apply { putInt("transactionId", transactionId) }.apply()
                         finish()
                     }
                 } else {

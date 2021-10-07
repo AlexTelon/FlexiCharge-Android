@@ -592,7 +592,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         //TODO Fix fetching transaction ID smartly
 
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val transactionId = sharedPreferences.getInt("TransactionId", -1);
+        val transactionId = sharedPreferences.getInt("TransactionId", -1)
 
         if (transactionId != -1) {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -605,7 +605,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             chargerInputDialog.dismiss()
                             setupChargingInProgressDialog(transaction)
                         }
-                    } else {
+                    }
+                    else {
 
                     }
                 } catch (e: HttpException) {
