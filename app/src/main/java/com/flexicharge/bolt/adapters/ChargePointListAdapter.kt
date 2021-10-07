@@ -10,7 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexicharge.bolt.ChargePoints
 import com.flexicharge.bolt.R
 
-class ChargePointListAdapter(private var chargePoints: ChargePoints, private var act: panToMarkerInterface, private var distance : MutableList<String>, private var chargerCount : MutableList<Int>) :
+class ChargePointListAdapter(
+    private var chargePoints: ChargePoints,
+    private var act: panToMarkerInterface,
+    private var distance: MutableList<String>,
+    private var chargerCount: MutableList<Int>
+) :
 RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -19,20 +24,23 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
         val itemImage : ImageView = itemView.findViewById(R.id.charger_icon)
         val itemNumberOfChargers: TextView = itemView.findViewById(R.id.charger_number_of_available)
 
-
         init {
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
                 act.panToMarker(
                     chargePoints[position].location[0],
                     chargePoints[position].location[1],
-                )
+                    chargePoints[position].chargePointID)
             }
         }
     }
 
     interface panToMarkerInterface {
-        fun panToMarker (latitude: Double, longitude: Double) {}
+        fun panToMarker (
+            latitude: Double,
+            longitude: Double,
+            chargePointID: Int
+        ) {}
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
