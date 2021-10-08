@@ -105,7 +105,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         mapFragment.getMapAsync(this)
 
         binding.identifyChargerButton.setOnClickListener {
-            setupChargerInputDialog()
+            if (this::chargePoints.isInitialized) {
+                setupChargerInputDialog()
+            }
+            else {
+                updateChargerList()
+                updateChargePointList()
+                setupChargerInputDialog()
+            }
         }
 
         binding.userButton.setOnClickListener {
@@ -139,10 +146,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_CODE ->
-            if (grantResults.isNotEmpty() && grantResults[0] ==
-            PackageManager.PERMISSION_GRANTED) {
-            getLocationAccess()
-        }
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLocationAccess()
+            }
         }
     }
 
@@ -205,7 +211,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     }
 
-    private fun setupChargerInProgressDialog() {
+    private fun setupChargingInProgressDialog() {
 
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
 
@@ -381,20 +387,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 val response = RetrofitInstance.flexiChargeApi.getChargePointList()
                 if (response.isSuccessful) {
                     val chargePoints = response.body() as ChargePoints
-                    Log.d("updatedChargerList", "Connected to charger ")
                     if (!chargePoints.isEmpty()) {
                         this@MainActivity.chargePoints = response.body() as ChargePoints
                     }
                     else {
-                        this@MainActivity.chargePoints = ChargePoints();
+                        this@MainActivity.chargePoints = ChargePoints()
                     }
-                } else {
-                    Log.d("validateConnection", "Could not connect to charger")
                 }
             } catch (e: HttpException) {
-                Log.d("validateConnection", "Crashed with Exception")
+                Log.d("validateConnection", "Http Error")
             } catch (e: IOException) {
-                Log.d("validateConnection", "You might not have internet connection")
+                Log.d("validateConnection", "No Internet Error - ChargePointList will not be initialized")
             }
         }
     }
@@ -405,7 +408,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 val response = RetrofitInstance.flexiChargeApi.getChargerList()
                 if (response.isSuccessful) {
                     val chargers = response.body() as Chargers
-                    Log.d("validateConnection", "Connected to charger ")
                     if (!chargers.isEmpty()) {
                         this@MainActivity.chargers = response.body() as Chargers
                         lifecycleScope.launch(Dispatchers.Main) {
@@ -415,13 +417,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     else {
                         this@MainActivity.chargers = Chargers()
                     }
-                } else {
-                    Log.d("validateConnection", "Could not connect to charger")
                 }
             } catch (e: HttpException) {
-                Log.d("validateConnection", "Crashed with Exception")
+                Log.d("validateConnection", "Http Error")
             } catch (e: IOException) {
-                Log.d("validateConnection", "You might not have internet connection")
+                Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
             }
         }
     }
@@ -444,7 +444,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         when (status) {
                             "Accepted" -> {
                             chargerInputDialog.dismiss()
-                            setupChargerInProgressDialog()
+                            setupChargingInProgressDialog()
                             //reserveCharger(chargerId, chargerInputStatus)
                             }
                             "Faulted" -> {
@@ -464,20 +464,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             }
                         }
                     }
-                    Log.d("validateConnection", "Charger:" + chargerId +  " got status" + status)
-                } else {
-                    Log.d("validateConnection", "Could not change status")
+                }
+                else {
                     lifecycleScope.launch(Dispatchers.Main) {
+                        // TODO Dont fake that it was successful
                         chargerInputDialog.dismiss()
-                        setupChargerInProgressDialog()
-
+                        setupChargingInProgressDialog()
                     }
-                    //setChargerButtonStatus(chargerInputStatus, false, "Communication Error", 0)
                 }
             } catch (e: HttpException) {
-                Log.d("validateConnection", "Crashed with Exception")
+                lifecycleScope.launch(Dispatchers.Main) {
+                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 0)
+                }
             } catch (e: IOException) {
-                Log.d("validateConnection", "You might not have internet connection")
+                lifecycleScope.launch(Dispatchers.Main) {
+                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
+                }
             }
         }
     }
@@ -526,9 +528,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     }
                 }
             } catch (e: HttpException) {
-                Log.d("validateConnection", "Crashed with HttpException")
+                lifecycleScope.launch(Dispatchers.Main) {
+                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 0)
+                }
             } catch (e: IOException) {
-                Log.d("validateConnection", "You might not have internet connection")
                 lifecycleScope.launch(Dispatchers.Main) {
                     setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
                 }
