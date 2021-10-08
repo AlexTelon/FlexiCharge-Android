@@ -1,5 +1,6 @@
 package com.flexicharge.bolt.payment
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,16 +9,19 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.flexicharge.bolt.R
+import androidx.lifecycle.lifecycleScope
+import com.flexicharge.bolt.*
+import com.flexicharge.bolt.AccountActivities.RegisterActivity
 import com.flexicharge.bolt.payment.api.OrderClient
 import com.flexicharge.bolt.payment.api.OrderLine
 import com.flexicharge.bolt.payment.api.OrderPayload
-import com.google.android.gms.maps.GoogleMap
 import com.klarna.mobile.sdk.api.payments.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
@@ -25,6 +29,8 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
     private val orderButton by lazy { findViewById<Button>(R.id.orderButton) }
     private var chargerId : Int = 0
+    private var clientToken : String = ""
+    private var transactionId : Int = 0
 
     private val paymentCategory = KlarnaPaymentCategory.PAY_NOW // please update this value if needed
 
@@ -34,7 +40,9 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_klarna)
         chargerId = intent.getIntExtra("ChargerId", 0)
-
+        clientToken = intent.getStringExtra("ClientToken").toString()
+        transactionId = intent.getIntExtra("TransactionId", 0)
+        Log.d("CLIENTTOKEN", clientToken)
         initialize()
 
         setupButtons()
@@ -52,7 +60,8 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                     resp.body()?.let { session ->
                         runOnUiThread {
                             klarnaPaymentView.initialize(
-                                session.client_token,
+                                clientToken,
+                                //session.client_token,
                                 "${getString(R.string.return_url_scheme)}://${getString(R.string.return_url_host)}"
                             )
                         }
@@ -88,10 +97,8 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 if (response.isSuccessful) {
                     runOnUiThread {
                         val intent = Intent(this@KlarnaActivity, KlarnaOrderCompletedActivity::class.java)
-                        //intent.putExtra("message","Charged 300SEK for Charger: " + chargerId)
-                        Toast.makeText(this@KlarnaActivity,"Charged 300SEK for Charger: " + chargerId,
-                            Toast.LENGTH_SHORT).show()
-                        //startActivity(intent)
+                        intent.putExtra("message","Charged 300SEK for Charger: " + chargerId)
+                        startActivity(intent)
                         finish()
                     }
                 } else {
@@ -153,6 +160,29 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         authToken: String?,
         finalizedRequired: Boolean?
     ) {
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val requestBody = TransactionOrder(authToken!!, transactionId)
+                val response = RetrofitInstance.flexiChargeApi.postTransactionOrder(requestBody)
+                if (response.isSuccessful) {
+                    //TODO Backend Klarna/Order/Session Request if successful
+                    val transaction = response.body() as TransactionList
+                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        finish()
+                    }
+                } else {
+                    Log.d("asd" ,"asda")
+                }
+            } catch (e: HttpException) {
+
+            } catch (e: IOException) {
+
+            }
+        }
+
         finalizeButton.isEnabled = finalizedRequired ?: false
         orderButton.isEnabled = approved && !(finalizedRequired ?: false)
         orderButton.tag = authToken

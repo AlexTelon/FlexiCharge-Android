@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var pinView: PinView
     private lateinit var chargerInputStatus: TextView
     private lateinit var listOfChargersRecyclerView: RecyclerView
+    private lateinit var currentTransaction: Transaction
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -125,8 +126,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
+    }
+
+    override fun onResume() {
+        super.onResume()
         updateChargerList()
         updateChargePointList()
+        checkCharging()
     }
 
     private fun Context.hideKeyboard(view: View) {
@@ -208,11 +214,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     ) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
         showCheckout(true, chargePointID, false, -1)
-
     }
 
-    private fun setupChargingInProgressDialog() {
-
+    private fun setupChargingInProgressDialog(transaction: Transaction) {
+        //TODO Populate and update frequently from transaction
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -225,18 +230,35 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         )
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.progressbarPercent)
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.progressbar)
-        var progress = 67;
+        var progress = 67
 
         bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
             //setChargerStatus(charger.chargerID,"Available")
             hours = Calendar.getInstance().time.hours.toString()
             minutes = Calendar.getInstance().time.minutes.toString()
             bottomSheetDialog.dismiss()
+            val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+            sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
             displayPaymentSummaryDialog()
         }
 
-        progressbar.progress = progress;
-        progressbarPercent.text = progress.toString();
+        var charger = chargers.filter { it.chargerID == transaction.chargerID }[0]
+        var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
+        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargingLocation)
+        chargingLocation.text = chargePoint.name
+        if (transaction.currentChargePercentage != null) {
+            progressbar.progress = transaction.currentChargePercentage as Int
+            progressbarPercent.text = transaction.currentChargePercentage.toString()
+        }
+        else {
+            progressbar.progress = 0
+            progressbarPercent.text = "0"
+        }
+
+
+        if (this::chargerInputDialog.isInitialized) {
+            chargerInputDialog.dismiss()
+        }
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
@@ -323,11 +345,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
         if (this::chargePoints.isInitialized) {
-            //var chargePointId = chargers.filter { it.chargerID == chargerId.toInt() }[0].chargePointID
             var chargersInCp = chargers.filter {it.chargePointID == chargePointId}
             var chargePoint = chargePoints.filter { it.chargePointID == chargePointId }[0]
-            //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint, chargerCount)
-            //listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp as Chargers, chargerId, chargePoint,  this)
             listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
         }
 
@@ -426,6 +445,49 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val requestBody = TransactionSession(chargerId, userId)
+                val response = RetrofitInstance.flexiChargeApi.postTransactionSession(requestBody)
+                if (response.isSuccessful) {
+                    //TODO Backend Klarna/Order/Session Request if successful
+                    val transaction = response.body() as Transaction
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
+                        intent.putExtra("ChargerId", chargerId)
+                        intent.putExtra("ClientToken", transaction.client_token)
+                        intent.putExtra("TransactionId", transaction.transactionID)
+                        startActivity(intent)
+                    }
+                } else {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        // TODO Dont fake that it was successful
+                    }
+                }
+            } catch (e: HttpException) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    setChargerButtonStatus(
+                        chargerInputStatus,
+                        false,
+                        "Could not get all data correctly",
+                        0
+                    )
+                }
+            } catch (e: IOException) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    setChargerButtonStatus(
+                        chargerInputStatus,
+                        false,
+                        "Unable to establish connection",
+                        0
+                    )
+                }
+            }
+        }
+    }
+
     private fun reserveCharger(chargerId: Int, chargerInputStatus: TextView) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -443,24 +505,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     lifecycleScope.launch(Dispatchers.Main) {
                         when (status) {
                             "Accepted" -> {
-                            chargerInputDialog.dismiss()
-                            setupChargingInProgressDialog()
-                            //reserveCharger(chargerId, chargerInputStatus)
+                                createKlarnaTransactionSession("BoltGuest", chargerId)
                             }
                             "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
                             }
                             "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
                             }
                             "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
                             }
                             "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
                             }
                             else -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 2)
                             }
                         }
                     }
@@ -468,8 +528,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 else {
                     lifecycleScope.launch(Dispatchers.Main) {
                         // TODO Dont fake that it was successful
-                        chargerInputDialog.dismiss()
-                        setupChargingInProgressDialog()
+                        createKlarnaTransactionSession("BoltGuest", chargerId)
                     }
                 }
             } catch (e: HttpException) {
@@ -493,30 +552,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
                     Log.d("validateConnection", "Connected to charger " + charger.chargerID)
                     lifecycleScope.launch(Dispatchers.Main) {
-                        //panToMarker(
-                        //    charger.location[0],
-                        //    charger.location[1],
-                        //    chargePoints[position].chargePointID
-                        //)
                         when (charger.status) {
                             "Available" -> {
-                                setChargerButtonStatus(chargerInputStatus, true, "Begin Charging", 1)
                                 showCheckout(true, charger.chargePointID, true, chargerId)
-                                chargerInputStatus.setOnClickListener {
-                                    reserveCharger(charger.chargerID, chargerInputStatus)
-                                }
+                                setChargerButtonStatus(chargerInputStatus, false, "Pay to start charging", 2)
                             }
                             "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
                             }
                             "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
                             }
                             "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
                             }
                             "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
+                            }
+                            "Charging" -> {
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 2)
                             }
 
                             else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger Out of Order", 2) }
@@ -524,16 +578,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        setChargerButtonStatus(chargerInputStatus, false, "Charger not identified", 0)
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger not identified", 2)
                     }
                 }
             } catch (e: HttpException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 0)
+                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 2)
                 }
             } catch (e: IOException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
+                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 2)
                 }
             }
         }
@@ -550,6 +604,37 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    private fun checkCharging() {
+
+        //TODO Fix fetching transaction ID smartly
+
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val transactionId = sharedPreferences.getInt("TransactionId", -1)
+
+        if (transactionId != -1) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                    if (response.isSuccessful) {
+                        //TODO Backend Klarna/Order/Session Request if successful
+                        val transaction = response.body() as Transaction
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            setupChargingInProgressDialog(transaction)
+                        }
+                    }
+                    else {
+
+                    }
+                } catch (e: HttpException) {
+
+                } catch (e: IOException) {
+
+                }
+            }
+
+
+        }
+    }
     private fun showCheckout(bool: Boolean, chargePointId: Int, showPayment: Boolean, chargerId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargers_near_me_layout)
@@ -569,9 +654,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 paymentText?.visibility = View.VISIBLE
                 chargerInput?.isEnabled = false
                 klarnaButton?.setOnClickListener {
-                    val intent = Intent(this@MainActivity,KlarnaActivity::class.java)
-                    intent.putExtra("ChargerId",chargerId)
-                    startActivity(intent)
+                    reserveCharger(chargerId, chargerInputStatus!!)
                 }
             }
             else {
