@@ -1,5 +1,6 @@
 package com.flexicharge.bolt
 
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -31,4 +32,12 @@ interface ApiInterface {
         @Body body: MutableMap<String, String>
     ): Response<String>
 
+    @GET("transactions/{transactionId}")
+    suspend fun getTransaction(@Path("transactionId") transactionId: Int): Response<Transaction>
+
+    @POST("transactions/session")
+    suspend fun postTransactionSession(@Body body: TransactionSession): Response<Transaction>
+
+    @POST("transactions/order")
+    suspend fun postTransactionOrder(@Body body: TransactionOrder): Response<TransactionList>
 }
