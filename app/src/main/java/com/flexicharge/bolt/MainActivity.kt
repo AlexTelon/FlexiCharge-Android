@@ -126,12 +126,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fetchLocation()
-        updateChargerList()
-        updateChargePointList()
     }
 
     override fun onResume() {
         super.onResume()
+        updateChargerList()
+        updateChargePointList()
         checkCharging()
     }
 
@@ -230,18 +230,35 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         )
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.progressbarPercent)
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.progressbar)
-        var progress = 67;
+        var progress = 67
 
         bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
             //setChargerStatus(charger.chargerID,"Available")
             hours = Calendar.getInstance().time.hours.toString()
             minutes = Calendar.getInstance().time.minutes.toString()
             bottomSheetDialog.dismiss()
+            val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+            sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
             displayPaymentSummaryDialog()
         }
 
-        progressbar.progress = progress;
-        progressbarPercent.text = progress.toString();
+        var charger = chargers.filter { it.chargerID == transaction.chargerID }[0]
+        var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
+        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargingLocation)
+        chargingLocation.text = chargePoint.name
+        if (transaction.currentChargePercentage != null) {
+            progressbar.progress = transaction.currentChargePercentage as Int
+            progressbarPercent.text = transaction.currentChargePercentage.toString()
+        }
+        else {
+            progressbar.progress = 0
+            progressbarPercent.text = "0"
+        }
+
+
+        if (this::chargerInputDialog.isInitialized) {
+            chargerInputDialog.dismiss()
+        }
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
@@ -602,7 +619,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         //TODO Backend Klarna/Order/Session Request if successful
                         val transaction = response.body() as Transaction
                         lifecycleScope.launch(Dispatchers.Main) {
-                            chargerInputDialog.dismiss()
                             setupChargingInProgressDialog(transaction)
                         }
                     }
