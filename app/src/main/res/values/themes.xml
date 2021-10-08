@@ -29,4 +29,5 @@
         <item name="colorPrimary">@color/dark_grey</item>
         <item name="colorOnSurface">@color/white</item>
     </style>
+
 </resources>

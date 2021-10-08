@@ -26,11 +26,10 @@ import java.io.IOException
 class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
     private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
-    private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
-    private val orderButton by lazy { findViewById<Button>(R.id.orderButton) }
     private var chargerId : Int = 0
     private var clientToken : String = ""
     private var transactionId : Int = 0
+    private var authTokenId : String = ""
 
     private val paymentCategory = KlarnaPaymentCategory.PAY_NOW // please update this value if needed
 
@@ -91,7 +90,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
             )
             val orderPayload = OrderPayload("SE", "SEK", "en-US", 30000, 0, listOf(orderLIne))
             // create the order using the auth token received in the authorization response
-            val orderCall = OrderClient.instance.createOrder(orderButton.tag as String, orderPayload)
+            val orderCall = OrderClient.instance.createOrder(authTokenId, orderPayload)
             try {
                 val response = orderCall.execute()
                 if (response.isSuccessful) {
@@ -113,13 +112,6 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private fun setupButtons() {
         authorizeButton.setOnClickListener {
             klarnaPaymentView.authorize(true, null)
-        }
-
-        finalizeButton.setOnClickListener {
-            klarnaPaymentView.finalize(null)
-        }
-        orderButton.setOnClickListener {
-            createOrder()
         }
     }
 
@@ -183,9 +175,9 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
             }
         }
 
-        finalizeButton.isEnabled = finalizedRequired ?: false
-        orderButton.isEnabled = approved && !(finalizedRequired ?: false)
-        orderButton.tag = authToken
+        if (authToken != null) {
+            authTokenId = authToken
+        }
     }
 
     override fun onReauthorized(view: KlarnaPaymentView, approved: Boolean, authToken: String?) {}
@@ -197,10 +189,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         }
     }
 
-    override fun onFinalized(view: KlarnaPaymentView, approved: Boolean, authToken: String?) {
-        orderButton.isEnabled = approved
-        orderButton.tag = authToken
-    }
+    override fun onFinalized(view: KlarnaPaymentView, approved: Boolean, authToken: String?) {}
 
     override fun onResume() {
         super.onResume()

@@ -5,7 +5,8 @@
     <string name="chargepoints_near_me">Charge Points Near Me</string>
     <string name="no_chargers_available">No Chargers Available</string>
     <string name="title_activity_maps">MapsActivity</string>
-    <string name="authorize">Enter Details</string>
+    <string name="authorize">Authorize</string>
+    <string name="continue_">Continue</string>
     <string name="finalize">Finalize</string>
     <string name="create_order">Pay Now</string>
     <string name="order_completed">Order completed!</string>
