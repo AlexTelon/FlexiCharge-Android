@@ -1,4 +1,4 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.api.flexicharge
 
 class Chargers : ArrayList<Charger>()
 

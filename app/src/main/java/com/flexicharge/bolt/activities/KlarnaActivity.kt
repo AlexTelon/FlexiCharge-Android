@@ -1,4 +1,4 @@
-package com.flexicharge.bolt.payment
+package com.flexicharge.bolt.activities
 
 import android.content.Context
 import android.content.Intent
@@ -6,15 +6,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.*
-import com.flexicharge.bolt.AccountActivities.RegisterActivity
-import com.flexicharge.bolt.payment.api.OrderClient
-import com.flexicharge.bolt.payment.api.OrderLine
-import com.flexicharge.bolt.payment.api.OrderPayload
+import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import com.flexicharge.bolt.api.flexicharge.TransactionList
+import com.flexicharge.bolt.api.flexicharge.TransactionOrder
+import com.flexicharge.bolt.api.klarna.OrderClient
+import com.flexicharge.bolt.api.klarna.OrderLine
+import com.flexicharge.bolt.api.klarna.OrderPayload
 import com.klarna.mobile.sdk.api.payments.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

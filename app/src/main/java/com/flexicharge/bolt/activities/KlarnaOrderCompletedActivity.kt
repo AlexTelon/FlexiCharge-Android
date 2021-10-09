@@ -1,10 +1,8 @@
-package com.flexicharge.bolt.payment
+package com.flexicharge.bolt.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.flexicharge.bolt.MainActivity
 import com.flexicharge.bolt.R
 
 class KlarnaOrderCompletedActivity : AppCompatActivity() {
