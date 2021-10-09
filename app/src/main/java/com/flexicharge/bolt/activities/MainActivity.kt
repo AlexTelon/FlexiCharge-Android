@@ -139,11 +139,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         MapHelper.onMapReady(this, googleMap)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        MapHelper.onRequestPermissionsResult(this, requestCode, grantResults)
-    }
-
     private fun Context.hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
