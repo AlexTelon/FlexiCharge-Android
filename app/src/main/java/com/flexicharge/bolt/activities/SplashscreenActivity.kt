@@ -19,7 +19,7 @@ class SplashscreenActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splashscreen)
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
-        }, 1000)
+        }, 10000)
     }
 
     private val permissionRequestCode = 521
