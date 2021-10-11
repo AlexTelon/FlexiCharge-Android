@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bolt">
         <activity
-            android:name=".activities.PermissionActivity"
+            android:name=".activities.SplashscreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
