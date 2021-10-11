@@ -12,7 +12,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/total_cost"
+        android:id="@+id/paymentPriceLayout_textView_totalCost"
         android:text="Total Cost"
         android:textStyle="bold"
         android:textColor="@color/black"
@@ -25,14 +25,14 @@
         android:layout_height="wrap_content"
         />
     <TextView
-        android:id="@+id/price"
+        android:id="@+id/paymentPriceLayout_textView_price"
         android:text="X kr"
         android:textColor="@color/black"
         android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/total_cost"
+        app:layout_constraintTop_toBottomOf="@id/paymentPriceLayout_textView_totalCost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,17 +10,17 @@
     android:foreground="?android:attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/chargepoint_distance"
+        android:id="@+id/chargePointListItem_textView_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Distans i nummer"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/chargepoinnt_address" />
+        app:layout_constraintTop_toTopOf="@+id/chargePointListItem_textView_address" />
 
     <TextView
-        android:id="@+id/chargepoinnt_address"
+        android:id="@+id/chargePointListItem_textView_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -32,7 +32,7 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:tint="@color/green"
-        android:id="@+id/charger_icon"
+        android:id="@+id/chargePointListItem_imageView_chargerIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -40,10 +40,10 @@
         android:paddingEnd="5dp"
         android:src="@drawable/cable"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargepoinnt_address" />
+        app:layout_constraintTop_toBottomOf="@+id/chargePointListItem_textView_address" />
 
     <TextView
-        android:id="@+id/charger_number_of_available"
+        android:id="@+id/chargePointListItem_textView_no_of_chargers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -51,8 +51,8 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/charger_icon"
-        app:layout_constraintTop_toTopOf="@+id/charger_icon" />
+        app:layout_constraintStart_toEndOf="@+id/chargePointListItem_imageView_chargerIcon"
+        app:layout_constraintTop_toTopOf="@+id/chargePointListItem_imageView_chargerIcon" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

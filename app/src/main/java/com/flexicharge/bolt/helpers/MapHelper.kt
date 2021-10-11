@@ -54,7 +54,7 @@ object MapHelper {
             if (location != null) {
                 currentLocation = location
                 val supportMapFragment =
-                    activity.supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+                    activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
                 supportMapFragment.getMapAsync(activity)
                 getLocationAccess(activity)
                 setCurrentLocation(activity)

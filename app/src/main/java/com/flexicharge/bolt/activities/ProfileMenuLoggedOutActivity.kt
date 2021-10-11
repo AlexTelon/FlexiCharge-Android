@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
 
-    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
+    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }
     //private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
     //private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
     //private val orderButton by lazy { findViewById<Button>(R.id.orderButton) }

@@ -50,7 +50,7 @@ class QrActivity : AppCompatActivity() {
 
     private fun scanQR() {
 
-        val scannerView: CodeScannerView = findViewById(R.id.scanner_view)
+        val scannerView: CodeScannerView = findViewById(R.id.qrActivity_codeScannerView)
         codeScanner = CodeScanner(this, scannerView)
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = CodeScanner.ALL_FORMATS

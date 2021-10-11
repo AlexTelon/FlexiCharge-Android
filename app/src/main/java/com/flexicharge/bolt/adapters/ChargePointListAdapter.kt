@@ -19,10 +19,10 @@ class ChargePointListAdapter(
 RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itemAddress: TextView = itemView.findViewById(R.id.chargepoinnt_address)
-        val itemDistance: TextView = itemView.findViewById(R.id.chargepoint_distance)
-        val itemImage : ImageView = itemView.findViewById(R.id.charger_icon)
-        val itemNumberOfChargers: TextView = itemView.findViewById(R.id.charger_number_of_available)
+        val itemAddress: TextView = itemView.findViewById(R.id.chargePointListItem_textView_address)
+        val itemDistance: TextView = itemView.findViewById(R.id.chargePointListItem_textView_distance)
+        val itemImage : ImageView = itemView.findViewById(R.id.chargePointListItem_imageView_chargerIcon)
+        val itemNumberOfChargers: TextView = itemView.findViewById(R.id.chargePointListItem_textView_no_of_chargers)
 
         init {
             itemView.setOnClickListener { v: View ->

@@ -10,7 +10,7 @@
     android:foreground="?android:attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/chargerId"
+        android:id="@+id/chargerListItem_textView_chargerId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dp"
@@ -18,22 +18,22 @@
         android:text="123456"
         android:textSize="12sp"
         android:textColor="@color/black"
-        app:layout_constraintStart_toEndOf="@+id/chargerCableIcon"
+        app:layout_constraintStart_toEndOf="@+id/chargerListItem_imageView_cableIcon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/chargerAC"
+        android:id="@+id/chargerListItem_textView_chargerAC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:textSize="12sp"
         android:text="AC 7kW"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/chargerId"
-        app:layout_constraintTop_toBottomOf="@+id/chargerId" />
+        app:layout_constraintStart_toStartOf="@+id/chargerListItem_textView_chargerId"
+        app:layout_constraintTop_toBottomOf="@+id/chargerListItem_textView_chargerId" />
 
     <TextView
-        android:id="@+id/chargerCost"
+        android:id="@+id/chargerListItem_textView_chargerCost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -42,11 +42,11 @@
         android:text="3.00kr/kWh"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/chargerAC"
-        app:layout_constraintTop_toBottomOf="@+id/chargerAC" />
+        app:layout_constraintStart_toStartOf="@+id/chargerListItem_textView_chargerAC"
+        app:layout_constraintTop_toBottomOf="@+id/chargerListItem_textView_chargerAC" />
 
     <TextView
-        android:id="@+id/chargerStatus"
+        android:id="@+id/chargerListItem_textView_chargerStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -55,11 +55,11 @@
         android:textColor="@color/green"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/chargerCost"
-        app:layout_constraintTop_toBottomOf="@+id/chargerCost" />
+        app:layout_constraintStart_toStartOf="@+id/chargerListItem_textView_chargerCost"
+        app:layout_constraintTop_toBottomOf="@+id/chargerListItem_textView_chargerCost" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/chargerCableIcon"
+        android:id="@+id/chargerListItem_imageView_cableIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="15dp"
@@ -70,14 +70,14 @@
         android:tint="@color/black" />
 
     <TextView
-        android:id="@+id/chargerType"
+        android:id="@+id/chargerListItem_textView_chargerType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="Type 2"
         android:textSize="12sp"
         android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="@+id/chargerCableIcon"
-        app:layout_constraintStart_toStartOf="@+id/chargerCableIcon"
-        app:layout_constraintTop_toBottomOf="@+id/chargerCableIcon" />
+        app:layout_constraintEnd_toEndOf="@+id/chargerListItem_imageView_cableIcon"
+        app:layout_constraintStart_toStartOf="@+id/chargerListItem_imageView_cableIcon"
+        app:layout_constraintTop_toBottomOf="@+id/chargerListItem_imageView_cableIcon" />
 </androidx.constraintlayout.widget.ConstraintLayout>

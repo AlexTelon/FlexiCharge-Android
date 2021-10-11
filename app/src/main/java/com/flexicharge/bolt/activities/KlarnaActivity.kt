@@ -25,8 +25,8 @@ import retrofit2.HttpException
 import java.io.IOException
 
 class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
-    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
-    private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
+    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }
+    private val authorizeButton by lazy { findViewById<Button>(R.id.klarnaActivity_button_authorize) }
     private var chargerId : Int = 0
     private var clientToken : String = ""
     private var transactionId : Int = 0

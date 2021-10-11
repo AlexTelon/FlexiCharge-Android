@@ -10,7 +10,7 @@ class KlarnaOrderCompletedActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_klarna_order_completed)
         var message = intent.getStringExtra("message")
-        var textView = findViewById<TextView>(R.id.messageTextView)
+        var textView = findViewById<TextView>(R.id.klarnaOrderCompletedActivity_textView_message)
         textView.text = message
     }
     override fun onBackPressed() {

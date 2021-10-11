@@ -80,20 +80,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.positionPinButton.setOnClickListener {
+        binding.mainActivityButtonPinPosition.setOnClickListener {
             currLocation(this)
         }
 
-        binding.cameraButton.setOnClickListener {
+        binding.mainActivityButtonCamera.setOnClickListener {
             val intent = Intent(this, QrActivity::class.java)
             startActivity(intent)
         }
 
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        binding.identifyChargerButton.setOnClickListener {
+        binding.mainActivityButtonIdentifyCharger.setOnClickListener {
             if (this::chargePoints.isInitialized) {
                 setupChargerInputDialog()
             }
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             }
         }
 
-        binding.userButton.setOnClickListener {
+        binding.mainActivityButtonUser.setOnClickListener {
             if (isGuest) {
                 startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
             }
@@ -156,11 +156,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             R.layout.layout_charger_in_progress,
             findViewById<ConstraintLayout>(R.id.chargerInProgress)
         )
-        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.progressbarPercent)
-        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.progressbar)
+        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
+        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
         var progress = 67
 
-        bottomSheetView.findViewById<MaterialButton>(R.id.stopCharging).setOnClickListener {
+        bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
             //setChargerStatus(charger.chargerID,"Available")
             hours = Calendar.getInstance().time.hours.toString()
             minutes = Calendar.getInstance().time.minutes.toString()
@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         var charger = chargers.filter { it.chargerID == transaction.chargerID }[0]
         var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
-        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargingLocation)
+        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         chargingLocation.text = chargePoint.name
         if (transaction.currentChargePercentage != null) {
             progressbar.progress = transaction.currentChargePercentage as Int
@@ -200,14 +200,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             R.layout.layout_payment_summary,
             findViewById<ConstraintLayout>(R.id.paymentSummaryLayout)
         )
-        val energyUsed = bottomSheetView.findViewById<TextView>(R.id.energy_used_value)
-        val duration = bottomSheetView.findViewById<TextView>(R.id.duration_value)
-        val chargingStopTime = bottomSheetView.findViewById<TextView>(R.id.charging_stop_time)
+        val energyUsed = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_energyUsedValue)
+        val duration = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_durationValue)
+        val chargingStopTime = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_finishedTime)
         //energyUsed.text = ""
         //duration.text = ""
         chargingStopTime.text = "Charging stopped at " + hours + ":" + minutes
 
-        val cross = bottomSheetView.findViewById<ImageButton>(R.id.close_button)
+        val cross = bottomSheetView.findViewById<ImageButton>(R.id.paymentSummaryLayout_button_close)
         cross.setOnClickListener {
             paymentSummaryDialog.dismiss()
         }
@@ -227,12 +227,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             findViewById<ConstraintLayout>(R.id.chargerInputLayout)
         )
 
-        val arrow = bottomSheetView.findViewById<ImageView>(R.id.arrow)
+        val arrow = bottomSheetView.findViewById<ImageView>(R.id.chargePointsNearMeLayout_imageView_arrow)
         arrow.setOnClickListener {
             displayChargePointList(bottomSheetView,arrow)
         }
 
-        val backButton = bottomSheetView.findViewById<ImageButton>(R.id.backButton)
+        val backButton = bottomSheetView.findViewById<ImageButton>(R.id.checkoutLayout_button_back)
         backButton.setOnClickListener {
             showCheckout(false, -1, false, -1)
         }
@@ -244,8 +244,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun setupChargerInput(bottomSheetView: View) {
-        pinView = bottomSheetView.findViewById<PinView>(R.id.charger_input_pinview)
-        chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.charger_input_status)
+        pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
+        chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.chargerInputLayout_textView_chargerStatus)
         pinView.doOnTextChanged { text, start, before, count ->
             if (text?.length == 6) {
                 val chargerId = text.toString().toUInt().toInt()
@@ -263,7 +263,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
         val chargerId = pinView.text.toString()
 
-        listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.chargerListRecyclerView)
+        listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
 
@@ -282,7 +282,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
-        val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.charger_input_list_recyclerview)
+        val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
         listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargePoints.isInitialized) {
             var distanceToChargePoint = mutableListOf<String>()
@@ -300,7 +300,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint, chargerCount)
         }
         //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
-        val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargepoints_near_me)
+        val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
         if (listOfChargePointsRecyclerView.visibility == View.GONE) {
             arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
@@ -486,7 +486,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             "Reserved" -> {
                                 setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 2)
                             }
-
                             else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger is " + charger.status, 2) }
                         }
                     }
@@ -556,13 +555,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
     private fun showCheckout(bool: Boolean, chargePointId: Int, showPayment: Boolean, chargerId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
-        val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargers_near_me_layout)
-        val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.charger_input_pinview)
-        val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.charger_input_status)
+        val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargePoints_near_me_layout)
+        val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.chargerInputLayout_pinView_chargerInput)
+        val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.chargerInputLayout_textView_chargerStatus)
         val chargerInputView = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargerInputLayout)
-        val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.currentLocation)
-        val paymentText = chargerInputDialog.findViewById<TextView>(R.id.paymentText)
-        val klarnaButton = chargerInputDialog.findViewById<ImageButton>(R.id.klarnaButton)
+        val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.checkoutLayout_textView_currentLocation)
+        val paymentText = chargerInputDialog.findViewById<TextView>(R.id.checkoutLayout_textView_payment)
+        val klarnaButton = chargerInputDialog.findViewById<ImageButton>(R.id.checkoutLayout_button_klarna)
         TransitionManager.beginDelayedTransition(chargerInputView as ViewGroup?, ChangeBounds())
 
         if(bool) {

@@ -7,7 +7,7 @@
     tools:context=".activities.RegisterActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/loginActivity_imageView_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="-999dp"
@@ -16,13 +16,13 @@
         android:layout_marginBottom="-16dp"
         android:background="@color/mild_grey"
         android:rotation="-7"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/loginActivity_textView_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/loginActivity_textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -35,7 +35,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/editTextEmail"
+        android:id="@+id/loginActivity_editText_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -48,7 +48,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_textView_title" />
     <EditText
         android:id="@+id/editTextPhone"
         android:layout_width="0dp"
@@ -63,10 +63,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_editText_email" />
 
     <EditText
-        android:id="@+id/editTextPassword"
+        android:id="@+id/loginActivity_editText_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -95,7 +95,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_editText_password" />
 
     <CheckBox
         android:id="@+id/checkBoxTosAgreement"
@@ -128,12 +128,12 @@
         android:minHeight="48dp"
         android:onClick="goToSignIn"
         android:text="Already have an account? Log in"
-        app:layout_constraintBottom_toTopOf="@+id/textViewContinueAsGuest"
+        app:layout_constraintBottom_toTopOf="@+id/loginActivity_textView_continueAsGuest"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textViewContinueAsGuest"
+        android:id="@+id/loginActivity_textView_continueAsGuest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"

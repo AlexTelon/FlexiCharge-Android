@@ -7,7 +7,7 @@
     tools:context=".activities.ProfileMenuLoggedOutActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/loginActivity_imageView_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="-999dp"
@@ -16,13 +16,13 @@
         android:layout_marginBottom="-16dp"
         android:background="@color/mild_grey"
         android:rotation="-7"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/loginActivity_textView_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/loginActivity_textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -47,7 +47,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_imageView_title" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -68,14 +68,14 @@
         app:layout_constraintTop_toBottomOf="@+id/aboutTextView" />
 
     <com.klarna.mobile.sdk.api.payments.KlarnaPaymentView
-        android:id="@+id/klarnaPaymentView"
+        android:id="@+id/klarnaActivity_KlarnaPaymentVie"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/aboutTextView"
-        app:layout_constraintBottom_toTopOf="@id/buttonConfirmLogin"/>
+        app:layout_constraintBottom_toTopOf="@id/loginActivity_button_confirmLogin"/>
 
     <Button
-        android:id="@+id/buttonConfirmLogin"
+        android:id="@+id/loginActivity_button_confirmLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
