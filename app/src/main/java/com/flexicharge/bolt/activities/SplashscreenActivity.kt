@@ -19,7 +19,6 @@ class SplashscreenActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splashscreen)
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
-            //Do something after 100ms
         }, 1000)
     }
 
