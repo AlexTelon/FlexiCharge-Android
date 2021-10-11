@@ -153,29 +153,29 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         authToken: String?,
         finalizedRequired: Boolean?
     ) {
+        if (authToken != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val requestBody = TransactionOrder(authToken!!, transactionId)
+                    val response = RetrofitInstance.flexiChargeApi.postTransactionOrder(requestBody)
+                    if (response.isSuccessful) {
+                        //TODO Backend Klarna/Order/Session Request if successful
+                        val transaction = response.body() as TransactionList
+                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            finish()
+                        }
+                    } else {
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val requestBody = TransactionOrder(authToken!!, transactionId)
-                val response = RetrofitInstance.flexiChargeApi.postTransactionOrder(requestBody)
-                if (response.isSuccessful) {
-                    //TODO Backend Klarna/Order/Session Request if successful
-                    val transaction = response.body() as TransactionList
-                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                    sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        finish()
                     }
-                } else {
-                    Log.d("asd" ,"asda")
+                } catch (e: HttpException) {
+
+                } catch (e: IOException) {
+
                 }
-            } catch (e: HttpException) {
-
-            } catch (e: IOException) {
-
             }
         }
-
         if (authToken != null) {
             authTokenId = authToken
         }
