@@ -6,17 +6,21 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.flexicharge.bolt.R
 
-class PermissionActivity : AppCompatActivity() {
+class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_permission)
-        requestPermission()
-
+        setContentView(R.layout.activity_splashscreen)
+        Handler(Looper.getMainLooper()).postDelayed({
+            requestPermission()
+            //Do something after 100ms
+        }, 1000)
     }
 
     private val permissionRequestCode = 521
