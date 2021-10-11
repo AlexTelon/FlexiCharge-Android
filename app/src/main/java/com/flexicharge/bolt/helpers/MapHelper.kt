@@ -94,9 +94,11 @@ object MapHelper {
         val blackIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
+
         chargers.forEach {
             val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location[0], it.location[1])).title(it.chargerID.toString()))
             if(it.status == "Available") marker.setIcon(greenIcon)
+            else if (it.status == "Faulted" ) marker.setIcon(blackIcon)
             else marker.setIcon(redIcon)
         }
     }
