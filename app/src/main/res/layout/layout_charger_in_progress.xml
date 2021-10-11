@@ -75,7 +75,7 @@ app:layout_anchorGravity="bottom">
         app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_information" />
 
     <TextView
-        android:id="@+id/chargingTimeStatus"
+        android:id="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -93,8 +93,8 @@ app:layout_anchorGravity="bottom">
         android:text="5.72kwh at 3kwh"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/chargingTimeStatus"
-        app:layout_constraintTop_toBottomOf="@+id/chargingTimeStatus" />
+        app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus" />
 
     <ImageView
         android:id="@+id/chargeInProgressLayout_imageView_locationIcon"
@@ -112,9 +112,9 @@ app:layout_anchorGravity="bottom">
         android:layout_height="24dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_clock"
-        app:layout_constraintBottom_toBottomOf="@+id/chargingTimeStatus"
-        app:layout_constraintEnd_toStartOf="@+id/chargingTimeStatus"
-        app:layout_constraintTop_toTopOf="@+id/chargingTimeStatus" />
+        app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
+        app:layout_constraintEnd_toStartOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
+        app:layout_constraintTop_toTopOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus" />
 
     <ImageView
         android:id="@+id/chargeInProgressLayout_imageView_lightningIcon"

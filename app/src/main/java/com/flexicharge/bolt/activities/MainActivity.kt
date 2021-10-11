@@ -44,6 +44,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
-        
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -144,7 +145,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun setupChargingInProgressDialog(transaction: Transaction) {
+    private suspend fun setupChargingInProgressDialog(transaction: Transaction) {
         //TODO Populate and update frequently from transaction
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
 
@@ -156,9 +157,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             R.layout.layout_charger_in_progress,
             findViewById<ConstraintLayout>(R.id.chargerInProgress)
         )
-        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
-        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
-        var progress = 67
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
             //setChargerStatus(charger.chargerID,"Available")
@@ -174,6 +172,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
         val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         chargingLocation.text = chargePoint.name
+
+        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
+        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
+
         if (transaction.currentChargePercentage != null) {
             progressbar.progress = transaction.currentChargePercentage as Int
             progressbarPercent.text = transaction.currentChargePercentage.toString()
@@ -183,13 +185,46 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             progressbarPercent.text = "0"
         }
 
-
         if (this::chargerInputDialog.isInitialized) {
             chargerInputDialog.dismiss()
         }
 
+        val pricePerKWH = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
+        pricePerKWH.text = transaction.kwhTransfered.toString() + " kW transferred"
+
+        val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
+        //chargingTimeStatus.text = SOME TRANSACTION.VARIABLE FROM BACKEND
+
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
+
+        if (transaction.currentChargePercentage != 100) {
+            var percent = 0
+            var time = 100
+            while (percent != 100) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transaction.transactionID)
+                    if (response.isSuccessful) {
+                        val updatedTransaction = response.body() as Transaction
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            progressbar.progress = percent
+                            progressbarPercent.text = percent.toString()
+                            var minutesLeft = time / 60
+                            var secondsLeft = time % 60
+                            var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
+                            chargingTimeStatus.text = timeString + " until fully charged"
+                            //progressbar.progress = updatedTransaction.currentChargePercentage as Int
+                            //progressbarPercent.text = updatedTransaction.currentChargePercentage.toString()
+                            //bottomSheetDialog.setContentView(bottomSheetView)
+                        }
+                    }
+                }
+                percent++
+                time--
+                Log.d("tag", percent.toString())
+                delay(900)
+            }
+        }
     }
 
     private fun displayPaymentSummaryDialog(){
