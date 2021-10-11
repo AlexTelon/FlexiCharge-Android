@@ -196,14 +196,14 @@
         app:layout_constraintTop_toBottomOf="@+id/aboutTextView" />
 
     <Button
-        android:id="@+id/loginActivity_button_confirmLogin"
+        android:id="@+id/loginActivity_button_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:onClick="loginClick"
-        android:text="Login"
+        android:onClick="logoutClick"
+        android:text="Logout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

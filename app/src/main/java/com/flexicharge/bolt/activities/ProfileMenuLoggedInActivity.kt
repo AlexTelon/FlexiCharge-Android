@@ -16,7 +16,6 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
     fun accountClick(view: View) {}
     fun nameAddressClick(view: View) {}
     fun aboutClick(view: View) {}
-    fun loginClick(view: View) {
-        startActivity(Intent(this, RegisterActivity::class.java));
+    fun logoutClick(view: View) {
     }
 }
