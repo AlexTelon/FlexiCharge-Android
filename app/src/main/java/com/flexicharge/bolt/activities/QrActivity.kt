@@ -1,4 +1,4 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.activities
 
 import android.Manifest
 import android.content.Intent
@@ -15,16 +15,16 @@ import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
+import com.flexicharge.bolt.R
 import java.io.Serializable
-import java.util.*
 
 
-class CameraActivity : AppCompatActivity() {
+class QrActivity : AppCompatActivity() {
 
     private lateinit var codeScanner: CodeScanner
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera)
+        setContentView(R.layout.activity_qr)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_DENIED
@@ -50,7 +50,7 @@ class CameraActivity : AppCompatActivity() {
 
     private fun scanQR() {
 
-        val scannerView: CodeScannerView = findViewById(R.id.scanner_view)
+        val scannerView: CodeScannerView = findViewById(R.id.qrActivity_codeScannerView)
         codeScanner = CodeScanner(this, scannerView)
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = CodeScanner.ALL_FORMATS

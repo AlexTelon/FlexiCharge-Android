@@ -1,4 +1,4 @@
-package com.flexicharge.bolt.payment.api
+package com.flexicharge.bolt.api.klarna
 
 import okhttp3.Credentials
 import okhttp3.Interceptor

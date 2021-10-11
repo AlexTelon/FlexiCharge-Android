@@ -1,6 +1,5 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.api.flexicharge
 
-import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 

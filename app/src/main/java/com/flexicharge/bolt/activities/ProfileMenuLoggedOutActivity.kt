@@ -1,12 +1,12 @@
-package com.flexicharge.bolt.AccountActivities
+package com.flexicharge.bolt.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.flexicharge.bolt.R
-import com.flexicharge.bolt.payment.api.OrderClient
-import com.flexicharge.bolt.payment.api.OrderPayload
+import com.flexicharge.bolt.api.klarna.OrderClient
+import com.flexicharge.bolt.api.klarna.OrderPayload
 import com.klarna.mobile.sdk.api.KlarnaMobileSDKCommon
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentCategory
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentView
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class ProfileMenuLoggedOutActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
 
-    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaPaymentView) }
+    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }
     //private val authorizeButton by lazy { findViewById<Button>(R.id.authorizeButton) }
     //private val finalizeButton by lazy { findViewById<Button>(R.id.finalizeButton) }
     //private val orderButton by lazy { findViewById<Button>(R.id.orderButton) }

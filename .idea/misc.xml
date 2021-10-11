@@ -34,6 +34,15 @@
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_charger_in_progress.xml" value="0.3795289855072464" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_klarna_order_completed.xml" value="0.5427083333333333" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.10092592592592593" />
+        <entry key="app/src/main/res/layout/activity_permission.xml" value="0.5427083333333333" />
+        <entry key="app/src/main/res/layout/activity_qr.xml" value="0.14351851851851852" />
+        <entry key="app/src/main/res/layout/layout_charger_checkout.xml" value="0.5427083333333333" />
+        <entry key="app/src/main/res/layout/layout_charger_in_progress.xml" value="0.10207700101317123" />
+        <entry key="app/src/main/res/layout/layout_charger_input.xml" value="0.31431159420289856" />
+        <entry key="app/src/main/res/layout/layout_payment_price.xml" value="0.26393110435663625" />
+        <entry key="app/src/main/res/layout/layout_payment_summary.xml" value="0.26393110435663625" />
       </map>
     </option>
   </component>

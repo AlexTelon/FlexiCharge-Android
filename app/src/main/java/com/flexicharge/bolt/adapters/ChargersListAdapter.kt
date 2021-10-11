@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.flexicharge.bolt.ChargePoint
-import com.flexicharge.bolt.Charger
+import com.flexicharge.bolt.api.flexicharge.ChargePoint
+import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.R
 
 class ChargersListAdapter(private val chargers: List<Charger>, private val enteredChargerId: String, private val chargePoint: ChargePoint, private val act: ChangeInputInterface): RecyclerView.Adapter<ChargersListAdapter.ViewHolder>() {
@@ -19,12 +19,12 @@ class ChargersListAdapter(private val chargers: List<Charger>, private val enter
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val chargerId: TextView = itemView.findViewById(R.id.chargerId)
-        val chargerStatus: TextView = itemView.findViewById(R.id.chargerStatus)
-        val chargerCost: TextView = itemView.findViewById(R.id.chargerCost)
-        val chargerAC : TextView = itemView.findViewById(R.id.chargerAC)
-        val chargerType: TextView = itemView.findViewById(R.id.chargerType)
-        val chargerCableIcon: AppCompatImageView = itemView.findViewById(R.id.chargerCableIcon)
+        val chargerId: TextView = itemView.findViewById(R.id.chargerListItem_textView_chargerId)
+        val chargerStatus: TextView = itemView.findViewById(R.id.chargerListItem_textView_chargerStatus)
+        val chargerCost: TextView = itemView.findViewById(R.id.chargerListItem_textView_chargerCost)
+        val chargerAC : TextView = itemView.findViewById(R.id.chargerListItem_textView_chargerAC)
+        val chargerType: TextView = itemView.findViewById(R.id.chargerListItem_textView_chargerType)
+        val chargerCableIcon: AppCompatImageView = itemView.findViewById(R.id.chargerListItem_imageView_cableIcon)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

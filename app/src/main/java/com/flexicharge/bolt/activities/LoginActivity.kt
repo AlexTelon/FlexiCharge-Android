@@ -1,4 +1,4 @@
-package com.flexicharge.bolt.AccountActivities
+package com.flexicharge.bolt.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

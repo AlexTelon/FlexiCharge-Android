@@ -7,10 +7,10 @@
     android:background="@color/white">
 
     <com.klarna.mobile.sdk.api.payments.KlarnaPaymentView
-        android:id="@+id/klarnaPaymentView"
+        android:id="@+id/klarnaActivity_KlarnaPaymentVie"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/flexichargeBanner"
+        app:layout_constraintBottom_toTopOf="@id/klarnaActivity_imageView_flexiCharge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -19,7 +19,7 @@
 
 
     <Button
-        android:id="@+id/authorizeButton"
+        android:id="@+id/klarnaActivity_button_authorize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
@@ -34,13 +34,13 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/flexichargeBanner"
+        android:id="@+id/klarnaActivity_imageView_flexiCharge"
         android:layout_width="205dp"
         android:layout_height="121dp"
         android:layout_marginBottom="15dp"
         android:src="@drawable/ic_flexicharge_banner"
         android:tint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/authorizeButton"
+        app:layout_constraintBottom_toTopOf="@+id/klarnaActivity_button_authorize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

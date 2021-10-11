@@ -1,4 +1,4 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.api.flexicharge
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

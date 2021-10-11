@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <fragment
-        android:id="@+id/map"
+        android:id="@+id/mainActivity_fragment_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -18,7 +18,7 @@
         tools:context=".MapsActivity" />
 
     <ImageButton
-        android:id="@+id/identify_charger_button"
+        android:id="@+id/mainActivity_button_identifyCharger"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="45dp"
@@ -32,7 +32,7 @@
         map:layout_constraintHorizontal_bias="0.498"
         map:layout_constraintStart_toStartOf="parent" />
     <ImageButton
-        android:id="@+id/camera_button"
+        android:id="@+id/mainActivity_button_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -41,12 +41,12 @@
         android:contentDescription="QR button"
         android:padding="12dp"
         android:src="@drawable/ic_camera"
-        map:layout_constraintBottom_toBottomOf="@+id/identify_charger_button"
-        map:layout_constraintStart_toStartOf="@+id/map"
-        map:layout_constraintTop_toTopOf="@+id/identify_charger_button" />
+        map:layout_constraintBottom_toBottomOf="@+id/mainActivity_button_identifyCharger"
+        map:layout_constraintStart_toStartOf="@+id/mainActivity_fragment_map"
+        map:layout_constraintTop_toTopOf="@+id/mainActivity_button_identifyCharger" />
 
     <ImageButton
-        android:id="@+id/user_button"
+        android:id="@+id/mainActivity_button_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
@@ -55,12 +55,12 @@
         android:contentDescription="User button"
         android:padding="12dp"
         android:src="@drawable/ic_user"
-        map:layout_constraintBottom_toBottomOf="@+id/identify_charger_button"
+        map:layout_constraintBottom_toBottomOf="@+id/mainActivity_button_identifyCharger"
         map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintTop_toTopOf="@+id/identify_charger_button" />
+        map:layout_constraintTop_toTopOf="@+id/mainActivity_button_identifyCharger" />
 
     <ImageButton
-        android:id="@+id/position_pin_button"
+        android:id="@+id/mainActivity_button_pinPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="35dp"
@@ -69,8 +69,8 @@
         android:contentDescription="Position button"
         android:padding="12dp"
         android:src="@drawable/ic_position_pin"
-        map:layout_constraintBottom_toTopOf="@+id/camera_button"
-        map:layout_constraintEnd_toEndOf="@+id/camera_button"
-        map:layout_constraintStart_toStartOf="@+id/camera_button" />
+        map:layout_constraintBottom_toTopOf="@+id/mainActivity_button_camera"
+        map:layout_constraintEnd_toEndOf="@+id/mainActivity_button_camera"
+        map:layout_constraintStart_toStartOf="@+id/mainActivity_button_camera" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
