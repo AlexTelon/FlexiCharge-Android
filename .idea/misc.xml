@@ -29,6 +29,7 @@
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.2" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/layout_price.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/layout/payment_summary.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.346875" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.3307291666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_in.xml" value="0.39166666666666666" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.5541666666666667" />
@@ -36,6 +37,8 @@
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.33" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_payment_price.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.3759057971014493" />
+        <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.346875" />
+        <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.346875" />
         <entry key="app/src/main/res/layout/activity_klarna_order_completed.xml" value="0.5427083333333333" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.10092592592592593" />
         <entry key="app/src/main/res/layout/activity_permission.xml" value="0.5427083333333333" />
