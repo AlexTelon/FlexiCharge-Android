@@ -249,14 +249,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun displayPaymentSummaryDialog(finalTransaction: Transaction, dateTime: String) {
-        paymentSummaryDialog = BottomSheetDialog(this@MainActivity, R.style.BottomSheetDialogTheme)
 
+        // TODO Look over values before final commit
+
+        paymentSummaryDialog = BottomSheetDialog(this@MainActivity, R.style.BottomSheetDialogTheme)
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(R.layout.layout_payment_summary, findViewById<ConstraintLayout>(R.id.paymentSummaryLayout))
         val energyUsed = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_energyUsedValue)
         val duration = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_durationValue)
         val chargingStopTime = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_finishedTime)
         val totalCost = bottomSheetView.findViewById<TextView>(R.id.paymentPriceLayout_textView_price)
-        energyUsed.text = "13kW"
+        energyUsed.text = finalTransaction.kwhTransfered.toString() + " kWh"
         duration.text = "25 seconds"
         chargingStopTime.text = "Charging stopped at " + dateTime
         totalCost.text = (finalTransaction.kwhTransfered.toString().toDouble() * finalTransaction.pricePerKwh.toDouble()).toString()
