@@ -1,18 +1,33 @@
 # Documentation for FlexiCharge Native Android Application
 
-## Code structure
+### Project Guidelines
 
 
+
+#### Code structure
+
+* **Class files are categorized into different packages, depending on their application.**
+  Example 1: A map helper class is stored in ".../bolt/helper/MapHelper.kt"
+  Example 2: A QR scanner activity is stored in ".../bolt/activities/QrActivity.kt"
+
+#### Naming Convention
+
+* **Camel casing is used for variable names.**
+  Example: A list of chargers is named chargerList
+
+* **ID's in Layout view's are identified by context, type of view and then name, separated by underscores**
+  Example: A menu button in mainActivity would be named mainActivity_button_menu
 
 ## The application
 
 ### Configuration Files
 
-1. Google Maps SDK API key
-  * Enter a Google Maps SDK api-key in the file ./app/src/debug/res/values/google_maps_api.xml by replacing `PUT_API_KEY_HERE` with the actual key
-3. Klarna testing account
-  * Using klarna requires Klarna Playgrond sample data. Use these personal details (You will only need to enter email and zip code once, then it will be remembered inside the app):
-     
+1. **Google Maps SDK API key**
+   Enter a Google Maps SDK api-key in the file ./app/src/debug/res/values/google_maps_api.xml by replacing `PUT_API_KEY_HERE` with the actual key
+
+2. **Klarna testing account**
+   Using klarna requires Klarna Playgrond sample data. Use these personal details (You will only need to enter email and zip code once, then it will be remembered inside the app):
+
   ![image-20211011145831799](./images/image-20211011145831799.png)
 
 ### Build Steps
@@ -22,21 +37,19 @@
 3. Compile and run application by clicking "Run"
 
 ### Using the app
-1. Upon starting the app, grant required location permissions to continue to Home.
+1. When starting the app, grant required location permissions to continue to Home Screen.
 2. In home, the user can do a multitude of things...
----
-* Use the map to view FlexiChargers on the map.
+   * Use the map to view FlexiChargers on the **map**.![image-20211011152235679](./images/image-20211011152235679.png)
+   * Tap ![image-20211011151837571](./images/image-20211011151837571.png) to "warp" to **your location**. 
+   * Tap ![image-20211011151855812](./images/image-20211011151855812.png) to access FlexiCharger **QR Scanner**
+   * Tap ![image-20211011151821916](./images/image-20211011151821916.png) to access the **ChargingPanel**.   ![image-20211011153319900](./images/image-20211011153319900.png) 
 
-  ![image-20211011152235679](./images/image-20211011152235679.png)
-* Tap ![image-20211011151837571](./images/image-20211011151837571.png) to "warp" to your location. 
-* Tap ![image-20211011151855812](./images/image-20211011151855812.png) to access FlexiCharger QR Scanner
-* Tap ![image-20211011151821916](./images/image-20211011151821916.png) to access the ChargingPanel. 
-  
 #### To charge
-   ![image-20211011153319900](./images/image-20211011153319900.png) 
+
    ![image-20211011152137316](./images/image-20211011152137316.png)
-1. Enter a valid charger ID pin in the ChargingPanel, a chargerID can be obtained by:
-   * Using map to find GREEN chargers
+
+1. Enter a valid ChargerID pin in the ChargingPanel, ChargerID's can be obtained by:
+   * Tapping green markers on the map.
    * Scanning a QR Code present on a FlexiCharger
    * Tapping a chargepoint from the "chargepoints near me" list and selecting one available charger.
 
