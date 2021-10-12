@@ -55,36 +55,48 @@ class QrActivity() : AppCompatActivity() {
         codeScanner = CodeScanner(this, scannerView)
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = CodeScanner.ALL_FORMATS
-        codeScanner.startPreview()
         codeScanner.autoFocusMode = AutoFocusMode.SAFE
         codeScanner.scanMode = ScanMode.SINGLE
         codeScanner.isAutoFocusEnabled = true
         codeScanner.isFlashEnabled = false
         scannerView.setOnClickListener {
             codeScanner.startPreview()
+        }
 
-            codeScanner.decodeCallback = DecodeCallback {
-                runOnUiThread {
-                    if(it.text.length != 6) {
-                        Toast.makeText(this, "QR CODE NOT IDENTIFIED", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }else{
-                        setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", it.text))
-                        finish()
-                    }
-
+        codeScanner.decodeCallback = DecodeCallback {
+            runOnUiThread {
+                if(it.text.length != 6) {
+                    Toast.makeText(this, "QR CODE NOT IDENTIFIED", Toast.LENGTH_SHORT).show()
+                    finish()
+                }else{
+                    setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", it.text))
+                    finish()
                 }
-            }
-            codeScanner.errorCallback = ErrorCallback {
-                runOnUiThread {
-                    Toast.makeText(
-                        this,
-                        "Camera initialization error : ${it.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
 
+            }
+        }
+        codeScanner.errorCallback = ErrorCallback {
+            runOnUiThread {
+                Toast.makeText(
+                    this,
+                    "Camera initialization error : ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(::codeScanner.isInitialized){
+            codeScanner.startPreview()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if(::codeScanner.isInitialized){
+            codeScanner.releaseResources()
         }
     }
 
