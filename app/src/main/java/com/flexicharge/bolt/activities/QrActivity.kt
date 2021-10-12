@@ -1,6 +1,7 @@
 package com.flexicharge.bolt.activities
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,10 +17,11 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.flexicharge.bolt.R
+import okio.utf8Size
 import java.io.Serializable
 
 
-class QrActivity : AppCompatActivity() {
+class QrActivity() : AppCompatActivity() {
 
     private lateinit var codeScanner: CodeScanner
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +36,6 @@ class QrActivity : AppCompatActivity() {
             scanQR()
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -48,36 +49,66 @@ class QrActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    private fun validateChargerId(chargerId: String): Boolean {
+        if(chargerId.length != 6) {
+            return false
+        }
+        if(chargerId.count { it.isDigit() } != 6) {
+            return false
+        }
+        return true
+    }
+
+
     private fun scanQR() {
 
         val scannerView: CodeScannerView = findViewById(R.id.qrActivity_codeScannerView)
         codeScanner = CodeScanner(this, scannerView)
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = CodeScanner.ALL_FORMATS
-        codeScanner.startPreview()
         codeScanner.autoFocusMode = AutoFocusMode.SAFE
         codeScanner.scanMode = ScanMode.SINGLE
         codeScanner.isAutoFocusEnabled = true
         codeScanner.isFlashEnabled = false
         scannerView.setOnClickListener {
             codeScanner.startPreview()
+        }
 
-            codeScanner.decodeCallback = DecodeCallback {
-                runOnUiThread {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it.text))
-                    startActivity(browserIntent)
+        codeScanner.decodeCallback = DecodeCallback {
+            runOnUiThread {
+
+                if(validateChargerId(it.text))
+                {
+                    setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", it.text))
+                    finish()
+                }
+                else {
+                    Toast.makeText(this, "QR INVALID", Toast.LENGTH_SHORT).show()
                 }
             }
-            codeScanner.errorCallback = ErrorCallback {
-                runOnUiThread {
-                    Toast.makeText(
-                        this,
-                        "Camera initialization error : ${it.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+        }
+        codeScanner.errorCallback = ErrorCallback {
+            runOnUiThread {
+                Toast.makeText(
+                    this,
+                    "Camera initialization error : ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+        }
+    }
 
+    override fun onResume() {
+        super.onResume()
+        if(::codeScanner.isInitialized){
+            codeScanner.startPreview()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if(::codeScanner.isInitialized){
+            codeScanner.releaseResources()
         }
     }
 
