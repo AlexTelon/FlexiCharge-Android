@@ -14,8 +14,6 @@ import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.TransactionList
 import com.flexicharge.bolt.api.flexicharge.TransactionOrder
 import com.flexicharge.bolt.api.klarna.OrderClient
-import com.flexicharge.bolt.api.klarna.OrderLine
-import com.flexicharge.bolt.api.klarna.OrderPayload
 import com.klarna.mobile.sdk.api.payments.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -52,61 +50,20 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private fun initialize() {
         if (OrderClient.hasSetCredentials()) {
             job = GlobalScope.launch {
-
-                // create a session and then initialize the payment view with the client token received in the response
-                val sessionCall = OrderClient.instance.createCreditSession(OrderPayload.defaultPayload)
-                try {
-                    val resp = sessionCall.execute()
-                    resp.body()?.let { session ->
-                        runOnUiThread {
-                            klarnaPaymentView.initialize(
-                                clientToken,
-                                //session.client_token,
-                                "${getString(R.string.return_url_scheme)}://${getString(R.string.return_url_host)}"
-                            )
-                        }
-                    } ?: showError(getString(R.string.error_server, resp.code()))
-                } catch (exception: Exception) {
-                    showError(exception.message)
+            try {
+                runOnUiThread {
+                    klarnaPaymentView.initialize(
+                        clientToken,
+                        "${getString(R.string.return_url_scheme)}://${getString(R.string.return_url_host)}"
+                    )
                 }
+            }
+            catch (exception: Exception) {
+                showError(exception.message)
+            }
             }
         } else {
             showError(getString(R.string.error_credentials))
-        }
-    }
-
-    private fun createOrder() {
-        job = GlobalScope.launch {
-
-            val orderLIne = OrderLine(
-                "https://demo.klarna.se/fashion/kp/media/wysiwyg/Accessoriesbagimg.jpg",
-                "physical",
-                "ChargerId: " + chargerId.toString(),
-                "FlexiCharge Charge Reservation",
-                1,
-                30000,
-                0,
-                30000,
-                0
-            )
-            val orderPayload = OrderPayload("SE", "SEK", "en-US", 30000, 0, listOf(orderLIne))
-            // create the order using the auth token received in the authorization response
-            val orderCall = OrderClient.instance.createOrder(authTokenId, orderPayload)
-            try {
-                val response = orderCall.execute()
-                if (response.isSuccessful) {
-                    runOnUiThread {
-                        val intent = Intent(this@KlarnaActivity, KlarnaOrderCompletedActivity::class.java)
-                        intent.putExtra("message","Charged 300SEK for Charger: " + chargerId)
-                        startActivity(intent)
-                        finish()
-                    }
-                } else {
-                    showError(null)
-                }
-            } catch (exception: Exception) {
-                showError(exception.message)
-            }
         }
     }
 
