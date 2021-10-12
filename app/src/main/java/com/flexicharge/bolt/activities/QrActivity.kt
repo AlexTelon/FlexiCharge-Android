@@ -1,6 +1,7 @@
 package com.flexicharge.bolt.activities
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,10 +17,11 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.flexicharge.bolt.R
+import okio.utf8Size
 import java.io.Serializable
 
 
-class QrActivity : AppCompatActivity() {
+class QrActivity() : AppCompatActivity() {
 
     private lateinit var codeScanner: CodeScanner
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +36,6 @@ class QrActivity : AppCompatActivity() {
             scanQR()
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -64,8 +65,14 @@ class QrActivity : AppCompatActivity() {
 
             codeScanner.decodeCallback = DecodeCallback {
                 runOnUiThread {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it.text))
-                    startActivity(browserIntent)
+                    if(it.text.length != 6) {
+                        Toast.makeText(this, "QR CODE NOT IDENTIFIED", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }else{
+                        setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", it.text))
+                        finish()
+                    }
+
                 }
             }
             codeScanner.errorCallback = ErrorCallback {
