@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bolt</string>
+    <string name="app_name">Flexi Charge</string>
     <string name="charger_status_occupied">Charger is occupied</string>
     <string name="charger_status_enter_code">Enter the Code Written on the Charger</string>
     <string name="chargepoints_near_me">Charge Points Near Me</string>
@@ -19,4 +19,5 @@
     <string name="payment">Payment</string>
     <string name="stop_charging">Stop Charging</string>
     <string name="current_location">Current Location</string>
+    <string name="powered_by">Powered by</string>
 </resources>
