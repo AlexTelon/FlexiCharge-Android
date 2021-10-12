@@ -153,6 +153,30 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         return sdf.format(netDate)
     }
 
+    private fun stopChargingProcess(transactionId: Int, bottomSheetDialog: BottomSheetDialog) {
+        try {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val response = RetrofitInstance.flexiChargeApi.transactionStop(transactionId)
+                if (response.isSuccessful) {
+                    val updatedTransaction = response.body() as Transaction
+                    val dateTime = unixToDateTime(updatedTransaction.timestamp.toString())
+                    hours = Calendar.getInstance().time.hours.toString()
+                    minutes = Calendar.getInstance().time.minutes.toString()
+                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        bottomSheetDialog.dismiss()
+                        displayPaymentSummaryDialog(updatedTransaction, dateTime)
+                    }
+                }
+            }
+        }
+        catch (e: IOException) {
+
+        }
+    }
+
+
     private suspend fun setupChargingInProgressDialog(transaction: Transaction) {
         //TODO Populate and update frequently from transaction
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
@@ -167,27 +191,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         )
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
-            try {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transaction.transactionID)
-                    if (response.isSuccessful) {
-                        val updatedTransaction = response.body() as Transaction
-                        val dateTime = unixToDateTime(updatedTransaction.timestamp.toString())
-                        hours = Calendar.getInstance().time.hours.toString()
-                        minutes = Calendar.getInstance().time.minutes.toString()
-                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            bottomSheetDialog.dismiss()
-                            displayPaymentSummaryDialog(updatedTransaction, dateTime)
-                        }
-                    }
-                }
-            }
-            catch (e: IOException) {
-
-            }
-
+            stopChargingProcess(transaction.transactionID, bottomSheetDialog)
         }
 
         var charger = chargers.filter { it.chargerID == transaction.chargerID }[0]
@@ -243,7 +247,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 percent++
                 time--
                 Log.d("tag", percent.toString())
-                delay(900)
+                delay(1000)
+            }
+            if (percent == 100) {
+                stopChargingProcess(transaction.transactionID, bottomSheetDialog)
             }
         }
     }

@@ -37,6 +37,12 @@ interface ApiInterface {
     @POST("transactions/session")
     suspend fun postTransactionSession(@Body body: TransactionSession): Response<Transaction>
 
-    @POST("transactions/order")
-    suspend fun postTransactionOrder(@Body body: TransactionOrder): Response<TransactionList>
+    @PUT("transactions/start/{transactionId}")
+    suspend fun transactionStart(
+        @Path("transactionId") transactionId: Int,
+        @Body body: TransactionOrder
+    ): Response<TransactionList>
+
+    @PUT("transactions/stop/{transactionId}")
+    suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<Transaction>
 }

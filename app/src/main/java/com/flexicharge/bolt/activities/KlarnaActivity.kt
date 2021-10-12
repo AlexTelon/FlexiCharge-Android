@@ -1,7 +1,6 @@
 package com.flexicharge.bolt.activities
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -39,7 +38,8 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         setContentView(R.layout.activity_klarna)
         chargerId = intent.getIntExtra("ChargerId", 0)
         clientToken = intent.getStringExtra("ClientToken").toString()
-        transactionId = intent.getIntExtra("TransactionId", 0)
+        //transactionId = intent.getIntExtra("TransactionId", 0)
+        transactionId = 256
         Log.d("CLIENTTOKEN", clientToken)
         initialize()
 
@@ -114,7 +114,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     val requestBody = TransactionOrder(authToken!!, transactionId)
-                    val response = RetrofitInstance.flexiChargeApi.postTransactionOrder(requestBody)
+                    val response = RetrofitInstance.flexiChargeApi.transactionStart(transactionId, requestBody)
                     if (response.isSuccessful) {
                         //TODO Backend Klarna/Order/Session Request if successful
                         val transaction = response.body() as TransactionList
@@ -124,7 +124,10 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                             finish()
                         }
                     } else {
-
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            authorizeButton.text = "Transaction Failed, try again!"
+                        }
+                        //finish()
                     }
                 } catch (e: HttpException) {
 
