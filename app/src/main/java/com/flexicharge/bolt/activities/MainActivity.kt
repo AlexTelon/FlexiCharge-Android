@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.IntentSenderRequest
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
@@ -70,7 +71,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var currentTransaction: Transaction
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", false)
@@ -87,8 +87,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         binding.mainActivityButtonCamera.setOnClickListener {
+
             val intent = Intent(this, QrActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, 12345)
+
         }
 
         val mapFragment = supportFragmentManager
@@ -112,6 +114,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             }
             else {
                 startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 12345){
+            if (resultCode == Activity.RESULT_OK){
+                try {
+                    setupChargerInputDialog()
+                    changeInput(data?.getStringExtra("QR_SCAN_RESULT").toString())
+                }catch (e: Exception){
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
