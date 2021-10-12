@@ -49,6 +49,17 @@ class QrActivity() : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    private fun validateChargerId(chargerId: String): Boolean {
+        if(chargerId.length != 6) {
+            return false
+        }
+        if(chargerId.count { it.isDigit() } != 6) {
+            return false
+        }
+        return true
+    }
+
+
     private fun scanQR() {
 
         val scannerView: CodeScannerView = findViewById(R.id.qrActivity_codeScannerView)
@@ -65,14 +76,15 @@ class QrActivity() : AppCompatActivity() {
 
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
-                if(it.text.length != 6) {
-                    Toast.makeText(this, "QR CODE NOT IDENTIFIED", Toast.LENGTH_SHORT).show()
-                    finish()
-                }else{
+
+                if(validateChargerId(it.text))
+                {
                     setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", it.text))
                     finish()
                 }
-
+                else {
+                    Toast.makeText(this, "QR INVALID", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         codeScanner.errorCallback = ErrorCallback {
