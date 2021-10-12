@@ -15,7 +15,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.activity.result.IntentSenderRequest
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
@@ -45,6 +44,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -169,7 +169,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         return sdf.format(netDate)
     }
 
-    private fun stopChargingProcess(transactionId: Int, bottomSheetDialog: BottomSheetDialog) {
+    private fun stopChargingProcess(
+        transactionId: Int,
+        bottomSheetDialog: BottomSheetDialog,
+    ) {
         try {
             lifecycleScope.launch(Dispatchers.IO) {
                 val response = RetrofitInstance.flexiChargeApi.transactionStop(transactionId)
@@ -181,6 +184,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                     lifecycleScope.launch(Dispatchers.Main) {
+
                         bottomSheetDialog.dismiss()
                         displayPaymentSummaryDialog(updatedTransaction, dateTime)
                     }
@@ -243,30 +247,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         if (transaction.currentChargePercentage != 100) {
             var percent = 0
             var time = 100
-            while (percent != 100) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transaction.transactionID)
-                    if (response.isSuccessful) {
-                        val updatedTransaction = response.body() as Transaction
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            //progressbar.progress = updatedTransaction.currentChargePercentage as Int
-                            //progressbarPercent.text = updatedTransaction.currentChargePercentage.toString() WHEN DONE USE THIS INSTEAD
-                            progressbar.progress = percent
-                            progressbarPercent.text = percent.toString()
-                            var minutesLeft = time / 60
-                            var secondsLeft = time % 60
-                            var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
-                            chargingTimeStatus.text = timeString + " until fully charged"
+            GlobalScope.launch {
+                while (percent != 100) {
+                    percent++
+                    time--
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val response = RetrofitInstance.flexiChargeApi.getTransaction(transaction.transactionID)
+                        if (response.isSuccessful) {
+                            val updatedTransaction = response.body() as Transaction
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                //progressbar.progress = updatedTransaction.currentChargePercentage as Int
+                                //progressbarPercent.text = updatedTransaction.currentChargePercentage.toString() WHEN DONE USE THIS INSTEAD
+                                progressbar.progress = percent
+                                progressbarPercent.text = percent.toString()
+                                var minutesLeft = time / 60
+                                var secondsLeft = time % 60
+                                var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
+                                chargingTimeStatus.text = timeString + " until fully charged"
+                                if (percent == 100) {
+                                    stopChargingProcess(transaction.transactionID, bottomSheetDialog)
+                                }
+                            }
                         }
                     }
+                    Log.d("tag", percent.toString())
+                    delay(1000)
                 }
-                percent++
-                time--
-                Log.d("tag", percent.toString())
-                delay(1000)
-            }
-            if (percent == 100) {
-                stopChargingProcess(transaction.transactionID, bottomSheetDialog)
             }
         }
     }
