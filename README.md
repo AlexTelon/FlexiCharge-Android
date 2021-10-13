@@ -27,8 +27,12 @@
 
 2. **Klarna testing account**
    Using klarna requires Klarna Playgrond sample data. Use these personal details (You will only need to enter email and zip code once, then it will be remembered inside the app):
-
-  ![image-20211011145831799](./images/image-20211011145831799.png)
+   **Personal Details used for Bank Transfer**
+   
+     ![image-20211011145831799](./images/image-20211011145831799.png)
+   
+   **Credit Card Details**
+   ![image-20211013123905119](./images/image-20211013123905119.png)
 
 ### Build Steps
 
