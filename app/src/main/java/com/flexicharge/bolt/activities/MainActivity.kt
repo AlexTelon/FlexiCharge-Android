@@ -170,24 +170,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun stopChargingProcess(
-        transactionId: Int,
+        initialPercentage: Int,
         bottomSheetDialog: BottomSheetDialog,
-        transaction: Transaction
     ) {
-        val dateTime = unixToDateTime(transaction.timestamp.toString())
+        val dateTime = unixToDateTime(currentTransaction.timestamp.toString())
         //hours = Calendar.getInstance().time.hours.toString()
         //minutes = Calendar.getInstance().time.minutes.toString()
         try {
             lifecycleScope.launch(Dispatchers.IO) {
-                val response = RetrofitInstance.flexiChargeApi.transactionStop(transaction.transactionID)
-                val updatedTransaction = (response.body() as TransactionList)[0]
-
+                val response = RetrofitInstance.flexiChargeApi.transactionStop(currentTransaction.transactionID)
                 if (response.isSuccessful) {
+                    currentTransaction = (response.body() as TransactionList)[0]
                     lifecycleScope.launch(Dispatchers.Main) {
                         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                         sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                         bottomSheetDialog.dismiss()
-                        displayPaymentSummaryDialog(updatedTransaction, dateTime)
+                        displayPaymentSummaryDialog(dateTime, initialPercentage)
                     }
                 }
                 else {
@@ -195,7 +193,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                         sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                         bottomSheetDialog.dismiss()
-                        displayPaymentSummaryDialog(transaction, dateTime)
+                        displayPaymentSummaryDialog(dateTime, initialPercentage)
                     }
                 }
             }
@@ -205,113 +203,119 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                 bottomSheetDialog.dismiss()
-                displayPaymentSummaryDialog(transaction, dateTime)
+                displayPaymentSummaryDialog(dateTime, initialPercentage)
             }
         }
     }
 
 
-    private suspend fun setupChargingInProgressDialog(transaction: Transaction) {
+    private suspend fun setupChargingInProgressDialog() {
         //TODO Populate and update frequently from transaction
+        if (this::chargerInputDialog.isInitialized) {
+            chargerInputDialog.dismiss()
+        }
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
+        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
+            R.layout.layout_charger_in_progress,
+            findViewById<ConstraintLayout>(R.id.chargerInProgress)
+        )
+        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
+        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
+        val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
+        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
+        val pricePerKWH = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
+
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.behavior.isDraggable = false;
         bottomSheetDialog.setCancelable(false)
 
-        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
-            R.layout.layout_charger_in_progress,
-            findViewById<ConstraintLayout>(R.id.chargerInProgress)
-        )
+        var continueLooping = true;
+
+        var initialPercentage = 0
+        if (currentTransaction.currentChargePercentage != null) {
+            initialPercentage = (currentTransaction.currentChargePercentage*100).toInt()
+        }
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
-            stopChargingProcess(transaction.transactionID, bottomSheetDialog, transaction)
+            continueLooping = false
+            stopChargingProcess(initialPercentage, bottomSheetDialog)
         }
-
-        var charger = chargers.filter { it.chargerID == transaction.chargerID }[0]
-        var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
-        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
-        chargingLocation.text = chargePoint.name
-
-        val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
-        val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
-
-        if (transaction.currentChargePercentage != null) {
-            progressbar.progress = transaction.currentChargePercentage as Int
-            progressbarPercent.text = transaction.currentChargePercentage.toString()
-        }
-        else {
-            progressbar.progress = 0
-            progressbarPercent.text = "0"
-        }
-
-        if (this::chargerInputDialog.isInitialized) {
-            chargerInputDialog.dismiss()
-        }
-
-        val pricePerKWH = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
-        pricePerKWH.text = transaction.kwhTransfered.toString() + " kW transferred"
-
-        val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
-        //chargingTimeStatus.text = SOME TRANSACTION.VARIABLE FROM BACKEND
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
 
-        if (transaction.currentChargePercentage != 100 && transaction.paymentConfirmed == false) {
-            var percent: Int
-            if (transaction.currentChargePercentage != null)
-                percent = 0
-            else percent = transaction.currentChargePercentage
-            var time = 100 - percent
+
+        var charger = chargers.filter { it.chargerID == currentTransaction.chargerID }[0]
+        var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
+
+        if (!currentTransaction.paymentConfirmed) {
+            chargingLocation.text = chargePoint.name
+            pricePerKWH.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
+            var percent = initialPercentage
             GlobalScope.launch {
-                while (percent != 100) {
-                    percent++
-                    time = 100 - percent
+                while (percent < 100 && continueLooping) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val response = RetrofitInstance.flexiChargeApi.getTransaction(transaction.transactionID)
+                        val response = RetrofitInstance.flexiChargeApi.getTransaction(currentTransaction.transactionID)
                         if (response.isSuccessful) {
-                            val updatedTransaction = response.body() as Transaction
+                            currentTransaction = response.body() as Transaction
                             lifecycleScope.launch(Dispatchers.Main) {
-                                //progressbar.progress = updatedTransaction.currentChargePercentage as Int
-                                //progressbarPercent.text = updatedTransaction.currentChargePercentage.toString() WHEN DONE USE THIS INSTEAD
+                                if (currentTransaction.currentChargePercentage != null)
+                                    percent = (currentTransaction.currentChargePercentage*100).toInt()
                                 progressbar.progress = percent
                                 progressbarPercent.text = percent.toString()
-                                var minutesLeft = time / 60
-                                var secondsLeft = time % 60
+                                var minutesLeft = (100 - percent) / 60
+                                var secondsLeft = (100 - percent) % 60
                                 var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
                                 chargingTimeStatus.text = timeString + " until fully charged"
                             }
                         }
                     }
                     Log.d("tag", percent.toString())
-                    delay(1000)
+                    delay(2000)
                 }
-                if (percent == 100) {
-                    stopChargingProcess(transaction.transactionID, bottomSheetDialog, transaction)
-                }
+                //if (percent == 100) {
+                //    stopChargingProcess(transaction.transactionID, initialPercentage, bottomSheetDialog, transaction)
+                //}
             }
+        }
+        else {
+            continueLooping = false
+            stopChargingProcess(initialPercentage, bottomSheetDialog)
         }
     }
 
-    private fun displayPaymentSummaryDialog(finalTransaction: Transaction, dateTime: String) {
+    private fun displayPaymentSummaryDialog(dateTime: String, initialPercentage: Int) {
 
         // TODO Look over values before final commit
 
         paymentSummaryDialog = BottomSheetDialog(this@MainActivity, R.style.BottomSheetDialogTheme)
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(R.layout.layout_payment_summary, findViewById<ConstraintLayout>(R.id.paymentSummaryLayout))
-        val energyUsed = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_energyUsedValue)
-        val duration = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_durationValue)
-        val chargingStopTime = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_finishedTime)
-        val totalCost = bottomSheetView.findViewById<TextView>(R.id.paymentPriceLayout_textView_price)
-        energyUsed.text = finalTransaction.kwhTransfered.toString() + " kWh"
-        duration.text = "25 seconds"
-        chargingStopTime.text = "Charging stopped at " + dateTime
-        totalCost.text = (finalTransaction.kwhTransfered.toString().toDouble() * finalTransaction.pricePerKwh.toDouble()).toString()
-        val cross = bottomSheetView.findViewById<ImageButton>(R.id.paymentSummaryLayout_button_close)
-        cross.setOnClickListener {
+        val energyUsedTextView = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_energyUsedValue)
+        val durationTextView = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_durationValue)
+        val chargingStopTimeTextView = bottomSheetView.findViewById<TextView>(R.id.paymentSummaryLayout_textView_finishedTime)
+        val totalCostTextView = bottomSheetView.findViewById<TextView>(R.id.paymentPriceLayout_textView_price)
+        val crossButton = bottomSheetView.findViewById<ImageButton>(R.id.paymentSummaryLayout_button_close)
+
+        crossButton.setOnClickListener {
             paymentSummaryDialog.dismiss()
         }
+
+        var kwhTransfered = 0
+        var totalCost = 0.toFloat()
+        if (currentTransaction.kwhTransfered != null) {
+            kwhTransfered = currentTransaction.kwhTransfered
+            totalCost = (currentTransaction.kwhTransfered.toString().toDouble() * currentTransaction.pricePerKwh.toDouble()/100).toFloat()
+        }
+        var duration = 0
+        if (currentTransaction.currentChargePercentage != null) {
+            duration = ((currentTransaction.currentChargePercentage * 100).toInt() - initialPercentage)
+        }
+
+        energyUsedTextView.text = kwhTransfered.toString() + " kWh"
+        durationTextView.text = duration.toString() + " Seconds"
+        chargingStopTimeTextView.text = "Charging stopped at " + dateTime
+        totalCostTextView.text = totalCost.toString() + "kr"
 
         paymentSummaryDialog.setContentView(bottomSheetView)
         paymentSummaryDialog.show()
@@ -638,9 +642,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
                     if (response.isSuccessful) {
                         //TODO Backend Klarna/Order/Session Request if successful
-                        val transaction = response.body() as Transaction
+                        currentTransaction = response.body() as Transaction
                         lifecycleScope.launch(Dispatchers.Main) {
-                            setupChargingInProgressDialog(transaction)
+                            setupChargingInProgressDialog()
                         }
                     }
                     else {
