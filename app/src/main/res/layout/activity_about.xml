@@ -9,13 +9,13 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/splashscreen_imageView_flexiChargeBanner"
-        android:layout_width="362dp"
-        android:layout_height="246dp"
-        android:src="@drawable/ic_flexicharge_banner"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="247dp"
+        android:layout_height="162dp"
+        android:layout_marginBottom="45dp"
+        android:src="@drawable/ic_flexicharge_name"
+        app:layout_constraintBottom_toTopOf="@+id/splashscreen_imageView_juBanner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -39,10 +39,15 @@
 
     <TextView
         android:id="@+id/aboutActivity_textView_about"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="App Created With Blood, Sweat and Tears"
-        app:layout_constraintBottom_toTopOf="@+id/splashscreen_imageView_flexiChargeBanner"
+        android:layout_marginTop="45dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
+        android:text="Flexi Charge is a system for booking electric car chargers all over Sweden. The product is created by students at Jönköping University. This mobile app was created by the Scrum squad called Bolt who is part of the mobile tribe for Flexi Charge.
+\n\nThank you for using Flexi Charge
+\n-Bolt"
+        android:textSize="18dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
