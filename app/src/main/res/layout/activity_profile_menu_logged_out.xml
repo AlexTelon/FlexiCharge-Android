@@ -81,10 +81,11 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:onClick="loginClick"
-        android:clickable="false"
         android:alpha="0.5"
+        android:clickable="false"
+        android:onClick="loginClick"
         android:text="Login (coming soon)"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
