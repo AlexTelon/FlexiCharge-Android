@@ -32,7 +32,7 @@
         style="@style/PinWidget.PinView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="10dp"
         android:cursorVisible="true"
         android:hint="------"
         android:inputType="number"
@@ -56,7 +56,7 @@
         app:viewType="rectangle" />
 
     <TextView
-        android:id="@+id/chargerInputLayout_textView_chargerStatus"
+        android:id="@+id/chargerInputLayout_textView_chargerStatuss"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="25dp"
@@ -68,9 +68,33 @@
         android:text="@string/charger_status_enter_code"
         android:textColor="@color/white"
         android:textSize="16sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/chargerInputLayout_textView_chargerStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="45dp"
+        android:layout_marginEnd="45dp"
+        android:layout_marginBottom="10dp"
+        android:padding="15dp"
+        android:text="@string/charger_status_enter_code"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:theme="@style/CustomMaterialButton"
+        app:cornerRadius="5dp"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/white"
+        app:strokeWidth="0dp" />
+
+
 
     <TextView
         android:id="@+id/chargerInputLayout_textView_chargerIdentfier"

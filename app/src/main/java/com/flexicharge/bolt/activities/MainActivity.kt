@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var hours : String
     private lateinit var minutes : String
     private lateinit var pinView: PinView
-    private lateinit var chargerInputStatus: TextView
+    private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
     private lateinit var currentTransaction: Transaction
 
@@ -323,6 +323,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun setupChargerInputDialog() {
+        updateChargerList()
+        updateChargePointList()
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
         )
@@ -350,7 +352,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun setupChargerInput(bottomSheetView: View) {
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
-        chargerInputStatus = bottomSheetView.findViewById<TextView>(R.id.chargerInputLayout_textView_chargerStatus)
+        chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
         pinView.doOnTextChanged { text, start, before, count ->
             if (text?.length == 6) {
                 val chargerId = text.toString().toUInt().toInt()
@@ -506,7 +508,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun reserveCharger(chargerId: Int, chargerInputStatus: TextView) {
+    private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestParams: MutableMap<String, String> = HashMap()
@@ -559,7 +561,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun displayChargerStatus(chargerId: Int, chargerInputStatus: TextView) {
+    private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
@@ -571,7 +573,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         when (charger.status) {
                             "Available" -> {
                                 showCheckout(true, charger.chargePointID, true, chargerId)
-                                setChargerButtonStatus(chargerInputStatus, false, "Pay to start charging", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Continue", 1)
                             }
                             "Faulted" -> {
                                 setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
@@ -611,14 +613,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun setChargerButtonStatus(chargerInputStatus: TextView, active: Boolean, text: String, color: Int) {
+    private fun setChargerButtonStatus(chargerInputStatus: MaterialButton, active: Boolean, text: String, color: Int) {
         chargerInputStatus.isClickable = active
         chargerInputStatus.text = text
         when (color) {
-            0 -> { chargerInputStatus.setBackgroundResource(R.color.red)}
-            1 -> { chargerInputStatus.setBackgroundResource(R.color.green)}
-            2 -> { chargerInputStatus.setBackgroundResource(R.color.dark_grey)}
-            3 -> { chargerInputStatus.setBackgroundResource(R.color.yellow)}
+            0 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.red))}
+            1 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.green))}
+            2 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.dark_grey))}
+            3 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.yellow))}
         }
     }
 
@@ -662,7 +664,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargePoints_near_me_layout)
         val chargerInput = chargerInputDialog.findViewById<EditText>(R.id.chargerInputLayout_pinView_chargerInput)
-        val chargerInputStatus = chargerInputDialog.findViewById<TextView>(R.id.chargerInputLayout_textView_chargerStatus)
+        val chargerInputStatus = chargerInputDialog.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
         val chargerInputView = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargerInputLayout)
         val chargerLocationText = chargerInputDialog.findViewById<TextView>(R.id.checkoutLayout_textView_currentLocation)
         val paymentText = chargerInputDialog.findViewById<TextView>(R.id.checkoutLayout_textView_payment)
@@ -677,8 +679,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 paymentText?.visibility = View.VISIBLE
                 chargerInput?.isEnabled = false
                 klarnaButton?.setOnClickListener {
+                    klarnaButton?.background = getDrawable(R.drawable.rounded_background_selected)
+                    chargerInputStatus?.isEnabled = true
+                    //reserveCharger(chargerId, chargerInputStatus!!)
+                }
+
+                chargerInputStatus?.setOnClickListener{
+                    chargerInputStatus?.isEnabled = false
                     reserveCharger(chargerId, chargerInputStatus!!)
                 }
+
             }
             else {
                 klarnaButton?.visibility = View.GONE
