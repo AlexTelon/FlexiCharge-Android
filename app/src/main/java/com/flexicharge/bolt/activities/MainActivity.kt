@@ -277,9 +277,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     Log.d("tag", percent.toString())
                     delay(2000)
                 }
-                //if (percent == 100) {
-                //    stopChargingProcess(transaction.transactionID, initialPercentage, bottomSheetDialog, transaction)
-                //}
+                if (percent == 100) {
+                    stopChargingProcess(initialPercentage, bottomSheetDialog)
+                }
             }
         }
         else {
