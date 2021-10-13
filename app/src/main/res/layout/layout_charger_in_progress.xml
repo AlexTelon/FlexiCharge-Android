@@ -8,25 +8,25 @@ android:background="@color/dark_grey"
 app:layout_anchorGravity="bottom">
 
     <ImageView
-        android:id="@+id/progressbar_icon"
+        android:id="@+id/chargeInProgressLayout_imageView_progressbarIcon"
         android:layout_width="wrap_content"
         android:layout_height="18dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressbarPercent"
-        app:layout_constraintEnd_toEndOf="@+id/progressbarPercent"
-        app:layout_constraintStart_toStartOf="@+id/progressbarPercent"
+        app:layout_constraintBottom_toTopOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
+        app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
+        app:layout_constraintStart_toStartOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
         android:background="@drawable/ic_lightning" />
 
     <TextView
-        android:id="@+id/progressbarPercent"
+        android:id="@+id/chargeInProgressLayout_textView_progressbarPercent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="67"
         android:textColor="@color/white"
         android:textSize="34sp"
-        app:layout_constraintBottom_toBottomOf="@+id/progressbar"
-        app:layout_constraintEnd_toEndOf="@+id/progressbar"
-        app:layout_constraintStart_toStartOf="@+id/progressbar"
-        app:layout_constraintTop_toTopOf="@+id/progressbar" />
+        app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_progressBar"
+        app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_progressBar"
+        app:layout_constraintStart_toStartOf="@+id/chargeInProgressLayout_progressBar"
+        app:layout_constraintTop_toTopOf="@+id/chargeInProgressLayout_progressBar" />
 
     <TextView
         android:id="@+id/progressbarPercentUnit"
@@ -35,11 +35,11 @@ app:layout_anchorGravity="bottom">
         android:text="%"
         android:textColor="@color/white"
         android:textSize="15dp"
-        app:layout_constraintStart_toEndOf="@+id/progressbarPercent"
-        app:layout_constraintTop_toBottomOf="@+id/progressbar_icon" />
+        app:layout_constraintStart_toEndOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_imageView_progressbarIcon" />
 
     <ProgressBar
-        android:id="@+id/progressbar"
+        android:id="@+id/chargeInProgressLayout_progressBar"
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:layout_marginStart="10dp"
@@ -47,10 +47,10 @@ app:layout_anchorGravity="bottom">
         android:progress="70"
         android:progressDrawable="@drawable/circularprogressbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargerInformation" />
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_information" />
 
     <TextView
-        android:id="@+id/chargerInformation"
+        android:id="@+id/chargeInProgressLayout_textView_information"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -63,7 +63,7 @@ app:layout_anchorGravity="bottom">
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/chargingLocation"
+        android:id="@+id/chargeInProgressLayout_textView_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -72,62 +72,62 @@ app:layout_anchorGravity="bottom">
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargerInformation" />
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_information" />
 
     <TextView
-        android:id="@+id/chargingTimeStatus"
+        android:id="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="1h 21min until full"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/chargingLocation"
-        app:layout_constraintTop_toBottomOf="@+id/chargingLocation" />
+        app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textView_location"
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_location" />
 
     <TextView
-        android:id="@+id/chargingSpeed"
+        android:id="@+id/chargeInProgressLayout_textView_chargeSpeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="5.72kwh at 3kwh"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/chargingTimeStatus"
-        app:layout_constraintTop_toBottomOf="@+id/chargingTimeStatus" />
+        app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus" />
 
     <ImageView
-        android:id="@+id/locationIcon"
+        android:id="@+id/chargeInProgressLayout_imageView_locationIcon"
         android:layout_width="21dp"
         android:layout_height="24dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_position_pin"
-        app:layout_constraintBottom_toBottomOf="@+id/chargingLocation"
-        app:layout_constraintEnd_toStartOf="@+id/chargingLocation"
-        app:layout_constraintTop_toTopOf="@+id/chargingLocation" />
+        app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textView_location"
+        app:layout_constraintEnd_toStartOf="@+id/chargeInProgressLayout_textView_location"
+        app:layout_constraintTop_toTopOf="@+id/chargeInProgressLayout_textView_location" />
 
     <ImageView
-        android:id="@+id/timeIcon"
+        android:id="@+id/chargeInProgressLayout_imageView_timeIcon"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_clock"
-        app:layout_constraintBottom_toBottomOf="@+id/chargingTimeStatus"
-        app:layout_constraintEnd_toStartOf="@+id/chargingTimeStatus"
-        app:layout_constraintTop_toTopOf="@+id/chargingTimeStatus" />
+        app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
+        app:layout_constraintEnd_toStartOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
+        app:layout_constraintTop_toTopOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus" />
 
     <ImageView
-        android:id="@+id/lightningIcon"
+        android:id="@+id/chargeInProgressLayout_imageView_lightningIcon"
         android:layout_width="17dp"
         android:layout_height="24dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_lightning"
-        app:layout_constraintBottom_toBottomOf="@+id/chargingSpeed"
-        app:layout_constraintEnd_toStartOf="@+id/chargingSpeed"
-        app:layout_constraintTop_toTopOf="@+id/chargingSpeed" />
+        app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textView_chargeSpeed"
+        app:layout_constraintEnd_toStartOf="@+id/chargeInProgressLayout_textView_chargeSpeed"
+        app:layout_constraintTop_toTopOf="@+id/chargeInProgressLayout_textView_chargeSpeed" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/stopCharging"
+        android:id="@+id/chargeInProgressLayout_button_stopCharging"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
@@ -144,7 +144,7 @@ app:layout_anchorGravity="bottom">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargingSpeed"
+        app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_chargeSpeed"
         app:strokeColor="@color/white"
         app:strokeWidth="1dp" />
 

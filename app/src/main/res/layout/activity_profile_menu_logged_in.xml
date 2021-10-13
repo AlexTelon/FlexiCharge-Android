@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AccountActivities.ProfileMenuLoggedInActivity">
+    tools:context=".activities.ProfileMenuLoggedInActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/loginActivity_imageView_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="-999dp"
@@ -16,13 +16,13 @@
         android:layout_marginBottom="-16dp"
         android:background="@color/mild_grey"
         android:rotation="-7"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/loginActivity_textView_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/loginActivity_textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -47,7 +47,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_imageView_title" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -196,14 +196,16 @@
         app:layout_constraintTop_toBottomOf="@+id/aboutTextView" />
 
     <Button
-        android:id="@+id/buttonConfirmLogin"
+        android:id="@+id/loginActivity_button_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:onClick="loginClick"
-        android:text="Login"
+        android:onClick="logoutClick"
+        android:text="Logout"
+        android:clickable="false"
+        android:alpha="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

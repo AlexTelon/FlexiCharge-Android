@@ -12,29 +12,29 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/total_cost"
-        android:text="Total Cost"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:layout_gravity="top"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/paymentPriceLayout_textView_totalCost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:layout_gravity="top"
+        android:text="Total Cost"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/price"
+        android:id="@+id/paymentPriceLayout_textView_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="X kr"
         android:textColor="@color/black"
-        android:textSize="26sp"
+        android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/total_cost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/paymentPriceLayout_textView_totalCost" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
