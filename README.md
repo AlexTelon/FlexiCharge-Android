@@ -51,9 +51,8 @@
 
 ### To charge
 
-   ![image-20211011152137316](./images/image-20211011152137316.png)
 
-1. Enter a valid ChargerID pin in the ChargingPanel, ChargerID's can be obtained by:
+1. Enter a valid ChargerID pin in the ChargingPanel... ![image-20211011152137316](./images/image-20211011152137316.png) ...ChargerID's can be obtained by:
    * Tapping green markers on the map.
    * Scanning a QR Code present on a FlexiCharger
    * Tapping a chargepoint from the "chargepoints near me" list and selecting one available charger.
