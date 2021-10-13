@@ -58,7 +58,6 @@ import kotlin.collections.HashMap
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
 
     private lateinit var binding: ActivityMainBinding
-
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
@@ -223,7 +222,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
         val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
         val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
-        val pricePerKWH = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
+        val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
 
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -234,7 +233,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         var initialPercentage = 0
         if (currentTransaction.currentChargePercentage != null) {
-            initialPercentage = (currentTransaction.currentChargePercentage*100).toInt()
+            initialPercentage = currentTransaction.currentChargePercentage
         }
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
@@ -251,7 +250,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         if (!currentTransaction.paymentConfirmed) {
             chargingLocation.text = chargePoint.name
-            pricePerKWH.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
+            val df = DecimalFormat("#.##")
+            //val distanceStr = df.format(currentTransaction.kwhTransfered/100).toString()
+            chargeSpeed.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
             var percent = initialPercentage
             GlobalScope.launch {
                 while (percent < 100 && continueLooping) {
@@ -261,9 +262,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             currentTransaction = response.body() as Transaction
                             lifecycleScope.launch(Dispatchers.Main) {
                                 if (currentTransaction.currentChargePercentage != null)
-                                    percent = (currentTransaction.currentChargePercentage*100).toInt()
+                                    percent = currentTransaction.currentChargePercentage
                                 progressbar.progress = percent
                                 progressbarPercent.text = percent.toString()
+                                chargeSpeed.text = currentTransaction.kwhTransfered.toString()
+
                                 var minutesLeft = (100 - percent) / 60
                                 var secondsLeft = (100 - percent) % 60
                                 var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
@@ -301,15 +304,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             paymentSummaryDialog.dismiss()
         }
 
-        var kwhTransfered = 0
+        var kwhTransfered = 0.toDouble()
         var totalCost = 0.toFloat()
-        if (currentTransaction.kwhTransfered != null) {
-            kwhTransfered = currentTransaction.kwhTransfered
-            totalCost = (currentTransaction.kwhTransfered.toString().toDouble() * currentTransaction.pricePerKwh.toDouble()/100).toFloat()
-        }
         var duration = 0
-        if (currentTransaction.currentChargePercentage != null) {
-            duration = ((currentTransaction.currentChargePercentage * 100).toInt() - initialPercentage)
+        if (this::currentTransaction.isInitialized) {
+            if (currentTransaction.kwhTransfered != null) {
+                kwhTransfered = currentTransaction.kwhTransfered
+                totalCost = (currentTransaction.kwhTransfered.toString().toDouble() * currentTransaction.pricePerKwh.toDouble()/100).toFloat()
+            }
+
+            if (currentTransaction.currentChargePercentage != null) {
+                duration = currentTransaction.currentChargePercentage - initialPercentage
+            }
         }
 
         energyUsedTextView.text = kwhTransfered.toString() + " kWh"
