@@ -39,7 +39,6 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         chargerId = intent.getIntExtra("ChargerId", 0)
         clientToken = intent.getStringExtra("ClientToken").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
-        //transactionId = 256
         Log.d("CLIENTTOKEN", clientToken)
         initialize()
 

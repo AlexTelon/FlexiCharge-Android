@@ -172,27 +172,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private fun stopChargingProcess(
         transactionId: Int,
         bottomSheetDialog: BottomSheetDialog,
+        transaction: Transaction
     ) {
+        val dateTime = unixToDateTime(transaction.timestamp.toString())
+        //hours = Calendar.getInstance().time.hours.toString()
+        //minutes = Calendar.getInstance().time.minutes.toString()
         try {
             lifecycleScope.launch(Dispatchers.IO) {
-                val response = RetrofitInstance.flexiChargeApi.transactionStop(transactionId)
-                if (response.isSuccessful) {
-                    val updatedTransaction = response.body() as Transaction
-                    val dateTime = unixToDateTime(updatedTransaction.timestamp.toString())
-                    hours = Calendar.getInstance().time.hours.toString()
-                    minutes = Calendar.getInstance().time.minutes.toString()
-                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                    sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
-                    lifecycleScope.launch(Dispatchers.Main) {
+                val response = RetrofitInstance.flexiChargeApi.transactionStop(transaction.transactionID)
+                val updatedTransaction = (response.body() as TransactionList)[0]
 
+                if (response.isSuccessful) {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                         bottomSheetDialog.dismiss()
                         displayPaymentSummaryDialog(updatedTransaction, dateTime)
+                    }
+                }
+                else {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                        bottomSheetDialog.dismiss()
+                        displayPaymentSummaryDialog(transaction, dateTime)
                     }
                 }
             }
         }
         catch (e: IOException) {
-
+            lifecycleScope.launch(Dispatchers.Main) {
+                val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                bottomSheetDialog.dismiss()
+                displayPaymentSummaryDialog(transaction, dateTime)
+            }
         }
     }
 
@@ -211,7 +225,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         )
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
-            stopChargingProcess(transaction.transactionID, bottomSheetDialog)
+            stopChargingProcess(transaction.transactionID, bottomSheetDialog, transaction)
         }
 
         var charger = chargers.filter { it.chargerID == transaction.chargerID }[0]
@@ -244,13 +258,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
 
-        if (transaction.currentChargePercentage != 100) {
-            var percent = 0
-            var time = 100
+        if (transaction.currentChargePercentage != 100 && transaction.paymentConfirmed == false) {
+            var percent: Int
+            if (transaction.currentChargePercentage != null)
+                percent = 0
+            else percent = transaction.currentChargePercentage
+            var time = 100 - percent
             GlobalScope.launch {
                 while (percent != 100) {
                     percent++
-                    time--
+                    time = 100 - percent
                     lifecycleScope.launch(Dispatchers.IO) {
                         val response = RetrofitInstance.flexiChargeApi.getTransaction(transaction.transactionID)
                         if (response.isSuccessful) {
@@ -264,14 +281,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                                 var secondsLeft = time % 60
                                 var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
                                 chargingTimeStatus.text = timeString + " until fully charged"
-                                if (percent == 100) {
-                                    stopChargingProcess(transaction.transactionID, bottomSheetDialog)
-                                }
                             }
                         }
                     }
                     Log.d("tag", percent.toString())
                     delay(1000)
+                }
+                if (percent == 100) {
+                    stopChargingProcess(transaction.transactionID, bottomSheetDialog, transaction)
                 }
             }
         }

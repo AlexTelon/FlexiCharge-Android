@@ -44,5 +44,5 @@ interface ApiInterface {
     ): Response<TransactionList>
 
     @PUT("transactions/stop/{transactionId}")
-    suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<Transaction>
+    suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<TransactionList>
 }

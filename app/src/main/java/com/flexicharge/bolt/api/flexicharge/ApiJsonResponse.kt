@@ -26,21 +26,15 @@ data class Transaction(
     val client_token: String,
     val currentChargePercentage: Any,
     val isKlarnaPayment: Boolean,
-    val kwhTransfered: Any,
+    val kwhTransfered: Int,
+    val meterStart: Int,
     val paymentConfirmed: Boolean,
     val paymentID: String,
-    val payment_method_categories: List<PaymentMethodCategory>,
     val pricePerKwh: String,
     val session_id: String,
     val timestamp: Int,
     val transactionID: Int,
     val userID: String
-)
-
-data class PaymentMethodCategory(
-    val asset_urls: AssetUrls,
-    val identifier: String,
-    val name: String
 )
 
 data class AssetUrls(
