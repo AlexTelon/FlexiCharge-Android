@@ -32,23 +32,24 @@
      ![image-20211011145831799](./images/image-20211011145831799.png)
    
    **Credit Card Details**
-   ![image-20211013123905119](./images/image-20211013123905119.png)
 
-### Build Steps
+     ![image-20211013123905119](./images/image-20211013123905119.png)
+
+## Build Steps
 
 1. Open project in Android Studio
 2. Let gradle download all required modules
 3. Compile and run application by clicking "Run"
 
-### Using the app
+## Using the app
 1. When starting the app, grant required location permissions to continue to Home Screen.
 2. In home, the user can do a multitude of things...
-   * Use the map to view FlexiChargers on the **map**.![image-20211011152235679](./images/image-20211011152235679.png)
+   * Use the map to view FlexiChargers on the **map**. ![image-20211011152235679](./images/image-20211011152235679.png)
    * Tap ![image-20211011151837571](./images/image-20211011151837571.png) to "warp" to **your location**. 
    * Tap ![image-20211011151855812](./images/image-20211011151855812.png) to access FlexiCharger **QR Scanner**
    * Tap ![image-20211011151821916](./images/image-20211011151821916.png) to access the **ChargingPanel**.   ![image-20211011153319900](./images/image-20211011153319900.png) 
 
-#### To charge
+### To charge
 
    ![image-20211011152137316](./images/image-20211011152137316.png)
 
@@ -68,7 +69,9 @@
 5. Upon finished charging a charging summary will be presented as such.
 
    ![image-20211011152445124](./images/image-20211011152445124.png)
+
 ---
+
 ### Known issues
 
 ## Support
