@@ -573,25 +573,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         when (charger.status) {
                             "Available" -> {
                                 showCheckout(true, charger.chargePointID, true, chargerId)
-                                setChargerButtonStatus(chargerInputStatus, false, "Continue", 1)
+                                setChargerButtonStatus(chargerInputStatus, true, "Continue", 2)
                             }
                             "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
                             }
                             "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
                             }
                             "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
                             }
                             "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
                             }
                             "Charging" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 0)
                             }
                             "Reserved" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 2)
+                                setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 0)
                             }
                             else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger is " + charger.status, 2) }
                         }
@@ -617,10 +617,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         chargerInputStatus.isClickable = active
         chargerInputStatus.text = text
         when (color) {
-            0 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.red))}
-            1 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.green))}
-            2 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.dark_grey))}
-            3 -> { chargerInputStatus.setBackgroundColor(getColor(R.color.yellow))}
+            0 -> {
+                chargerInputStatus.setBackgroundColor(getColor(R.color.red))
+                chargerInputStatus.setTextColor(getColor(R.color.white))
+            }
+            1 -> {
+                chargerInputStatus.setBackgroundColor(getColor(R.color.green))
+                chargerInputStatus.setTextColor(getColor(R.color.white))
+            }
+            2 -> {
+                chargerInputStatus.setBackgroundColor(getColor(R.color.light_grey))
+                chargerInputStatus.setTextColor(getColor(R.color.black))
+            }
+            3 -> {
+                chargerInputStatus.setBackgroundColor(getColor(R.color.dark_grey))
+                chargerInputStatus.setTextColor(getColor(R.color.white))
+            }
         }
     }
 
@@ -675,17 +687,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargersNearMeLayout?.visibility = View.GONE
             checkoutLayout?.visibility =View.VISIBLE
             if (showPayment) {
+                klarnaButton?.background = getDrawable(R.drawable.rounded_background)
                 klarnaButton?.visibility = View.VISIBLE
                 paymentText?.visibility = View.VISIBLE
                 chargerInput?.isEnabled = false
+                chargerInputStatus?.isEnabled = false
+
                 klarnaButton?.setOnClickListener {
                     klarnaButton?.background = getDrawable(R.drawable.rounded_background_selected)
                     chargerInputStatus?.isEnabled = true
+                    if (chargerInputStatus != null) {
+                        setChargerButtonStatus(chargerInputStatus, true, "Continue", 1)
+                    }
                     //reserveCharger(chargerId, chargerInputStatus!!)
                 }
 
                 chargerInputStatus?.setOnClickListener{
-                    chargerInputStatus?.isEnabled = false
                     reserveCharger(chargerId, chargerInputStatus!!)
                 }
 
@@ -705,7 +722,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargersNearMeLayout?.visibility = View.VISIBLE
             checkoutLayout?.visibility = View.GONE
             chargerInput?.text?.clear()
-            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 2)
+            setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 3)
         }
     }
 }
