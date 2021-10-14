@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                                     percent = currentTransaction.currentChargePercentage
                                 progressbar.progress = percent
                                 progressbarPercent.text = percent.toString()
-                                chargeSpeed.text = currentTransaction.kwhTransfered.toString()
+                                chargeSpeed.text = currentTransaction.kwhTransfered.toString() + " kWh"
 
                                 var minutesLeft = (100 - percent) / 60
                                 var secondsLeft = (100 - percent) % 60
@@ -307,18 +307,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         var kwhTransfered = 0.toDouble()
         var totalCost = 0.toFloat()
         var duration = 0
+        var pricePerKwh = "0"
         if (this::currentTransaction.isInitialized) {
             if (currentTransaction.kwhTransfered != null) {
                 kwhTransfered = currentTransaction.kwhTransfered
                 totalCost = (currentTransaction.kwhTransfered.toString().toDouble() * currentTransaction.pricePerKwh.toDouble()/100).toFloat()
             }
-
+            if (currentTransaction.pricePerKwh != null) {
+                pricePerKwh = currentTransaction.pricePerKwh
+            }
             if (currentTransaction.currentChargePercentage != null) {
                 duration = currentTransaction.currentChargePercentage - initialPercentage
             }
         }
 
-        energyUsedTextView.text = kwhTransfered.toString() + " kWh"
+        energyUsedTextView.text = kwhTransfered.toString() + " kWh @" + pricePerKwh + "kr kWh"
         durationTextView.text = duration.toString() + " Seconds"
         chargingStopTimeTextView.text = "Charging stopped at " + dateTime
         totalCostTextView.text = totalCost.toString() + "kr"

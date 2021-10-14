@@ -56,10 +56,12 @@ class QrActivity() : AppCompatActivity() {
     }
 
     private fun validateChargerId(chargerId: String): String {
-
+        // Depends on how the charger teams design their QR, this if case may be used in the future.
+        /*
         if (chargerId.length != VALID_QR_STRING_LENGTH) {
             return NOT_VALID_QR_STRING
         }
+        */
         val formattedString = chargerId.filter {
             it.isDigit()
         }
