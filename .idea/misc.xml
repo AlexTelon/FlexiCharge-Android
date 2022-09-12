@@ -3,6 +3,25 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_about.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_forgot_password.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_klarna.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_klarna_order_completed.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_login.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.2911458333333333" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_in.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_out.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_qr.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_register.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_splashscreen.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/chargepoint_list_item.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.67" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_checkout.xml" value="0.5" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_in_progress.xml" value="0.2545289855072464" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.5383319292333614" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_chargerpoints_near_me.xml" value="0.2545289855072464" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_payment_price.xml" value="0.27760416666666665" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.27760416666666665" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/ic_arrow_down_24.xml" value="0.1" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/ic_arrow_down_32.xml" value="0.1" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/drawable/rounded_edittext.xml" value="1.0214285714285714" />

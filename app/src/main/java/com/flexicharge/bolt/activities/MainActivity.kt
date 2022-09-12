@@ -57,7 +57,7 @@ import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
@@ -117,22 +117,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {   //results of trying to connect to charger.
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == 12345){
-            if (resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK){                                      // its ok
                 try {
                     setupChargerInputDialog()
                     changeInput(data?.getStringExtra("QR_SCAN_RESULT").toString())
                 }catch (e: Exception){
-                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()  //exception handling
                 }
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
+        super.onResume()       //, for your activity to start interacting with the user.
         fetchLocation(this)
         updateChargerList()
         updateChargePointList()
@@ -359,7 +359,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         chargerInputDialog.show()
     }
 
-    private fun setupChargerInput(bottomSheetView: View) {
+    private fun setupChargerInput(bottomSheetView: View) {      // act when the charger's number is written
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
         chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
         pinView.doOnTextChanged { text, start, before, count ->
@@ -397,7 +397,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
+    private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {       // display the chargers near u
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
         listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
         if (this::chargePoints.isInitialized) {
@@ -453,8 +453,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private fun updateChargerList() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.flexiChargeApi.getChargerList()
-                if (response.isSuccessful) {
+                val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
+                if (response.isSuccessful) {                                    // , getting data from API?
                     val chargers = response.body() as Chargers
                     if (!chargers.isEmpty()) {
                         this@MainActivity.chargers = response.body() as Chargers
@@ -478,7 +478,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val requestBody = TransactionSession(chargerId, userId)
+                val requestBody = TransactionSession(chargerId, userId) // post request is stored in HTTP body.
                 val response = RetrofitInstance.flexiChargeApi.postTransactionSession(requestBody)
                 if (response.isSuccessful) {
                     //TODO Backend Klarna/Order/Session Request if successful

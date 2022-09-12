@@ -20,6 +20,7 @@ class RegisterActivity : AppCompatActivity() {
         // Communicate with backend
         // Handle Backend Reply
         // Proceed to MainActivity upon confirmation
+
         Toast.makeText(applicationContext, "TODO: Register Account!", Toast.LENGTH_SHORT).show()
     }
     fun goToSignIn(view: View) {
