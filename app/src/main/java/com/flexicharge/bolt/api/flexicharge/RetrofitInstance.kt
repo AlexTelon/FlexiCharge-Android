@@ -31,8 +31,6 @@ class RetrofitInstance {
             retrofit.create(ApiInterface::class.java)
         }
 
-
-
     }
 
 }

@@ -69,6 +69,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", true) //Set to true to enable registration
+
+
         if (!isGuest) {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
