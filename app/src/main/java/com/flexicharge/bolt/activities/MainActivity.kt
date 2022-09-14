@@ -645,7 +645,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun validateChargerId(chargerId: String): Boolean {
+    public fun validateChargerId(chargerId: String): Boolean {
         if (chargerId.length != 6) {
             return false
         }
