@@ -35,4 +35,10 @@ class TestApi {
         val response = RetrofitInstance.flexiChargeApi.getTransaction(1)
         assert(response.isSuccessful)
     }
+
+    @Test
+    fun testGetChargePoint() = runBlocking {
+        val response = RetrofitInstance.flexiChargeApi.getChargePoint(24)
+        assert(response.isSuccessful)
+    }
 }
