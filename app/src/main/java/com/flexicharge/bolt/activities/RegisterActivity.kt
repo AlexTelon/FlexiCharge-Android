@@ -27,13 +27,19 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
+    val emailIsValid : Boolean = true;
+    val passwordIsValid : Boolean = true;
+    val phoneNrIsValid : Boolean = true;
+
     // first take the input from user
     var registerUserEmail            = findViewById<EditText>(R.id.loginActivity_editText_email)
     var registerUserPhoneNr          = findViewById<EditText>(R.id.editTextPhone)
     var registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
     var registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat);
+    var RegisterErrorHelper          = findViewById<TextView>(R.id.loginActivity_textView_helper)
 
     //make them into strings
+    var RegisterErrorHelperString    = RegisterErrorHelper.text.toString()
     var registerUserPhoneNrString    = registerUserPhoneNr.text.toString()
     var registerUserEmailString      = registerUserEmail.text.toString()
     var registerUserPassString       = registerUserPass.text.toString()
@@ -59,7 +65,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun emailFocusedListener() {
         registerUserEmail.setOnFocusChangeListener { _, focused ->
             if (!focused) {
-                registerUserEmailString = validEmail()
+                RegisterErrorHelperString = validEmail()
             }
         }
     }
@@ -75,7 +81,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun PasswordFocusedListener() {
         registerUserPass.setOnFocusChangeListener { _, focused ->
             if (!focused) {
-                registerUserPassString = validPassword()
+                RegisterErrorHelperString = validPassword()
             }
         }
     }
@@ -92,7 +98,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun phoneFocusedListener() {
         registerUserPhoneNr.setOnFocusChangeListener { _, focused ->
             if (!focused) {
-                registerUserPhoneNrString = validPhone()
+                RegisterErrorHelperString = validPhone()
             }
         }
     }

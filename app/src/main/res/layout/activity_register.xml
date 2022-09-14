@@ -107,6 +107,21 @@
         app:layout_constraintStart_toStartOf="@+id/editTextPasswordRepeat"
         app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeat" />
 
+    <TextView
+        android:id="@+id/loginActivity_textView_helper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-black"
+        android:text=""
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="15sp"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxTosAgreement"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintBottom_toTopOf ="buttonRegisterConfirm" />
+
     <Button
         android:id="@+id/buttonRegisterConfirm"
         android:layout_width="0dp"
