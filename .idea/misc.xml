@@ -61,6 +61,26 @@
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.3759057971014493" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.346875" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.346875" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/drawable-anydpi/cable.xml" value="0.1935" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/drawable/oval_menu_background.xml" value="0.1935" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/drawable/rounded_background.xml" value="0.1935" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/drawable/rounded_background_selected.xml" value="0.1935" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_about.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_forgot_password.xml" value="0.23646496815286625" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_klarna.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_klarna_order_completed.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_login.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_in.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_out.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_qr.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_register.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/activity_splashscreen.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/fragment_recover_pass.xml" value="0.284375" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/fragment_revover_email_sent.xml" value="0.2703125" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/layout_payment_price.xml" value="0.18541666666666667" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.18541666666666667" />
         <entry key="app/src/main/res/layout/activity_klarna_order_completed.xml" value="0.5427083333333333" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.10092592592592593" />
         <entry key="app/src/main/res/layout/activity_permission.xml" value="0.5427083333333333" />

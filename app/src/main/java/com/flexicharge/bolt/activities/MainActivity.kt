@@ -92,6 +92,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         }
 
+        ///---------------------------------------------------------test----------------------------------------------------
+        binding.recoverpaswordTest.setOnClickListener{
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
+     //----------------------------------------------------------------------------------------------------------------
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)

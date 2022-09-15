@@ -73,4 +73,15 @@
         map:layout_constraintEnd_toEndOf="@+id/mainActivity_button_camera"
         map:layout_constraintStart_toStartOf="@+id/mainActivity_button_camera" />
 
+    <Button
+        android:id="@+id/recoverpaswordTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="72dp"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintHorizontal_bias="0.504"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="@+id/mainActivity_fragment_map" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
