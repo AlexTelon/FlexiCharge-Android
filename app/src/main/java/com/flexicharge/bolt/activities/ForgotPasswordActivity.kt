@@ -12,14 +12,9 @@ class ForgotPasswordActivity : AppCompatActivity(), Communicator_ {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
-
-
         val fragmentRecoverPass = FragmentRecoverPass()
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragmentRecoverPass).commit()
-
-
     }
-
     override fun passDataCom(editTextInput: String) {
         val bundle = Bundle()
         // key name EmailAddress
@@ -30,19 +25,6 @@ class ForgotPasswordActivity : AppCompatActivity(), Communicator_ {
         fragmentingEmailSent.arguments = bundle
         transaction.replace(R.id.fragment_container, fragmentingEmailSent)
         transaction.commit()
-
-
-
     }
 
-
-/*
-    fun recoverPassword(view: View) {
-        Toast.makeText(applicationContext, "TODO: Recover Password!", Toast.LENGTH_SHORT).show()
-
-
-
-    }
-
- */
 }

@@ -19,7 +19,6 @@ import com.google.android.gms.tasks.OnCanceledListener
 class FragmentRecoverPass : Fragment() {
 
     private  lateinit var communicator: Communicator_
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,7 +29,6 @@ class FragmentRecoverPass : Fragment() {
         communicator = activity as Communicator_
         view.findViewById<Button>(R.id.buttonConfirmRecoverPassword).setOnClickListener{
             val email: String = view.findViewById<EditText>(R.id.loginActivity_editText_email).text.toString().trim{it <= ' '}
-
             fun String.isEmailValid(): Boolean {
                 return !email.isEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
             }
@@ -46,8 +44,6 @@ class FragmentRecoverPass : Fragment() {
 
             }
         }
-
-
         return view
 
     }
