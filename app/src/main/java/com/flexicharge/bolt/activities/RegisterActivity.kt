@@ -58,11 +58,10 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var registerUserPassString        : String
     lateinit var registerUserRepeatPassString  : String
 
-    fun confirmRegistration(view: View) {
-        // Send Post Request To Backend With new user details
+    private fun confirmRegistration() {
         var registerBtn = findViewById<Button>(R.id.buttonRegisterConfirm)
         val agreeCheckBox = findViewById<CheckBox>(R.id.checkBoxTosAgreement)
-
+        // when register btn is clicked, check if email, pass and phone are valid, then check agreement box, then send request to backend.
         registerBtn.setOnClickListener {
             validEmail()
             validPassword()
@@ -150,32 +149,35 @@ class RegisterActivity : AppCompatActivity() {
 
         private fun sendUserData (userEmail : String, userPass : String, userPhoneNr : String  ){
         lifecycleScope.launch(Dispatchers.IO) {
+            // handle request to backend.
             try {
                 val requestBody = UserDetails(userEmail, userPass, userPhoneNr)
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
                 if (response.isSuccessful) {
                     lifecycleScope.launch(Dispatchers.Main) {
+                        // Proceed to MainActivity upon confirmation
                         val intent = Intent(this@RegisterActivity, MainActivity::class.java)
                         startActivity(intent)
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
+                        Toast.makeText(this@RegisterActivity, "you are in else", Toast.LENGTH_LONG)
 
                     }
                 }
             } catch (e: HttpException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-
+                    Toast.makeText(this@RegisterActivity, "you are in HTTP Exception", Toast.LENGTH_LONG)
                 }
             } catch (e: IOException) {
-
+                Toast.makeText(this@RegisterActivity, "you are in IO Exception", Toast.LENGTH_LONG)
             }
         }
         }
         // Handle Backend Reply
 
 
-        // Proceed to MainActivity upon confirmation
+
 
 
 
