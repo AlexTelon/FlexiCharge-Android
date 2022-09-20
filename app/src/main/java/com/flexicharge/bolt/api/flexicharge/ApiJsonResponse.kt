@@ -66,6 +66,7 @@ class UserDetails(
     val userPhoneNr : String
 )
 
+
 class UserDetailsGotten(
     val userId : Int,
     val userEmail : String,

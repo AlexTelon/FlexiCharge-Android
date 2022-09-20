@@ -108,12 +108,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         binding.mainActivityButtonUser.setOnClickListener {
-            if (isGuest) {
+            /*if (isGuest) {
                 startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
             }
             else {
                 startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
-            }
+            }*/
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 

@@ -13,6 +13,7 @@ import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -25,37 +26,52 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
 
+        registerUserEmail            = findViewById<EditText>(R.id.loginActivity_editText_email)
+        registerUserPhoneNr          = findViewById<EditText>(R.id.editTextPhone)
+        registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
+        registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat);
+        RegisterErrorHelper          = findViewById<TextView>(R.id.loginActivity_textView_helper)
+        RegisterErrorHelperString    = RegisterErrorHelper.text.toString()
+        registerUserPhoneNrString    = registerUserPhoneNr.text.toString()
+        registerUserEmailString      = registerUserEmail.text.toString()
+        registerUserPassString       = registerUserPass.text.toString()
+        registerUserRepeatPassString = registerUserRepeatPass.text.toString()
+
+        confirmRegistration(  )
     }
 
-    val emailIsValid : Boolean = true;
-    val passwordIsValid : Boolean = true;
-    val phoneNrIsValid : Boolean = true;
+    var emailIsValid : Boolean = true;
+    var passwordIsValid : Boolean = true;
+    var phoneNrIsValid : Boolean = true;
 
     // first take the input from user
-    var registerUserEmail            = findViewById<EditText>(R.id.loginActivity_editText_email)
-    var registerUserPhoneNr          = findViewById<EditText>(R.id.editTextPhone)
-    var registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
-    var registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat);
-    var RegisterErrorHelper          = findViewById<TextView>(R.id.loginActivity_textView_helper)
+    lateinit var registerUserEmail          : EditText
+    lateinit var registerUserPhoneNr        : EditText
+    lateinit var registerUserPass           : EditText
+    lateinit var registerUserRepeatPass     : EditText
+    lateinit var RegisterErrorHelper        : TextView
 
     //make them into strings
-    var RegisterErrorHelperString    = RegisterErrorHelper.text.toString()
-    var registerUserPhoneNrString    = registerUserPhoneNr.text.toString()
-    var registerUserEmailString      = registerUserEmail.text.toString()
-    var registerUserPassString       = registerUserPass.text.toString()
-    var registerUserRepeatPassString = registerUserRepeatPass.text.toString()
+    lateinit var RegisterErrorHelperString     : String
+    lateinit var registerUserPhoneNrString     : String
+    lateinit var registerUserEmailString       : String
+    lateinit var registerUserPassString        : String
+    lateinit var registerUserRepeatPassString  : String
 
     fun confirmRegistration(view: View) {
-        // Validate user Email
-
-
         // Send Post Request To Backend With new user details
-        val registerBtn = findViewById<Button>(R.id.buttonRegisterConfirm)
+        var registerBtn = findViewById<Button>(R.id.buttonRegisterConfirm)
         val agreeCheckBox = findViewById<CheckBox>(R.id.checkBoxTosAgreement)
 
         registerBtn.setOnClickListener {
+            validEmail()
+            validPassword()
+            validPhone()
+
             if (agreeCheckBox.isChecked()) {
-                sendUserData(registerUserEmailString, registerUserPassString,registerUserPhoneNrString )
+                if(emailIsValid && passwordIsValid  && phoneNrIsValid ) {
+                    sendUserData(registerUserEmailString, registerUserPassString,registerUserPhoneNrString )
+                }
 
             }
         }
@@ -71,9 +87,12 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun validEmail(): String {
-        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches())
+        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches()) {
+            emailIsValid = false;
             return "Invalid Email Address"
-
+        }
+        else
+            emailIsValid = true;
         return ""
     }
 
@@ -89,7 +108,12 @@ class RegisterActivity : AppCompatActivity() {
     //check if Email is valid
     private fun validPassword(): String {
         if(registerUserPassString.length < 8) {
+            passwordIsValid = false;
             return "Minimum 8 Characters Password!"
+
+        }
+        else {
+            passwordIsValid = true;
         }
         return ""
     }
@@ -106,10 +130,17 @@ class RegisterActivity : AppCompatActivity() {
     //check if phonenr is valid
     private fun validPhone() : String {
         if(!registerUserPhoneNrString.matches(".*[0-9]".toRegex())){
+            phoneNrIsValid = false
             return "Must Be all Digits"
+
         }
         if(registerUserPhoneNrString.length != 10) {
+            phoneNrIsValid = false
             return "Must Be 10 Digits!"
+
+        }
+        else {
+            phoneNrIsValid = true;
         }
         return ""
     }
