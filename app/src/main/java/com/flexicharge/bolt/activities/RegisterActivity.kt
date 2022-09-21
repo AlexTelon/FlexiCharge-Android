@@ -27,15 +27,23 @@ class RegisterActivity : AppCompatActivity() {
 
 
         registerUserEmail            = findViewById<EditText>(R.id.loginActivity_editText_email)
-        registerUserPhoneNr          = findViewById<EditText>(R.id.editTextPhone)
         registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
-        registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat);
-        RegisterErrorHelper          = findViewById<TextView>(R.id.loginActivity_textView_helper)
-        RegisterErrorHelperString    = RegisterErrorHelper.text.toString()
-        registerUserPhoneNrString    = registerUserPhoneNr.text.toString()
-        registerUserEmailString      = registerUserEmail.text.toString()
-        registerUserPassString       = registerUserPass.text.toString()
-        registerUserRepeatPassString = registerUserRepeatPass.text.toString()
+        registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat)
+        registerEmailErrorHelper     = findViewById<EditText>(R.id.register_activity_valid_email_helper)
+        registerPasswordErrorHelper  = findViewById<EditText>(R.id.register_activity_valid_password_helper)
+
+        // check email valid
+        registerUserEmail.setOnFocusChangeListener { _, focused ->
+            if (!focused) {
+                registerEmailErrorHelper.text = validEmail()
+            }
+        }
+        // check pass valid
+        registerUserPass.setOnFocusChangeListener { _, focused ->
+            if (!focused) {
+                registerPasswordErrorHelper.text = validPassword()
+            }
+        }
 
         confirmRegistration(  )
     }
@@ -46,17 +54,13 @@ class RegisterActivity : AppCompatActivity() {
 
     // first take the input from user
     lateinit var registerUserEmail          : EditText
-    lateinit var registerUserPhoneNr        : EditText
     lateinit var registerUserPass           : EditText
     lateinit var registerUserRepeatPass     : EditText
-    lateinit var RegisterErrorHelper        : TextView
+    // these two help with showing if email and password are valid
+    lateinit var registerEmailErrorHelper   : TextView
+    lateinit var registerPasswordErrorHelper   : TextView
 
-    //make them into strings
-    lateinit var RegisterErrorHelperString     : String
-    lateinit var registerUserPhoneNrString     : String
-    lateinit var registerUserEmailString       : String
-    lateinit var registerUserPassString        : String
-    lateinit var registerUserRepeatPassString  : String
+
 
     private fun confirmRegistration() {
         var registerBtn = findViewById<Button>(R.id.buttonRegisterConfirm)
@@ -65,28 +69,20 @@ class RegisterActivity : AppCompatActivity() {
         registerBtn.setOnClickListener {
             validEmail()
             validPassword()
-            validPhone()
 
             if (agreeCheckBox.isChecked()) {
                 if(emailIsValid && passwordIsValid  && phoneNrIsValid ) {
-                    sendUserData(registerUserEmailString, registerUserPassString,registerUserPhoneNrString )
+                    sendUserData(registerUserEmail.toString(), registerUserPass.toString())
                 }
 
             }
         }
     }
 
-    //check if Email is valid
-    private fun emailFocusedListener() {
-        registerUserEmail.setOnFocusChangeListener { _, focused ->
-            if (!focused) {
-                RegisterErrorHelperString = validEmail()
-            }
-        }
-    }
 
+    // check if email is valid
     private fun validEmail(): String {
-        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches()) {
+        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmail.toString()).matches()) {
             emailIsValid = false;
             return "Invalid Email Address"
         }
@@ -95,18 +91,10 @@ class RegisterActivity : AppCompatActivity() {
         return ""
     }
 
-    //check if Pass is valid
-    private fun PasswordFocusedListener() {
-        registerUserPass.setOnFocusChangeListener { _, focused ->
-            if (!focused) {
-                RegisterErrorHelperString = validPassword()
-            }
-        }
-    }
+    //check if Password is valid
 
-    //check if Email is valid
     private fun validPassword(): String {
-        if(registerUserPassString.length < 8) {
+        if(registerUserPass.toString().length < 8) {
             passwordIsValid = false;
             return "Minimum 8 Characters Password!"
 
@@ -117,41 +105,13 @@ class RegisterActivity : AppCompatActivity() {
         return ""
     }
 
-    //check if Phone is valid
-    private fun phoneFocusedListener() {
-        registerUserPhoneNr.setOnFocusChangeListener { _, focused ->
-            if (!focused) {
-                RegisterErrorHelperString = validPhone()
-            }
-        }
-    }
-
-    //check if phonenr is valid
-    private fun validPhone() : String {
-        if(!registerUserPhoneNrString.matches(".*[0-9]".toRegex())){
-            phoneNrIsValid = false
-            return "Must Be all Digits"
-
-        }
-        if(registerUserPhoneNrString.length != 10) {
-            phoneNrIsValid = false
-            return "Must Be 10 Digits!"
-
-        }
-        else {
-            phoneNrIsValid = true;
-        }
-        return ""
-    }
-
-
     //function to send users' data to backend
 
-        private fun sendUserData (userEmail : String, userPass : String, userPhoneNr : String  ){
+        private fun sendUserData (userEmail : String, userPass : String){
         lifecycleScope.launch(Dispatchers.IO) {
             // handle request to backend.
             try {
-                val requestBody = UserDetails(userEmail, userPass, userPhoneNr)
+                val requestBody = UserDetails(userEmail, userPass)
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
                 if (response.isSuccessful) {
                     lifecycleScope.launch(Dispatchers.Main) {

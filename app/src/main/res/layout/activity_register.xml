@@ -50,21 +50,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginActivity_textView_title" />
 
-    <EditText
-        android:id="@+id/editTextPhone"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:ems="10"
-        android:hint="Phone Number"
-        android:inputType="phone"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginActivity_editText_email" />
+
 
     <EditText
         android:id="@+id/loginActivity_editText_password"
@@ -80,7 +66,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_editText_email" />
 
     <EditText
         android:id="@+id/editTextPasswordRepeat"
@@ -108,7 +94,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeat" />
 
     <TextView
-        android:id="@+id/loginActivity_textView_helper"
+        android:id="@+id/register_activity_valid_email_helper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -121,6 +107,21 @@
         app:layout_constraintBottom_toTopOf="@+id/buttonRegisterConfirm"
         app:layout_constraintTop_toBottomOf="@+id/checkBoxTosAgreement"
         />
+    <TextView
+        android:id="@+id/register_activity_valid_password_helper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-black"
+        android:text="error"
+        android:textColor="@android:color/primary_text_dark"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRegisterConfirm"
+        app:layout_constraintTop_toBottomOf="@+id/register_activity_valid_email_helper"
+        />
+
     <Button
         android:id="@+id/buttonRegisterConfirm"
         android:layout_width="0dp"
