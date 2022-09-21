@@ -1,6 +1,18 @@
 package com.flexicharge.bolt.api.flexicharge
+import okhttp3.Credentials
 
 class Chargers : ArrayList<Charger>()
+
+data class Credentials(
+    val username: String,
+    val password: String
+)
+data class LoginBody(
+    val accessToken: String,
+    val email : String,
+    val username: String,
+    val userID: String
+)
 
 data class Charger(
     val chargePointID: Int,
