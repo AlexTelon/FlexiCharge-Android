@@ -55,7 +55,7 @@ class SplashscreenActivity : AppCompatActivity() {
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivityForResult(intent, REQUEST_LOCATION)
         } else {
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             this.finish()
         }
     }
