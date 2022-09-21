@@ -25,41 +25,22 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-
         registerUserEmail            = findViewById<EditText>(R.id.loginActivity_editText_email)
         registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
         registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat)
-        registerEmailErrorHelper     = findViewById<EditText>(R.id.register_activity_valid_email_helper)
-        registerPasswordErrorHelper  = findViewById<EditText>(R.id.register_activity_valid_password_helper)
 
-        // check email valid
-        registerUserEmail.setOnFocusChangeListener { _, focused ->
-            if (!focused) {
-                registerEmailErrorHelper.text = validEmail()
-            }
-        }
-        // check pass valid
-        registerUserPass.setOnFocusChangeListener { _, focused ->
-            if (!focused) {
-                registerPasswordErrorHelper.text = validPassword()
-            }
-        }
 
         confirmRegistration(  )
     }
 
     var emailIsValid : Boolean = true;
     var passwordIsValid : Boolean = true;
-    var phoneNrIsValid : Boolean = true;
+    var passwordRepeatIsValid : Boolean = true;
 
     // first take the input from user
     lateinit var registerUserEmail          : EditText
     lateinit var registerUserPass           : EditText
     lateinit var registerUserRepeatPass     : EditText
-    // these two help with showing if email and password are valid
-    lateinit var registerEmailErrorHelper   : TextView
-    lateinit var registerPasswordErrorHelper   : TextView
-
 
 
     private fun confirmRegistration() {
@@ -69,9 +50,9 @@ class RegisterActivity : AppCompatActivity() {
         registerBtn.setOnClickListener {
             validEmail()
             validPassword()
-
+            validRepeatPassword()
             if (agreeCheckBox.isChecked()) {
-                if(emailIsValid && passwordIsValid  && phoneNrIsValid ) {
+                if(emailIsValid && passwordIsValid && passwordRepeatIsValid ) {
                     sendUserData(registerUserEmail.toString(), registerUserPass.toString())
                 }
 
@@ -81,30 +62,39 @@ class RegisterActivity : AppCompatActivity() {
 
 
     // check if email is valid
-    private fun validEmail(): String {
-        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmail.toString()).matches()) {
+    private fun validEmail() {
+        val registerUserEmailString = registerUserEmail.text.toString()
+        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches()) {
             emailIsValid = false;
-            return "Invalid Email Address"
+            registerUserEmail.setError("Invalid Email")
         }
-        else
+        else if(Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches()){
             emailIsValid = true;
-        return ""
+        }
+
     }
 
     //check if Password is valid
 
-    private fun validPassword(): String {
-        if(registerUserPass.toString().length < 8) {
+    private fun validPassword() {
+        if(registerUserPass.text.toString().length < 8) {
             passwordIsValid = false;
-            return "Minimum 8 Characters Password!"
-
+            registerUserPass.setError("Minimum 8 Characters")
         }
         else {
             passwordIsValid = true;
         }
-        return ""
     }
 
+    private fun validRepeatPassword(){
+        if(registerUserPass.text.toString() != registerUserRepeatPass.text.toString()){
+            passwordRepeatIsValid = false
+            registerUserRepeatPass.setError("Doesn't match!")
+        }
+        else {
+            passwordRepeatIsValid = true
+        }
+    }
     //function to send users' data to backend
 
         private fun sendUserData (userEmail : String, userPass : String){
@@ -122,7 +112,6 @@ class RegisterActivity : AppCompatActivity() {
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
                         Toast.makeText(this@RegisterActivity, "you are in else", Toast.LENGTH_LONG)
-
                     }
                 }
             } catch (e: HttpException) {

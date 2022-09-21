@@ -93,34 +93,6 @@
         app:layout_constraintStart_toStartOf="@+id/editTextPasswordRepeat"
         app:layout_constraintTop_toBottomOf="@+id/editTextPasswordRepeat" />
 
-    <TextView
-        android:id="@+id/register_activity_valid_email_helper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-black"
-        android:text="error"
-        android:textColor="@android:color/primary_text_dark"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/buttonRegisterConfirm"
-        app:layout_constraintTop_toBottomOf="@+id/checkBoxTosAgreement"
-        />
-    <TextView
-        android:id="@+id/register_activity_valid_password_helper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-black"
-        android:text="error"
-        android:textColor="@android:color/primary_text_dark"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/buttonRegisterConfirm"
-        app:layout_constraintTop_toBottomOf="@+id/register_activity_valid_email_helper"
-        />
 
     <Button
         android:id="@+id/buttonRegisterConfirm"
