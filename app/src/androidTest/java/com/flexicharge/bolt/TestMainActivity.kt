@@ -41,7 +41,6 @@ class TestMainActivity {
         activityScenario.onActivity { activity ->
             for(i in 0 .. 999999) {
                 val idString = getIdString(i)
-                //println("Validating charger id %s (%d)".format(idString, i))
                 assert(activity.validateChargerId(idString))
             }
 
