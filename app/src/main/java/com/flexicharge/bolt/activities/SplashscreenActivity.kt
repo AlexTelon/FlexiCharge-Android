@@ -1,6 +1,7 @@
 package com.flexicharge.bolt.activities
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.flexicharge.bolt.R
@@ -20,6 +22,22 @@ class SplashscreenActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
         }, 1000)
+
+        //if the app is newly installed (user not logged in), this should happen.
+        initializeLoginSharedPreference()
+        //otherwise, check if the user has been logged in
+        //TODO: act if the user logged in
+    }
+
+    private fun initializeLoginSharedPreference() {
+        Log.d("sharedoPre", "splash called")
+        val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.apply {
+            putString("accessToken", " ")
+            putString("userId", " ")
+            putInt("isLoggedIn", 0)
+        }.apply()
     }
 
     private val permissionRequestCode = 521
