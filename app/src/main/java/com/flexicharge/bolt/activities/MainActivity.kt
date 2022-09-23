@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun unixToDateTime(unixTime: String) : String {
+    public fun unixToDateTime(unixTime: String) : String {
         val sdf = SimpleDateFormat("MM/dd/HH:mm")
         val GMTOffset = TimeZone.getTimeZone("Europe/Stockholm")
         val netDate = Date(unixTime.toLong() * 1000)
@@ -645,7 +645,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun validateChargerId(chargerId: String): Boolean {
+    public fun validateChargerId(chargerId: String): Boolean {
         if (chargerId.length != 6) {
             return false
         }
