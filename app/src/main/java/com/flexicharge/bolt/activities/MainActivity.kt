@@ -43,10 +43,7 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.DecimalFormat
@@ -100,9 +97,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 setupChargerInputDialog()
             }
             else {
-                updateChargerList()
-                updateChargePointList()
-                setupChargerInputDialog()
+                updateChargerList().invokeOnCompletion {
+                    updateChargePointList().invokeOnCompletion {
+                        setupChargerInputDialog()
+                    }
+                }
             }
         }
 
@@ -206,11 +205,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private suspend fun updateCurrentTransaction() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val response = RetrofitInstance.flexiChargeApi.getTransaction(currentTransaction.transactionID)
+    private fun updateCurrentTransaction(transactionID: Int) : Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
+            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionID)
             if (!response.isSuccessful) {
-                throw HttpException(response)
+                cancel("Could not fetch transaction!")
             } else {
                 currentTransaction = response.body() as Transaction
             }
@@ -222,7 +221,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargerInputDialog.dismiss()
         }
 
-        updateChargerList()
         val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
         val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
@@ -268,9 +266,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             GlobalScope.launch {
                 while (percent < 100 && continueLooping) {
                     try {
-                        updateCurrentTransaction()
+                        updateCurrentTransaction(currentTransaction.transactionID)
                     }
                     catch (e: Exception) {
+                        chargingTimeStatus.text = e.message
                         chargeSpeed.text = e.message
                         delay(delayBetweenUpdatesMs)
                         continue
@@ -405,8 +404,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
         }
 
-
-
         // Only add decoration on first-time display
         if( listOfChargersRecyclerView.itemDecorationCount == 0) {
             listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
@@ -445,8 +442,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun updateChargePointList() {
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun updateChargePointList() : Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getChargePointList()
                 if (response.isSuccessful) {
@@ -466,8 +463,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun updateChargerList() {
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun updateChargerList() : Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
                 if (response.isSuccessful) {                                    // , getting data from API?
@@ -675,28 +672,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
 
-        if (transactionId != -1) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
-                    if (response.isSuccessful) {
-                        //TODO Backend Klarna/Order/Session Request if successful
-                        currentTransaction = response.body() as Transaction
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            setupChargingInProgressDialog()
-                        }
+        if (transactionId == -1) {
+            return
+        }
+
+        updateCurrentTransaction(transactionId).invokeOnCompletion {
+            updateChargerList().invokeOnCompletion {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    try {
+                        setupChargingInProgressDialog()
                     }
-                    else {
-
+                    catch (e: Exception) {
+                        Toast.makeText(applicationContext, e.message + " : " + e.cause, Toast.LENGTH_LONG).show()
                     }
-                } catch (e: HttpException) {
-
-                } catch (e: IOException) {
-
                 }
             }
         }
+
     }
+
     private fun showCheckout(bool: Boolean, chargePointId: Int, showPayment: Boolean, chargerId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargePoints_near_me_layout)
