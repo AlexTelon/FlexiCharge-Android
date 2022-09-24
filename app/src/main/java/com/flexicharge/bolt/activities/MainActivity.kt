@@ -56,7 +56,6 @@ import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
-
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
@@ -207,10 +206,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    private suspend fun updateCurrentTransaction() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val response = RetrofitInstance.flexiChargeApi.getTransaction(currentTransaction.transactionID)
+            if (!response.isSuccessful) {
+                throw HttpException(response)
+            } else {
+                currentTransaction = response.body() as Transaction
+            }
+        }
+    }
 
     private suspend fun setupChargingInProgressDialog() {
         if (this::chargerInputDialog.isInitialized) {
             chargerInputDialog.dismiss()
+        }
+
+        updateChargerList()
+        val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
+        val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
+
+        if(charger == null || chargePoint == null) {
+            throw Exception("Tried to display charging information for a charger that doesn't exist.")
         }
 
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
@@ -223,7 +240,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
         val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
-
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.behavior.isDraggable = false;
@@ -241,45 +257,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
 
-        updateChargerList()
-        val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
-        val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
-
-        if(charger == null || chargePoint == null) {
-            throw Exception("Tried to display charging information for a charger that doesn't exist.")
-        }
-
         if (!currentTransaction.paymentConfirmed) {
-            chargingLocation.text = chargePoint.name
             val df = DecimalFormat("#.##")
             //val distanceStr = df.format(currentTransaction.kwhTransfered/100).toString()
-            chargeSpeed.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
             var percent = initialPercentage
+            val delayBetweenUpdatesMs : Long = 2000
+
+            chargingLocation.text = chargePoint.name
+            chargeSpeed.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
             GlobalScope.launch {
                 while (percent < 100 && continueLooping) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val response = RetrofitInstance.flexiChargeApi.getTransaction(currentTransaction.transactionID)
-                        if (response.isSuccessful) {
-                            currentTransaction = response.body() as Transaction
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                if (currentTransaction.currentChargePercentage != null)
-                                    percent = currentTransaction.currentChargePercentage
-                                progressbar.progress = percent
-                                progressbarPercent.text = percent.toString()
-                                chargeSpeed.text = currentTransaction.kwhTransfered.toString() + " kWh"
-
-                                var minutesLeft = (100 - percent) / 60
-                                var secondsLeft = (100 - percent) % 60
-                                var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
-                                chargingTimeStatus.text = timeString + " until fully charged"
-                            }
-                        }
+                    try {
+                        updateCurrentTransaction()
                     }
+                    catch (e: Exception) {
+                        chargeSpeed.text = e.message
+                        delay(delayBetweenUpdatesMs)
+                        continue
+                    }
+
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        percent = currentTransaction.currentChargePercentage
+                        progressbar.progress = percent
+                        progressbarPercent.text = percent.toString()
+                        chargeSpeed.text = currentTransaction.kwhTransfered.toString() + " kWh"
+
+                        val minutesLeft = (100 - percent) / 60
+                        val secondsLeft = (100 - percent) % 60
+                        val timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
+                        chargingTimeStatus.text = timeString + " until fully charged"
+                    }
+
                     Log.d("tag", percent.toString())
-                    delay(2000)
-                }
-                if (percent == 100) {
-                    stopChargingProcess(initialPercentage, bottomSheetDialog)
+                    if (percent == 100) {
+                        stopChargingProcess(initialPercentage, bottomSheetDialog)
+                    }
+                    else {
+                        delay(delayBetweenUpdatesMs)
+                    }
                 }
             }
         }
