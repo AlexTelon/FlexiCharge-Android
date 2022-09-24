@@ -209,10 +209,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
     private suspend fun setupChargingInProgressDialog() {
-        //TODO Populate and update frequently from transaction
         if (this::chargerInputDialog.isInitialized) {
             chargerInputDialog.dismiss()
         }
+
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
             R.layout.layout_charger_in_progress,
@@ -231,10 +231,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         var continueLooping = true;
 
-        var initialPercentage = 0
-        if (currentTransaction.currentChargePercentage != null) {
-            initialPercentage = currentTransaction.currentChargePercentage
-        }
+        val initialPercentage = currentTransaction.currentChargePercentage
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
             continueLooping = false
@@ -244,9 +241,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
 
+        updateChargerList()
+        val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
+        val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
-        var charger = chargers.filter { it.chargerID == currentTransaction.chargerID }[0]
-        var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
+        if(charger == null || chargePoint == null) {
+            throw Exception("Tried to display charging information for a charger that doesn't exist.")
+        }
 
         if (!currentTransaction.paymentConfirmed) {
             chargingLocation.text = chargePoint.name
