@@ -132,9 +132,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()       //, for your activity to start interacting with the user.
         fetchLocation(this)
-        updateChargerList()
-        updateChargePointList()
-        checkPendingTransaction()
+        updateChargerList().invokeOnCompletion {
+            updateChargePointList().invokeOnCompletion {
+                checkPendingTransaction()
+            }
+        }
     }
 
     override fun changeInput(newInput: String){
@@ -677,16 +679,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         updateCurrentTransaction(transactionId).invokeOnCompletion {
-            updateChargerList().invokeOnCompletion {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    try {
-                        setupChargingInProgressDialog()
-                    }
-                    catch (e: Exception) {
-                        Toast.makeText(applicationContext, e.message + " : " + e.cause, Toast.LENGTH_LONG).show()
-                    }
+            lifecycleScope.launch(Dispatchers.Main) {
+                try {
+                    setupChargingInProgressDialog()
+                }
+                catch (e: Exception) {
+                    Toast.makeText(applicationContext, e.message + " : " + e.cause, Toast.LENGTH_LONG).show()
                 }
             }
+
         }
 
     }
