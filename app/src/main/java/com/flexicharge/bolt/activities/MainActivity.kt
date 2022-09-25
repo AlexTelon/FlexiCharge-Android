@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
@@ -414,23 +415,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {       // display the chargers near u
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
-        listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
-        if (this::chargePoints.isInitialized) {
-            var distanceToChargePoint = mutableListOf<String>()
-            var chargerCount = mutableListOf<Int>()
-
-            chargePoints.forEachIndexed { index, chargePoint ->
-                var dist = FloatArray(1)
-                Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
-                val df = DecimalFormat("#.##")
-                val distanceStr = df.format(dist[0] / 1000).toString()
-                val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                distanceToChargePoint.add(distanceStr)
-                chargerCount.add(count)
-            }
-            listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint, chargerCount)
-        }
-        //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
         if (listOfChargePointsRecyclerView.visibility == View.GONE) {
@@ -442,6 +426,38 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             listOfChargePointsRecyclerView.visibility = View.GONE
             chargePointsNearMe.visibility = View.VISIBLE
         }
+        listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
+        updateChargePointList().invokeOnCompletion {
+            if (this::chargePoints.isInitialized) {
+                val distanceToChargePoint = mutableListOf<String>()
+                val chargerCount = mutableListOf<Int>()
+
+                chargePoints.forEachIndexed { index, chargePoint ->
+                    val dist = FloatArray(1)
+                    var couldGetLocation = true
+                    try {
+                        Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+                    }
+                    catch (e: UninitializedPropertyAccessException) {
+                        dist[0] = 0f
+                        couldGetLocation = false
+                    }
+
+                    val df = DecimalFormat("#.##")
+                    val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
+                        "?"
+                    }
+
+                    val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                    distanceToChargePoint.add(distanceStr)
+                    chargerCount.add(count)
+                }
+                lifecycleScope.launch(Dispatchers.Main) {
+                    listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this@MainActivity, distanceToChargePoint, chargerCount)
+                }
+            }
+        }
+        //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
     }
 
     private fun updateChargePointList() : Job {
