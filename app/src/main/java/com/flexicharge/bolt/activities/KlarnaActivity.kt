@@ -112,7 +112,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         if (authToken != null) {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
-                    val requestBody = TransactionOrder(authToken!!, transactionId)
+                    val requestBody = TransactionOrder(transactionId, authToken!!)
                     val response = RetrofitInstance.flexiChargeApi.transactionStart(transactionId, requestBody)
                     if (response.isSuccessful) {
                         //TODO Backend Klarna/Order/Session Request if successful
@@ -123,10 +123,17 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                             finish()
                         }
                     } else {
+                        //TODO Don't fake a successful transaction
+                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().apply() { putInt("TransactionId", transactionId) }.apply()
+
+                        /* Actual expected behaviour:
                         lifecycleScope.launch(Dispatchers.Main) {
                             authorizeButton.text = "Transaction Failed, try again!"
                         }
-                        //finish()
+                        */
+
+                        finish()
                     }
                 } catch (e: HttpException) {
 
