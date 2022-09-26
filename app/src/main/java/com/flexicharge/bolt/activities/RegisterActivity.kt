@@ -3,12 +3,14 @@ package com.flexicharge.bolt.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserDetails
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
             validRepeatPassword()
             if (agreeCheckBox.isChecked()) {
                 if(emailIsValid && passwordIsValid && passwordRepeatIsValid ) {
-                    sendUserData(registerUserEmail.toString(), registerUserPass.toString())
+                    sendUserData(registerUserEmail.text.toString(), registerUserPass.text.toString())
                 }
 
             }
@@ -104,12 +106,12 @@ class RegisterActivity : AppCompatActivity() {
                 val requestBody = UserDetails(userEmail, userPass)
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
                 if (response.isSuccessful) {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        // Proceed to MainActivity upon confirmation
-                        val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                    lifecycleScope.launch( Dispatchers.Main) {
+                        val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                         startActivity(intent)
-                    }
-                } else {
+                   }
+                }
+                else {
                     lifecycleScope.launch(Dispatchers.Main) {
                         Toast.makeText(this@RegisterActivity, "you are in else", Toast.LENGTH_LONG)
                     }
@@ -118,23 +120,13 @@ class RegisterActivity : AppCompatActivity() {
                 lifecycleScope.launch(Dispatchers.Main) {
                     Toast.makeText(this@RegisterActivity, "you are in HTTP Exception", Toast.LENGTH_LONG)
                 }
-            } catch (e: IOException) {
-                Toast.makeText(this@RegisterActivity, "you are in IO Exception", Toast.LENGTH_LONG)
+            } catch (e: IOException) {lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(this@RegisterActivity, e.message, Toast.LENGTH_LONG)
+                }
             }
         }
         }
-        // Handle Backend Reply
 
-
-
-
-
-
-
-    fun goToSignIn(view: View) {
-        //Go to sign in activity
-        startActivity(Intent(this, LoginActivity::class.java))
-    }
     fun continueAsGuest(view: View) {
         //Continue to MainActivity
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)

@@ -52,8 +52,8 @@ interface ApiInterface {
     suspend fun signIn(@Body body: Credentials): Response<LoginBody>
 
     // post request to store new users' data into database
-    @POST("users")
-    fun registerNewUser (@Body body: UserDetails) : Response<UserDetailsGotten>
+    @POST("/auth/sign-up")
+    suspend fun registerNewUser (@Body body: UserDetails) : Response<Unit>
 
 
 

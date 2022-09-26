@@ -61,14 +61,14 @@ data class TransactionOrder(
 )
 // Every user has his own email, password and phone nr
 class UserDetails(
-    val userEmail : String,
-    val userPass : String
+    val username : String,
+    val password : String
 )
 
 
 class UserDetailsGotten(
-    val userId : Int,
-    val userEmail : String,
-    val userPass : String
+    val message : String,
+    val code : String,
+    val statusCode : Int
 )
 
