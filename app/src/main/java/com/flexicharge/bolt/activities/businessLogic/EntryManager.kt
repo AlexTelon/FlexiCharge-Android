@@ -15,7 +15,7 @@ import java.io.IOException
 class EntryManager: AppCompatActivity() {
     private val loginBody = LoginBody("","","","")
 
-    fun singUp(
+    fun singIn(
         username: String,
         password: String,
         callback: (LoginBody, message: String, isOK: Boolean) -> Unit
