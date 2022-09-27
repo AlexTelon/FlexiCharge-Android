@@ -59,11 +59,17 @@ data class TransactionOrder(
     val transactionID: Int,
     val authorization_token: String
 )
-// Every user has his own email, password and phone nr
+// Every user has his own email, password
 class UserDetails(
     val username : String,
     val password : String
 )
+
+class VerificationDetails (
+    val username : String,
+    val code : String
+)
+
 
 
 class UserDetailsGotten(

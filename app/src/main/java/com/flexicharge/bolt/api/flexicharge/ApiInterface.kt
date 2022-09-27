@@ -56,7 +56,8 @@ interface ApiInterface {
     suspend fun registerNewUser (@Body body: UserDetails) : Response<Unit>
 
 
-
+    @POST("/auth/verify")
+    suspend fun verifyEmail(@Body body: VerificationDetails)
 
 
 }

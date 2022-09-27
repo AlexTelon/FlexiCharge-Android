@@ -107,7 +107,7 @@ class RegisterActivity : AppCompatActivity() {
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
                 if (response.isSuccessful) {
                     lifecycleScope.launch( Dispatchers.Main) {
-                        val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                        val intent = Intent(this@RegisterActivity, VerifyActivity::class.java)
                         startActivity(intent)
                    }
                 }
