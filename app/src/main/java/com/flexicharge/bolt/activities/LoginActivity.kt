@@ -26,18 +26,17 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val email =  findViewById<EditText>(R.id.loginActivity_editText_email)
-        val password2 = findViewById<EditText>(R.id.loginActivity_editText_password)
+        val emailEditText = binding.loginActivityEditTextEmail
+        val passwordEditText = binding.loginActivityEditTextPassword
 
-        validateUserInput(email, "isEmail")
-        validateUserInput(password2, "isPass")
+        validateUserInput(emailEditText, "isEmail")
+        validateUserInput(passwordEditText, "isPass")
 
         binding.loginActivityButtonLogout.setOnClickListener {
-            username = binding.loginActivityEditTextEmail.text.toString()
-            password = binding.loginActivityEditTextPassword.text.toString()
+            username = emailEditText.text.toString()
+            password = passwordEditText.text.toString()
             entryManager.singIn(username, password) { loginBody, message, isOK ->
                 if (isOK) {
-                    Log.d("sharedoPre", loginBody.accessToken.toString())
                     navigateToMain(loginBody.accessToken, loginBody.userID, loginBody.username, loginBody.email)
                 }
                 else {
@@ -51,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun validateUserInput(field: EditText, isWhat: String): Boolean {
-        val loginButton = findViewById<Button>(R.id.loginActivity_button_logout)
+        val loginButton = binding.loginActivityButtonLogout
         var valid = false
         field.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
