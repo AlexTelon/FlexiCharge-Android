@@ -91,16 +91,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         binding.mainActivityButtonIdentifyCharger.setOnClickListener {
             setupChargerInputDialog()
-            /*if (this::chargePoints.isInitialized) {
-                setupChargerInputDialog()
-            }
-            else {
-                updateChargerList().invokeOnCompletion {
-                    updateChargePointList().invokeOnCompletion {
-                        setupChargerInputDialog()
-                    }
-                }
-            }*/
         }
 
         val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
@@ -491,30 +481,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         return lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
-                if (response.isSuccessful) {                                    // , getting data from API?
-                    val chargers = response.body() as Chargers
-                    if (!chargers.isEmpty()) {
-                        this@MainActivity.chargers = response.body() as Chargers
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            addNewMarkers(this@MainActivity, chargers, fun (charger: Charger?) : Boolean {
-                                if(charger != null && validateChargerId(charger.chargerID.toString())) {
-                                    lifecycleScope.launch(Dispatchers.Main) {
-                                        setupChargerInputDialog()
-                                        changeInput(charger.chargerID.toString())
-                                    }
-                                }
-                                return false;
-                            })
-                        }
-                    }
-                    else {
-                        this@MainActivity.chargers = Chargers()
-                    }
+                if (!response.isSuccessful) {
+                    cancel("Failed retrieving chargers")
                 }
+                val chargers = response.body() as Chargers
+                lifecycleScope.launch(Dispatchers.Main) {
+                    this@MainActivity.chargers = response.body() as Chargers
+                    addNewMarkers(this@MainActivity, chargers, fun (charger: Charger?) : Boolean {
+                        if(charger != null && validateChargerId(charger.chargerID.toString())) {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                setupChargerInputDialog()
+                                changeInput(charger.chargerID.toString())
+                            }
+                        }
+                        return false;
+                    })
+                }
+
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Http Error")
+                cancel(e.message())
             } catch (e: IOException) {
                 Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
+                cancel(e.toString())
             }
         }
     }
@@ -566,6 +555,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestParams: MutableMap<String, String> = HashMap()
+                requestParams.put("chargerId", chargerId.toString())
                 requestParams.put("connectorId", "1")
                 requestParams.put("idTag", "1")
                 requestParams.put("reservationId", "1")
