@@ -75,7 +75,4 @@ class UserDetailsGotten(
     val code : String,
     val statusCode : Int
 )
-
-class VerificationResponse (
-    val statusCode: Int
-)
+L

@@ -32,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
         registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
         registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat)
 
-        
+
         confirmRegistration(  )
     }
 
