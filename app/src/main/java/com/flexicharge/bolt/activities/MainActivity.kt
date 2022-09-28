@@ -370,13 +370,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             showCheckout(false, -1, false, -1)
         }
 
-        setupChargerInput(bottomSheetView)
+        setupChargerInput()
 
         chargerInputDialog.setContentView(bottomSheetView)
         chargerInputDialog.show()
     }
 
-    private fun setupChargerInput(bottomSheetView: View) {      // act when the charger's number is written
+    private fun setupChargerInput() {
+        // act when the charger's number is written
+        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
+            R.layout.layout_charger_input,
+            findViewById<ConstraintLayout>(R.id.chargerInputLayout)
+        )
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
         chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
         pinView.doOnTextChanged { text, start, before, count ->
@@ -465,6 +470,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+
     private fun updateChargerList() : Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -474,7 +480,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     if (!chargers.isEmpty()) {
                         this@MainActivity.chargers = response.body() as Chargers
                         lifecycleScope.launch(Dispatchers.Main) {
-                            addNewMarkers(this@MainActivity, chargers)
+                            addNewMarkers(this@MainActivity, chargers, fun (charger: Charger) : Boolean {
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    setupChargerInput()
+                                    displayChargerStatus(charger.chargerID, chargerInputStatus)
+
+                                }
+                                return false;
+                            })
                         }
                     }
                     else {
