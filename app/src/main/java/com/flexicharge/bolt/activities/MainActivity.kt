@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
-import android.os.Looper
 import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
@@ -91,7 +90,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         mapFragment.getMapAsync(this)
 
         binding.mainActivityButtonIdentifyCharger.setOnClickListener {
-            if (this::chargePoints.isInitialized) {
+            setupChargerInputDialog()
+            /*if (this::chargePoints.isInitialized) {
                 setupChargerInputDialog()
             }
             else {
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         setupChargerInputDialog()
                     }
                 }
-            }
+            }*/
         }
 
         val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
@@ -354,8 +354,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun setupChargerInputDialog() {
-        //updateChargerList()
-        //updateChargePointList()
 
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
@@ -376,18 +374,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             showCheckout(false, -1, false, -1)
         }
 
-        setupChargerInput()
+        setupChargerInput(bottomSheetView)
 
         chargerInputDialog.setContentView(bottomSheetView)
         chargerInputDialog.show()
     }
 
-    private fun setupChargerInput() {
-        // act when the charger's number is written
-        val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
-            R.layout.layout_charger_input,
-            findViewById<ConstraintLayout>(R.id.chargerInputLayout)
-        )
+    private fun setupChargerInput(bottomSheetView: View) {
+
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
         chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
         pinView.doOnTextChanged { text, start, before, count ->
@@ -402,6 +396,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 }
             }
         }
+
     }
 
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
@@ -501,14 +496,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     if (!chargers.isEmpty()) {
                         this@MainActivity.chargers = response.body() as Chargers
                         lifecycleScope.launch(Dispatchers.Main) {
-                            addNewMarkers(this@MainActivity, chargers, fun (charger: Charger) : Boolean {
-                                updateChargerList().invokeOnCompletion {
-                                    updateChargePointList().invokeOnCompletion {
-                                        lifecycleScope.launch(Dispatchers.Main) {
-                                            setupChargerInput()
-                                            setupChargerInputDialog()
-                                            displayChargerStatus(charger.chargerID, chargerInputStatus)
-                                        }
+                            addNewMarkers(this@MainActivity, chargers, fun (charger: Charger?) : Boolean {
+                                if(charger != null && validateChargerId(charger.chargerID.toString())) {
+                                    lifecycleScope.launch(Dispatchers.Main) {
+                                        setupChargerInputDialog()
+                                        changeInput(charger.chargerID.toString())
                                     }
                                 }
                                 return false;

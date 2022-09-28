@@ -91,21 +91,25 @@ object MapHelper {
             )
     }
 
-    fun addNewMarkers(activity: MainActivity, chargers: Chargers, onTapMarker: (Charger) -> Boolean){
+    fun addNewMarkers(activity: MainActivity, chargers: Chargers, onTapMarker: (Charger?) -> Boolean){
         val blackIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
 
+        val markerIdToChargerMap = mutableMapOf<String, Charger>()
+
         chargers.forEach { charger ->
             val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
-            mMap.setOnMarkerClickListener {
-                onTapMarker(charger)
+            markerIdToChargerMap[marker.id] = charger
+            when (charger.status) {
+                "Available" -> marker.setIcon(greenIcon)
+                "Faulted" -> marker.setIcon(blackIcon)
+                else -> marker.setIcon(redIcon)
             }
+        }
 
-            if(charger.status == "Available") marker.setIcon(greenIcon)
-            else if (charger.status == "Faulted" ) marker.setIcon(blackIcon)
-            else marker.setIcon(redIcon)
-
+        mMap.setOnMarkerClickListener {
+            onTapMarker(markerIdToChargerMap[it.id])
         }
     }
 
