@@ -76,3 +76,6 @@ class UserDetailsGotten(
     val statusCode : Int
 )
 
+class VerificationResponse (
+    val statusCode: Int
+)

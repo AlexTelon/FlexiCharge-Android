@@ -57,7 +57,7 @@ interface ApiInterface {
 
 
     @POST("/auth/verify")
-    suspend fun verifyEmail(@Body body: VerificationDetails)
+    suspend fun verifyEmail(@Body body: VerificationDetails) : Response<VerificationResponse>
 
 
 }

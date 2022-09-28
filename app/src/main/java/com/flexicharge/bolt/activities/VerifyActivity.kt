@@ -29,8 +29,8 @@ class VerifyActivity : AppCompatActivity() {
     private lateinit var verificationCode : EditText
     private lateinit var verificationEmail : EditText
 
-    fun confirmVerification(){
-        var verifyBtn = findViewById<Button>(R.id.buttonVerify)
+    private fun confirmVerification(){
+        val verifyBtn = findViewById<Button>(R.id.buttonVerify)
 
         verifyBtn.setOnClickListener {
             verifyUser(verificationEmail.text.toString(), verificationCode.text.toString())
@@ -52,15 +52,15 @@ class VerifyActivity : AppCompatActivity() {
                 }
                 else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        Toast.makeText(this@VerifyActivity, "Code Invalid, Try Again", Toast.LENGTH_LONG)
+                        Toast.makeText(this@VerifyActivity, "Code Invalid, Try Again", Toast.LENGTH_LONG).show()
                     }
                 }
             } catch (e: HttpException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    Toast.makeText(this@VerifyActivity, "you are in HTTP Exception", Toast.LENGTH_LONG)
+                    Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG).show()
                 }
             } catch (e: IOException) {lifecycleScope.launch(Dispatchers.Main) {
-                Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG)
+                Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG).show()
                 }
             }
         }

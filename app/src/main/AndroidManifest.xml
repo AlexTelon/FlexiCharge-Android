@@ -64,6 +64,10 @@
             android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
+            android:name=".activities.VerifyActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".activities.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"/>
