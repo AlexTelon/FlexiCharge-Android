@@ -10,6 +10,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.flexicharge.bolt.api.flexicharge.Chargers
 import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.api.flexicharge.Charger
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -90,16 +91,21 @@ object MapHelper {
             )
     }
 
-    fun addNewMarkers(activity: MainActivity, chargers: Chargers){
+    fun addNewMarkers(activity: MainActivity, chargers: Chargers, onTapMarker: (Charger) -> Boolean){
         val blackIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
 
-        chargers.forEach {
-            val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location[0], it.location[1])).title(it.chargerID.toString()))
-            if(it.status == "Available") marker.setIcon(greenIcon)
-            else if (it.status == "Faulted" ) marker.setIcon(blackIcon)
+        chargers.forEach { charger ->
+            val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
+            mMap.setOnMarkerClickListener {
+                onTapMarker(charger)
+            }
+
+            if(charger.status == "Available") marker.setIcon(greenIcon)
+            else if (charger.status == "Faulted" ) marker.setIcon(blackIcon)
             else marker.setIcon(redIcon)
+
         }
     }
 
