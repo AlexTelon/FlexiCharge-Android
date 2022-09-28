@@ -3,6 +3,7 @@ package com.flexicharge.bolt.helpers
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,16 +17,15 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import java.lang.Exception
 
 object MapHelper {
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var currentLocation: Location
     lateinit var mMap: GoogleMap
+
+    private var markerToChargerMap = mutableMapOf<Marker, Charger>()
     const val LOCATION_PERMISSION_REQUEST_CODE = 1
     const val PERMISSION_CODE = 101
 
@@ -96,11 +96,13 @@ object MapHelper {
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
 
-        val markerIdToChargerMap = mutableMapOf<String, Charger>()
+        markerToChargerMap.keys.forEach{
+            it.remove()
+        }
 
         chargers.forEach { charger ->
             val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
-            markerIdToChargerMap[marker.id] = charger
+            markerToChargerMap[marker] = charger
             when (charger.status) {
                 "Available" -> marker.setIcon(greenIcon)
                 "Faulted" -> marker.setIcon(blackIcon)
@@ -109,7 +111,8 @@ object MapHelper {
         }
 
         mMap.setOnMarkerClickListener {
-            onTapMarker(markerIdToChargerMap[it.id])
+            Log.d("mapHelper", "Marker clicked: " + it.id)
+            onTapMarker(markerToChargerMap[it])
         }
     }
 
