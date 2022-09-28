@@ -8,6 +8,7 @@ import android.util.Patterns
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.EntryManager
@@ -31,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
         registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
         registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat)
 
-
+        
         confirmRegistration(  )
     }
 
@@ -126,6 +127,10 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
         }
+    fun goToSignIn(view: View) {
+        //Go to sign in activity
+        startActivity(Intent(this, LoginActivity::class.java))
+    }
 
     fun continueAsGuest(view: View) {
         //Continue to MainActivity
