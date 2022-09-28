@@ -43,10 +43,7 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.DecimalFormat
@@ -56,7 +53,6 @@ import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
-
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
     private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
@@ -101,9 +97,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 setupChargerInputDialog()
             }
             else {
-                updateChargerList()
-                updateChargePointList()
-                setupChargerInputDialog()
+                updateChargerList().invokeOnCompletion {
+                    updateChargePointList().invokeOnCompletion {
+                        setupChargerInputDialog()
+                    }
+                }
             }
         }
 
@@ -134,9 +132,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()       //, for your activity to start interacting with the user.
         fetchLocation(this)
-        updateChargerList()
-        updateChargePointList()
-        checkPendingTransaction()
+        updateChargerList().invokeOnCompletion {
+            updateChargePointList().invokeOnCompletion {
+                checkPendingTransaction()
+            }
+        }
     }
 
     override fun changeInput(newInput: String){
@@ -207,12 +207,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    private fun updateCurrentTransaction(transactionID: Int) : Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
+            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionID)
+            if (!response.isSuccessful) {
+                cancel("Could not fetch transaction!")
+            } else {
+                currentTransaction = response.body() as Transaction
+            }
+        }
+    }
 
     private suspend fun setupChargingInProgressDialog() {
-        //TODO Populate and update frequently from transaction
         if (this::chargerInputDialog.isInitialized) {
             chargerInputDialog.dismiss()
         }
+
+        val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
+        val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
+
+        if(charger == null || chargePoint == null) {
+            throw Exception("Tried to display charging information for a charger that doesn't exist.")
+        }
+
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
             R.layout.layout_charger_in_progress,
@@ -224,17 +241,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
 
-
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.behavior.isDraggable = false;
         bottomSheetDialog.setCancelable(false)
 
         var continueLooping = true;
 
-        var initialPercentage = 0
-        if (currentTransaction.currentChargePercentage != null) {
-            initialPercentage = currentTransaction.currentChargePercentage
-        }
+        val initialPercentage = currentTransaction.currentChargePercentage
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
             continueLooping = false
@@ -244,41 +257,45 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
 
-
-        var charger = chargers.filter { it.chargerID == currentTransaction.chargerID }[0]
-        var chargePoint = chargePoints.filter { it.chargePointID == charger.chargePointID }[0]
-
         if (!currentTransaction.paymentConfirmed) {
-            chargingLocation.text = chargePoint.name
             val df = DecimalFormat("#.##")
             //val distanceStr = df.format(currentTransaction.kwhTransfered/100).toString()
-            chargeSpeed.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
             var percent = initialPercentage
+            val delayBetweenUpdatesMs : Long = 2000
+
+            chargingLocation.text = chargePoint.name
+            chargeSpeed.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
             GlobalScope.launch {
                 while (percent < 100 && continueLooping) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val response = RetrofitInstance.flexiChargeApi.getTransaction(currentTransaction.transactionID)
-                        if (response.isSuccessful) {
-                            currentTransaction = response.body() as Transaction
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                if (currentTransaction.currentChargePercentage != null)
-                                    percent = currentTransaction.currentChargePercentage
-                                progressbar.progress = percent
-                                progressbarPercent.text = percent.toString()
-                                chargeSpeed.text = currentTransaction.kwhTransfered.toString() + " kWh"
-
-                                var minutesLeft = (100 - percent) / 60
-                                var secondsLeft = (100 - percent) % 60
-                                var timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
-                                chargingTimeStatus.text = timeString + " until fully charged"
-                            }
-                        }
+                    try {
+                        updateCurrentTransaction(currentTransaction.transactionID)
                     }
+                    catch (e: Exception) {
+                        chargingTimeStatus.text = e.message
+                        chargeSpeed.text = e.message
+                        delay(delayBetweenUpdatesMs)
+                        continue
+                    }
+
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        percent = currentTransaction.currentChargePercentage
+                        progressbar.progress = percent
+                        progressbarPercent.text = percent.toString()
+                        chargeSpeed.text = currentTransaction.kwhTransfered.toString() + " kWh"
+
+                        val minutesLeft = (100 - percent) / 60
+                        val secondsLeft = (100 - percent) % 60
+                        val timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
+                        chargingTimeStatus.text = timeString + " until fully charged"
+                    }
+
                     Log.d("tag", percent.toString())
-                    delay(2000)
-                }
-                if (percent == 100) {
-                    stopChargingProcess(initialPercentage, bottomSheetDialog)
+                    if (percent == 100) {
+                        stopChargingProcess(initialPercentage, bottomSheetDialog)
+                    }
+                    else {
+                        delay(delayBetweenUpdatesMs)
+                    }
                 }
             }
         }
@@ -389,8 +406,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
         }
 
-
-
         // Only add decoration on first-time display
         if( listOfChargersRecyclerView.itemDecorationCount == 0) {
             listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
@@ -429,8 +444,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun updateChargePointList() {
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun updateChargePointList() : Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getChargePointList()
                 if (response.isSuccessful) {
@@ -450,8 +465,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun updateChargerList() {
-        lifecycleScope.launch(Dispatchers.IO) {
+    private fun updateChargerList() : Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
                 if (response.isSuccessful) {                                    // , getting data from API?
@@ -659,28 +674,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
 
-        if (transactionId != -1) {
-            lifecycleScope.launch(Dispatchers.IO) {
+        if (transactionId == -1) {
+            return
+        }
+
+        updateCurrentTransaction(transactionId).invokeOnCompletion {
+            lifecycleScope.launch(Dispatchers.Main) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
-                    if (response.isSuccessful) {
-                        //TODO Backend Klarna/Order/Session Request if successful
-                        currentTransaction = response.body() as Transaction
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            setupChargingInProgressDialog()
-                        }
-                    }
-                    else {
-
-                    }
-                } catch (e: HttpException) {
-
-                } catch (e: IOException) {
-
+                    setupChargingInProgressDialog()
+                }
+                catch (e: Exception) {
+                    Toast.makeText(applicationContext, e.message + " : " + e.cause, Toast.LENGTH_LONG).show()
                 }
             }
+
         }
+
     }
+
     private fun showCheckout(bool: Boolean, chargePointId: Int, showPayment: Boolean, chargerId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargePoints_near_me_layout)
