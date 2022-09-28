@@ -83,10 +83,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         binding.mainActivityButtonCamera.setOnClickListener {
-
             val intent = Intent(this, QrActivity::class.java)
             startActivityForResult(intent, 12345)
-
         }
 
         val mapFragment = supportFragmentManager
@@ -350,8 +348,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun setupChargerInputDialog() {
-        updateChargerList()
-        updateChargePointList()
+        //updateChargerList()
+        //updateChargePointList()
+
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
         )
@@ -497,10 +496,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         this@MainActivity.chargers = response.body() as Chargers
                         lifecycleScope.launch(Dispatchers.Main) {
                             addNewMarkers(this@MainActivity, chargers, fun (charger: Charger) : Boolean {
-                                lifecycleScope.launch(Dispatchers.Main) {
-                                    setupChargerInput()
-                                    displayChargerStatus(charger.chargerID, chargerInputStatus)
-
+                                updateChargerList().invokeOnCompletion {
+                                    updateChargePointList().invokeOnCompletion {
+                                        lifecycleScope.launch(Dispatchers.Main) {
+                                            setupChargerInput()
+                                            setupChargerInputDialog()
+                                            displayChargerStatus(charger.chargerID, chargerInputStatus)
+                                        }
+                                    }
                                 }
                                 return false;
                             })
