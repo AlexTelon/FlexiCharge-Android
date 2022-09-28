@@ -8,7 +8,7 @@ object StatusCode {
     const val unAuthorized = 401
 }
 
-object textInputType {
+object TextInputType {
     const val  isEmail = "is email"
     const val isPassword = "is password"
 }
