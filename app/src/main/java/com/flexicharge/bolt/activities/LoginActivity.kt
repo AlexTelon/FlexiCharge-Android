@@ -4,17 +4,18 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
+import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.databinding.ActivityLoginBinding
+import com.flexicharge.bolt.helpers.TextInputType
+import com.flexicharge.bolt.helpers.Validator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
+    private val validator = Validator()
     private val entryManager = EntryManager()
     private lateinit var binding: ActivityLoginBinding
     private var username = " "
@@ -28,70 +29,31 @@ class LoginActivity : AppCompatActivity() {
 
         val emailEditText = binding.loginActivityEditTextEmail
         val passwordEditText = binding.loginActivityEditTextPassword
+        val error = binding.loginActivityErrorMessage
 
-        validateUserInput(emailEditText, "isEmail")
-        validateUserInput(passwordEditText, "isPass")
+        validator.validateUserInput(emailEditText, TextInputType.isEmail)
+        validator.validateUserInput(passwordEditText, TextInputType.isPassword)
 
         binding.loginActivityButtonLogout.setOnClickListener {
             username = emailEditText.text.toString()
             password = passwordEditText.text.toString()
-            entryManager.singIn(username, password) { loginBody, message, isOK ->
-                if (isOK) {
-                    navigateToMain(loginBody.accessToken, loginBody.userID, loginBody.username, loginBody.email)
-                }
-                else {
-                    Log.d("sharedoPre", message)
+            lifecycleScope.launch(Dispatchers.IO) {
+                entryManager.singIn(username, password) { loginBody, message, isOK ->
+                    if (isOK) {
+                        navigateToMain(loginBody.accessToken, loginBody.userID, loginBody.username, loginBody.email)
+                    }
+                    else {
+                        lifecycleScope.launch (Dispatchers.Main) {
+                            if (message == "Bad Request"){
+                                error.text = "Incorrect username or password."
+                            } else {
+                                error.text = message
+                            }
+                        }
+                    }
                 }
             }
-
         }
-
-
-    }
-
-    private fun validateUserInput(field: EditText, isWhat: String): Boolean {
-        val loginButton = binding.loginActivityButtonLogout
-        var valid = false
-        field.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s != null) {
-                    if(s.isEmpty()) {
-                        field.error = "Can not be empty"
-                    }
-                    when (isWhat) {
-                        "isEmail" ->
-                            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(field.text).matches()) {
-                                loginButton.isEnabled = false
-                                field.error = "Invalid email."
-                            } else {
-                                loginButton.isEnabled = true
-                                valid = true
-                            }
-
-                        "isPass" ->
-                            if (
-                                s.length < 8
-                                || s.firstOrNull { it.isDigit() } == null
-                                || s.filter { it.isLetter() }.firstOrNull { it.isUpperCase() } == null
-                                || s.filter { it.isLetter() }.firstOrNull { it.isLowerCase() } == null
-                                || s.firstOrNull { !it.isLetterOrDigit() } == null
-                            ) {
-                                loginButton.isEnabled = false
-                                field.error = "Password must have 8 chars containing upper- and lower case characters, digits and symbols"
-                            } else {
-                                loginButton.isEnabled = true
-                                valid = true
-                            }
-                    }
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {   }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {  }
-
-        })
-
-        return valid
     }
 
     private fun navigateToMain(accessToken: String, userId: String, username: String, email:String) {

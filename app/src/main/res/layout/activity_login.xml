@@ -67,14 +67,12 @@
         app:layout_constraintTop_toBottomOf="@+id/loginActivity_editText_email" />
 
     <Button
-        android:enabled="false"
         android:id="@+id/loginActivity_button_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="16dp"
-        android:onClick="confirmLogin"
         android:text="Login"
         app:layout_constraintBottom_toTopOf="@+id/loginActivity_textView_continueAsGuest"
         app:layout_constraintEnd_toEndOf="parent"
@@ -87,10 +85,19 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:minHeight="48dp"
-        android:onClick="forgotPassword"
         android:text="I forgot my password"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:textColor="@color/red"
+        android:id="@+id/loginActivity_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        app:layout_constraintBottom_toTopOf="@+id/loginActivity_button_logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginActivity_editText_password" />
 </androidx.constraintlayout.widget.ConstraintLayout>
