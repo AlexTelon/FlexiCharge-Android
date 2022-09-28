@@ -1,23 +1,16 @@
 package com.flexicharge.bolt.activities
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.util.Patterns
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.StatusCode
-import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import com.flexicharge.bolt.api.flexicharge.UserDetails
 import com.flexicharge.bolt.api.flexicharge.VerificationDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -68,7 +61,7 @@ class VerifyActivity : AppCompatActivity() {
                 }
             } catch (e: IOException) {lifecycleScope.launch(Dispatchers.Main) {
                 Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG)
-            }
+                }
             }
         }
     }

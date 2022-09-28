@@ -70,8 +70,6 @@ class VerificationDetails (
     val code : String
 )
 
-
-
 class UserDetailsGotten(
     val message : String,
     val code : String,
