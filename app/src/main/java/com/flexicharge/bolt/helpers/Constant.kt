@@ -1,4 +1,4 @@
-package com.flexicharge.bolt
+package com.flexicharge.bolt.helpers
 
 object StatusCode {
     const val ok = 200
@@ -6,4 +6,9 @@ object StatusCode {
     const val badRequest = 400
     const val notFound = 404
     const val unAuthorized = 401
+}
+
+object TextInputType {
+    const val  isEmail = "is email"
+    const val isPassword = "is password"
 }
