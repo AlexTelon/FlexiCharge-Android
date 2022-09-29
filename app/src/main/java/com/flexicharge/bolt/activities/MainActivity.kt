@@ -107,13 +107,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             }
         }
 
+        val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
+        val accessToken = loginSharedPref.getString("accessToken", Context.MODE_PRIVATE.toString())
+        val userId = loginSharedPref.getString("userId", Context.MODE_PRIVATE.toString())
+        val isLoggedIn = loginSharedPref.getInt("isLoggedIn", 1)
+
+        val loggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
+
         binding.mainActivityButtonUser.setOnClickListener {
-            if (isGuest) {
+            if (loggedIn == "true") {
+                val intent = Intent(this, ProfileMenuLoggedInActivity::class.java)
+                intent.putExtra("accessToken", accessToken)
+                intent.putExtra("userId", userId)
+                intent.putExtra("isLoggedIn", isLoggedIn)
+                startActivity(intent)
+            } else {
                 startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
             }
-            else {
-                startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
-            }
+
         }
     }
 

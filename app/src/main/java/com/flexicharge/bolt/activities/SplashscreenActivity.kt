@@ -37,6 +37,7 @@ class SplashscreenActivity : AppCompatActivity() {
             putString("accessToken", " ")
             putString("userId", " ")
             putInt("isLoggedIn", 0)
+            putString("loggedIn", "false")
         }.apply()
     }
 

@@ -11,7 +11,7 @@ data class LoginBody(
     val accessToken: String,
     val email : String,
     val username: String,
-    val userID: String
+    val user_id: String
 )
 
 data class Charger(
