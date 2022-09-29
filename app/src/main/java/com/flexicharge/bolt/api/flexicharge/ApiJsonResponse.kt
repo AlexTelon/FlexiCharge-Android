@@ -75,4 +75,3 @@ class UserDetailsGotten(
     val code : String,
     val statusCode : Int
 )
-L
