@@ -17,7 +17,11 @@ class Validator {
                     when (isWhat) {
                         TextInputType.isEmail ->
                             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(field.text).matches()) {
+
                                 field.error = "Invalid email."
+                            }
+                            else{
+                                field.error = null
                             }
 
                         TextInputType.isPassword ->
@@ -29,6 +33,9 @@ class Validator {
                                 || s.firstOrNull { !it.isLetterOrDigit() } == null
                             ) {
                                 field.error = "Password must have 8 chars containing upper- and lower case characters, digits and symbols"
+                            }
+                            else {
+                                field.error = null
                             }
                     }
                 }

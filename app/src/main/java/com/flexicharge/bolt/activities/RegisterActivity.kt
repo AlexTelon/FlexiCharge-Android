@@ -14,6 +14,8 @@ import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserDetails
+import com.flexicharge.bolt.helpers.TextInputType
+import com.flexicharge.bolt.helpers.Validator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.w3c.dom.Text
@@ -28,6 +30,8 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+
+
         registerUserEmail            = findViewById<EditText>(R.id.loginActivity_editText_email)
         registerUserPass             = findViewById<EditText>(R.id.loginActivity_editText_password)
         registerUserRepeatPass       = findViewById<EditText>(R.id.editTextPasswordRepeat)
@@ -36,8 +40,6 @@ class RegisterActivity : AppCompatActivity() {
         confirmRegistration(  )
     }
 
-    var emailIsValid : Boolean = true;
-    var passwordIsValid : Boolean = true;
     var passwordRepeatIsValid : Boolean = true;
 
     // first take the input from user
@@ -49,45 +51,25 @@ class RegisterActivity : AppCompatActivity() {
     private fun confirmRegistration() {
         var registerBtn = findViewById<Button>(R.id.buttonRegisterConfirm)
         val agreeCheckBox = findViewById<CheckBox>(R.id.checkBoxTosAgreement)
+
+        val validateHelper = Validator()
+        validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
+        validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
         // when register btn is clicked, check if email, pass and phone are valid, then check agreement box, then send request to backend.
         registerBtn.setOnClickListener {
-            validEmail()
-            validPassword()
             validRepeatPassword()
             if (agreeCheckBox.isChecked()) {
-                if(emailIsValid && passwordIsValid && passwordRepeatIsValid ) {
-                    sendUserData(registerUserEmail.text.toString(), registerUserPass.text.toString())
+                if(passwordRepeatIsValid == true) {
+                if(registerUserEmail.error == null) {
+                    if(registerUserPass.error == null){
+                        sendUserData(registerUserEmail.text.toString(), registerUserPass.text.toString())
+                    }
                 }
-
+            }
             }
         }
     }
 
-
-    // check if email is valid
-    private fun validEmail() {
-        val registerUserEmailString = registerUserEmail.text.toString()
-        if(!Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches()) {
-            emailIsValid = false;
-            registerUserEmail.setError("Invalid Email")
-        }
-        else if(Patterns.EMAIL_ADDRESS.matcher(registerUserEmailString).matches()){
-            emailIsValid = true;
-        }
-
-    }
-
-    //check if Password is valid
-
-    private fun validPassword() {
-        if(registerUserPass.text.toString().length < 8) {
-            passwordIsValid = false;
-            registerUserPass.setError("Minimum 8 Characters")
-        }
-        else {
-            passwordIsValid = true;
-        }
-    }
 
     private fun validRepeatPassword(){
         if(registerUserPass.text.toString() != registerUserRepeatPass.text.toString()){

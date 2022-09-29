@@ -6,7 +6,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
-import com.flexicharge.bolt.StatusCode
+import com.flexicharge.bolt.helpers.StatusCode
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.VerificationDetails
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +19,9 @@ class VerifyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verify_email)
-
         verificationCode = findViewById<EditText>(R.id.verifyActivity_editText_code)
         verificationEmail = findViewById<EditText>(R.id.verifyActivity_editText_email)
+
 
         confirmVerification()
     }
