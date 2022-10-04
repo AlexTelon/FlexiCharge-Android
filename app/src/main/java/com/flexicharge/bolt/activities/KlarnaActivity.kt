@@ -112,7 +112,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         if (authToken != null) {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
-                    val requestBody = TransactionOrder(transactionId, authToken!!)
+                    val requestBody = TransactionOrder(authToken!!)
                     val response = RetrofitInstance.flexiChargeApi.transactionStart(transactionId, requestBody)
                     if (response.isSuccessful) {
                         //TODO Backend Klarna/Order/Session Request if successful

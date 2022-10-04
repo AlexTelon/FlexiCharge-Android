@@ -56,6 +56,5 @@ data class TransactionSession(
 )
 
 data class TransactionOrder(
-    val transactionID: Int,
     val authorization_token: String
 )
