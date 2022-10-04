@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var listOfChargersRecyclerView: RecyclerView
     private lateinit var currentTransaction: Transaction
 
-    private val remoteChargerList = RemoteChargerList()
+    private val remoteChargerList = RemoteChargerList(Chargers())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         remoteChargerList.setOnRefreshedCallBack {
             lifecycleScope.launch(Dispatchers.Main) {
-                addNewMarkers(this@MainActivity, remoteChargerList.chargers, fun (charger: Charger?) : Boolean {
+                addNewMarkers(this@MainActivity, remoteChargerList.value, fun (charger: Charger?) : Boolean {
                     if(charger != null && validateChargerId(charger.chargerID.toString())) {
                         lifecycleScope.launch(Dispatchers.Main) {
                             setupChargerInputDialog()
@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargerInputDialog.dismiss()
         }
 
-        val charger = remoteChargerList.chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
+        val charger = remoteChargerList.value.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
         val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
         if(charger == null || chargePoint == null) {
@@ -415,7 +415,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
         if (this::chargePoints.isInitialized) {
-            var chargersInCp = remoteChargerList.chargers.filter {it.chargePointID == chargePointId}
+            var chargersInCp = remoteChargerList.value.filter {it.chargePointID == chargePointId}
             var chargePoint = chargePoints.filter { it.chargePointID == chargePointId }[0]
             listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
         }
@@ -461,7 +461,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         "?"
                     }
 
-                    val count = remoteChargerList.chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                    val count = remoteChargerList.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
                     distanceToChargePoint.add(distanceStr)
                     chargerCount.add(count)
                 }
