@@ -25,6 +25,7 @@ import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
 import com.flexicharge.bolt.activities.businessLogic.RemoteChargePoints
+import com.flexicharge.bolt.activities.businessLogic.RemoteCharger
 import com.flexicharge.bolt.activities.businessLogic.RemoteChargers
 import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
@@ -553,55 +554,46 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
-                if (response.isSuccessful) {
-                    val charger = response.body() as Charger
-
-                    Log.d("validateConnection", "Connected to charger " + charger.chargerID)
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        when (charger.status) {
-                            "Available" -> {
-                                showCheckout(true, charger.chargePointID, true, chargerId)
-                                setChargerButtonStatus(chargerInputStatus, true, "Continue", 2)
-                            }
-                            "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
-                            }
-                            "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
-                            }
-                            "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
-                            }
-                            "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
-                            }
-                            "Charging" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 0)
-                            }
-                            "Reserved" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 0)
-                            }
-                            else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger is " + charger.status, 2) }
+        val remoteCharger = RemoteCharger(chargerId)
+        try {
+            remoteCharger.refresh(lifecycleScope).invokeOnCompletion {
+                val charger = remoteCharger.value
+                Log.d("validateConnection", "Connected to charger " + charger.chargerID)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    when (charger.status) {
+                        "Available" -> {
+                            showCheckout(true, charger.chargePointID, true, chargerId)
+                            setChargerButtonStatus(chargerInputStatus, true, "Continue", 2)
                         }
+                        "Faulted" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
+                        }
+                        "Occupied" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
+                        }
+                        "Rejected" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
+                        }
+                        "Unavailable" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
+                        }
+                        "Charging" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 0)
+                        }
+                        "Reserved" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 0)
+                        }
+                        else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger is " + charger.status, 2) }
                     }
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        setChargerButtonStatus(chargerInputStatus, false, "Charger not identified", 2)
-                    }
-                }
-            } catch (e: HttpException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 2)
-                }
-            } catch (e: IOException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 2)
                 }
             }
         }
+        catch(e: CancellationException) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                setChargerButtonStatus(chargerInputStatus, false, e.message!!, 2)
+            }
+        }
+
     }
 
     private fun setChargerButtonStatus(chargerInputStatus: MaterialButton, active: Boolean, text: String, color: Int) {
