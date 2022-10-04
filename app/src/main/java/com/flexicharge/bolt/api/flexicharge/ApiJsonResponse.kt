@@ -1,5 +1,7 @@
 package com.flexicharge.bolt.api.flexicharge
 
+import android.telephony.TelephonyCallback
+
 class Chargers : ArrayList<Charger>()
 
 data class Charger(
@@ -47,3 +49,13 @@ data class TransactionOrder(
     val authorization_token: String,
     val transactionID: Int
 )
+
+
+data class ResetResponseBody(val status: String)
+
+data class ResetRequestBody(
+    val username: String,
+    val password: String,
+    val confirmationCode: String
+)
+
