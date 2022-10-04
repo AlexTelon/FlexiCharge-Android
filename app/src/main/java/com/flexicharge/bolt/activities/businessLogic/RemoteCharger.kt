@@ -25,7 +25,7 @@ class RemoteCharger(private var id: Int = -1) : RemoteObject<Charger>() {
                     value = response.body() as Charger
                 }
                 else {
-                    cancel(cancelMessage)
+                    cancel(response.message())
                 }
 
             } catch (e: HttpException) {
