@@ -45,4 +45,11 @@ interface ApiInterface {
 
     @PUT("transactions/stop/{transactionId}")
     suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<TransactionList>
+
+
+    @POST("/auth/forgot-password/{username}")
+    suspend fun resetPass(@Path("username") username: String): Response<ResetResponseBody>
+
+    @POST("/auth/confirm-forgot-password")
+    suspend fun confReset(@Body body: ResetRequestBody): Response<ResetResponseBody>
 }
