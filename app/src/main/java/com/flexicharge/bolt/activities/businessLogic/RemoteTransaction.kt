@@ -22,9 +22,30 @@ class RemoteTransaction() : RemoteObject<Transaction>() {
             val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
             if (!response.isSuccessful) {
                 cancel("Could not fetch transaction!")
-            } else {
+            }
+            else {
                 value = response.body() as Transaction
             }
+        }
+    }
+
+    fun stop(lifecycleScope: LifecycleCoroutineScope): Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
+                if (!response.isSuccessful) {
+                    cancel(response.message())
+                }
+            }
+            catch (e: Exception) {
+                if(e.message != null) {
+                    cancel(e.message!!)
+                }
+                else {
+                    cancel("an unspecified error occurred")
+                }
+            }
+
         }
     }
 
