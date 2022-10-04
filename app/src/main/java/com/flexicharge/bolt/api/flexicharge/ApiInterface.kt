@@ -1,5 +1,7 @@
 package com.flexicharge.bolt.api.flexicharge
 
+import android.service.autofill.UserData
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -48,4 +50,14 @@ interface ApiInterface {
 
     @POST("/auth/sign-in")
     suspend fun signIn(@Body body: Credentials): Response<LoginBody>
+
+    // post request to store new users' data into database
+    @POST("/auth/sign-up")
+    suspend fun registerNewUser (@Body body: UserDetails) : Response<Unit>
+
+
+    @POST("/auth/verify")
+    suspend fun verifyEmail(@Body body: VerificationDetails) : Response<Unit>
+
+
 }

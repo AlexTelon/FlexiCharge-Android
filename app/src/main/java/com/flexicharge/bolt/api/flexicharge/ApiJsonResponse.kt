@@ -11,7 +11,7 @@ data class LoginBody(
     val accessToken: String,
     val email : String,
     val username: String,
-    val userID: String
+    val user_id: String
 )
 
 data class Charger(
@@ -57,4 +57,20 @@ data class TransactionSession(
 
 data class TransactionOrder(
     val authorization_token: String
+)
+// Every user has his own email, password
+class UserDetails(
+    val username : String,
+    val password : String
+)
+
+class VerificationDetails (
+    val username : String,
+    val code : String
+)
+
+class UserDetailsGotten(
+    val message : String,
+    val code : String,
+    val statusCode : Int
 )

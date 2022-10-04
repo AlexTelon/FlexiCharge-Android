@@ -24,7 +24,7 @@
         <activity
             android:name=".activities.AboutActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.SplashscreenActivity"
             android:exported="true"
@@ -38,15 +38,15 @@
         <activity
             android:name=".activities.QrActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ProfileMenuLoggedOutActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ProfileMenuLoggedInActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -62,18 +62,22 @@
         <activity
             android:name=".activities.ForgotPasswordActivity"
             android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.VerifyActivity"
+            android:exported="true"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="true" />
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.KlarnaActivity"
             android:exported="true"
@@ -90,7 +94,7 @@
         </activity>
         <activity
             android:name=".activities.KlarnaOrderCompletedActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

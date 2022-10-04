@@ -50,6 +50,7 @@
         app:layout_constraintTop_toBottomOf="@+id/loginActivity_imageView_title" />
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/ic_black_arrow_right_2"
@@ -58,6 +59,7 @@
         app:layout_constraintTop_toTopOf="@+id/aboutTextView" />
 
     <TableRow
+        android:id="@+id/tableRow"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="32dp"
@@ -71,22 +73,17 @@
         android:id="@+id/klarnaActivity_KlarnaPaymentVie"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/aboutTextView"
-        app:layout_constraintBottom_toTopOf="@id/loginActivity_button_logout"/>
+        app:layout_constraintBottom_toTopOf="@id/loginActivity_button_logout"
+        app:layout_constraintTop_toBottomOf="@id/aboutTextView" />
 
     <Button
         android:id="@+id/loginActivity_button_logout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:alpha="0.5"
-        android:clickable="false"
-        android:onClick="loginClick"
-        android:text="Login (coming soon)"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="92dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="12dp"
+        android:text="Login"
+        app:layout_constraintBottom_toTopOf="@+id/aboutTextView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.949"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
