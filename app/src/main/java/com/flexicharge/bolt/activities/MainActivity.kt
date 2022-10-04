@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
+import com.flexicharge.bolt.activities.businessLogic.RemoteChargerList
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
 import com.flexicharge.bolt.helpers.MapHelper.currLocation
 import com.flexicharge.bolt.helpers.MapHelper.currentLocation
@@ -51,7 +52,6 @@ import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
-    private lateinit var chargers: Chargers
     private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
     private lateinit var paymentSummaryDialog: BottomSheetDialog
@@ -61,6 +61,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
     private lateinit var currentTransaction: Transaction
+
+    private val remoteChargerList = RemoteChargerList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +77,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        remoteChargerList.setOnRefreshedCallBack {
+            lifecycleScope.launch(Dispatchers.Main) {
+                addNewMarkers(this@MainActivity, remoteChargerList.chargers, fun (charger: Charger?) : Boolean {
+                    if(charger != null && validateChargerId(charger.chargerID.toString())) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            setupChargerInputDialog()
+                            changeInput(charger.chargerID.toString())
+                        }
+                    }
+                    return false;
+                })
+            }
+        }
+        remoteChargerList.refresh(lifecycleScope)
 
         binding.mainActivityButtonPinPosition.setOnClickListener {
             currLocation(this)
@@ -126,12 +143,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()       //, for your activity to start interacting with the user.
-        fetchLocation(this)
-        updateChargerList().invokeOnCompletion {
+        remoteChargerList.refresh(lifecycleScope).invokeOnCompletion {
             updateChargePointList().invokeOnCompletion {
                 checkPendingTransaction()
             }
         }
+
+        fetchLocation(this)
     }
 
     override fun changeInput(newInput: String){
@@ -218,7 +236,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargerInputDialog.dismiss()
         }
 
-        val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
+        val charger = remoteChargerList.chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
         val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
         if(charger == null || chargePoint == null) {
@@ -397,7 +415,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
         if (this::chargePoints.isInitialized) {
-            var chargersInCp = chargers.filter {it.chargePointID == chargePointId}
+            var chargersInCp = remoteChargerList.chargers.filter {it.chargePointID == chargePointId}
             var chargePoint = chargePoints.filter { it.chargePointID == chargePointId }[0]
             listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
         }
@@ -443,7 +461,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         "?"
                     }
 
-                    val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                    val count = remoteChargerList.chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
                     distanceToChargePoint.add(distanceStr)
                     chargerCount.add(count)
                 }
@@ -476,37 +494,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-
-    private fun updateChargerList() : Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
-                if (!response.isSuccessful) {
-                    cancel("Failed retrieving chargers")
-                }
-                val chargers = response.body() as Chargers
-                lifecycleScope.launch(Dispatchers.Main) {
-                    this@MainActivity.chargers = response.body() as Chargers
-                    addNewMarkers(this@MainActivity, chargers, fun (charger: Charger?) : Boolean {
-                        if(charger != null && validateChargerId(charger.chargerID.toString())) {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                setupChargerInputDialog()
-                                changeInput(charger.chargerID.toString())
-                            }
-                        }
-                        return false;
-                    })
-                }
-
-            } catch (e: HttpException) {
-                Log.d("validateConnection", "Http Error")
-                cancel(e.message())
-            } catch (e: IOException) {
-                Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
-                cancel(e.toString())
-            }
-        }
-    }
 
     private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
 
