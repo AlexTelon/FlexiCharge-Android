@@ -81,10 +81,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         binding.mainActivityButtonCamera.setOnClickListener {
-
             val intent = Intent(this, QrActivity::class.java)
             startActivityForResult(intent, 12345)
-
         }
 
         val mapFragment = supportFragmentManager
@@ -92,16 +90,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         mapFragment.getMapAsync(this)
 
         binding.mainActivityButtonIdentifyCharger.setOnClickListener {
-            if (this::chargePoints.isInitialized) {
-                setupChargerInputDialog()
-            }
-            else {
-                updateChargerList().invokeOnCompletion {
-                    updateChargePointList().invokeOnCompletion {
-                        setupChargerInputDialog()
-                    }
-                }
-            }
+            setupChargerInputDialog()
         }
 
         val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
@@ -355,8 +344,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun setupChargerInputDialog() {
-        updateChargerList()
-        updateChargePointList()
+
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
         )
@@ -382,7 +370,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         chargerInputDialog.show()
     }
 
-    private fun setupChargerInput(bottomSheetView: View) {      // act when the charger's number is written
+    private fun setupChargerInput(bottomSheetView: View) {
+
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
         chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
         pinView.doOnTextChanged { text, start, before, count ->
@@ -397,6 +386,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 }
             }
         }
+
     }
 
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
@@ -420,23 +410,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {       // display the chargers near u
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
-        listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
-        if (this::chargePoints.isInitialized) {
-            var distanceToChargePoint = mutableListOf<String>()
-            var chargerCount = mutableListOf<Int>()
-
-            chargePoints.forEachIndexed { index, chargePoint ->
-                var dist = FloatArray(1)
-                Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
-                val df = DecimalFormat("#.##")
-                val distanceStr = df.format(dist[0] / 1000).toString()
-                val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                distanceToChargePoint.add(distanceStr)
-                chargerCount.add(count)
-            }
-            listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this, distanceToChargePoint, chargerCount)
-        }
-        //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
         if (listOfChargePointsRecyclerView.visibility == View.GONE) {
@@ -448,6 +421,38 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             listOfChargePointsRecyclerView.visibility = View.GONE
             chargePointsNearMe.visibility = View.VISIBLE
         }
+        listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
+        updateChargePointList().invokeOnCompletion {
+            if (this::chargePoints.isInitialized) {
+                val distanceToChargePoint = mutableListOf<String>()
+                val chargerCount = mutableListOf<Int>()
+
+                chargePoints.forEachIndexed { index, chargePoint ->
+                    val dist = FloatArray(1)
+                    var couldGetLocation = true
+                    try {
+                        Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+                    }
+                    catch (e: UninitializedPropertyAccessException) {
+                        dist[0] = 0f
+                        couldGetLocation = false
+                    }
+
+                    val df = DecimalFormat("#.##")
+                    val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
+                        "?"
+                    }
+
+                    val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                    distanceToChargePoint.add(distanceStr)
+                    chargerCount.add(count)
+                }
+                lifecycleScope.launch(Dispatchers.Main) {
+                    listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this@MainActivity, distanceToChargePoint, chargerCount)
+                }
+            }
+        }
+        //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
     }
 
     private fun updateChargePointList() : Job {
@@ -471,26 +476,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+
     private fun updateChargerList() : Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
-                if (response.isSuccessful) {                                    // , getting data from API?
-                    val chargers = response.body() as Chargers
-                    if (!chargers.isEmpty()) {
-                        this@MainActivity.chargers = response.body() as Chargers
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            addNewMarkers(this@MainActivity, chargers)
-                        }
-                    }
-                    else {
-                        this@MainActivity.chargers = Chargers()
-                    }
+                if (!response.isSuccessful) {
+                    cancel("Failed retrieving chargers")
                 }
+                val chargers = response.body() as Chargers
+                lifecycleScope.launch(Dispatchers.Main) {
+                    this@MainActivity.chargers = response.body() as Chargers
+                    addNewMarkers(this@MainActivity, chargers, fun (charger: Charger?) : Boolean {
+                        if(charger != null && validateChargerId(charger.chargerID.toString())) {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                setupChargerInputDialog()
+                                changeInput(charger.chargerID.toString())
+                            }
+                        }
+                        return false;
+                    })
+                }
+
             } catch (e: HttpException) {
                 Log.d("validateConnection", "Http Error")
+                cancel(e.message())
             } catch (e: IOException) {
                 Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
+                cancel(e.toString())
             }
         }
     }
@@ -542,6 +555,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestParams: MutableMap<String, String> = HashMap()
+                requestParams.put("chargerId", chargerId.toString())
                 requestParams.put("connectorId", "1")
                 requestParams.put("idTag", "1")
                 requestParams.put("reservationId", "1")

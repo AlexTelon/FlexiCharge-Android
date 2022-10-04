@@ -3,6 +3,7 @@ package com.flexicharge.bolt.helpers
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -10,21 +11,21 @@ import androidx.core.graphics.drawable.toBitmap
 import com.flexicharge.bolt.api.flexicharge.Chargers
 import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.api.flexicharge.Charger
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import java.lang.Exception
 
 object MapHelper {
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var currentLocation: Location
     lateinit var mMap: GoogleMap
+
+    private var markerToChargerMap = mutableMapOf<Marker, Charger>()
     const val LOCATION_PERMISSION_REQUEST_CODE = 1
     const val PERMISSION_CODE = 101
 
@@ -90,16 +91,28 @@ object MapHelper {
             )
     }
 
-    fun addNewMarkers(activity: MainActivity, chargers: Chargers){
+    fun addNewMarkers(activity: MainActivity, chargers: Chargers, onTapMarker: (Charger?) -> Boolean){
         val blackIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
 
-        chargers.forEach {
-            val marker = mMap.addMarker(MarkerOptions().position(LatLng(it.location[0], it.location[1])).title(it.chargerID.toString()))
-            if(it.status == "Available") marker.setIcon(greenIcon)
-            else if (it.status == "Faulted" ) marker.setIcon(blackIcon)
-            else marker.setIcon(redIcon)
+        markerToChargerMap.keys.forEach{
+            it.remove()
+        }
+
+        chargers.forEach { charger ->
+            val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
+            markerToChargerMap[marker] = charger
+            when (charger.status) {
+                "Available" -> marker.setIcon(greenIcon)
+                "Faulted" -> marker.setIcon(blackIcon)
+                else -> marker.setIcon(redIcon)
+            }
+        }
+
+        mMap.setOnMarkerClickListener {
+            Log.d("mapHelper", "Marker clicked: " + it.id)
+            onTapMarker(markerToChargerMap[it])
         }
     }
 
