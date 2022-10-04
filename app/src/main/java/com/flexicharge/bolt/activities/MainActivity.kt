@@ -24,7 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
-import com.flexicharge.bolt.activities.businessLogic.RemoteChargerList
+import com.flexicharge.bolt.activities.businessLogic.RemoteChargePoints
+import com.flexicharge.bolt.activities.businessLogic.RemoteChargers
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
 import com.flexicharge.bolt.helpers.MapHelper.currLocation
 import com.flexicharge.bolt.helpers.MapHelper.currentLocation
@@ -52,7 +53,6 @@ import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
-    private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
     private lateinit var paymentSummaryDialog: BottomSheetDialog
     private lateinit var hours : String
@@ -62,7 +62,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var listOfChargersRecyclerView: RecyclerView
     private lateinit var currentTransaction: Transaction
 
-    private val remoteChargerList = RemoteChargerList(Chargers())
+    private val remoteChargerList = RemoteChargers(Chargers())
+    private val remoteChargePoints = RemoteChargePoints(ChargePoints())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,7 +145,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()       //, for your activity to start interacting with the user.
         remoteChargerList.refresh(lifecycleScope).invokeOnCompletion {
-            updateChargePointList().invokeOnCompletion {
+            remoteChargePoints.refresh(lifecycleScope).invokeOnCompletion {
                 checkPendingTransaction()
             }
         }
@@ -237,7 +238,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         val charger = remoteChargerList.value.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
-        val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
+        val chargePoint = remoteChargePoints.value.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
         if(charger == null || chargePoint == null) {
             throw Exception("Tried to display charging information for a charger that doesn't exist.")
@@ -414,11 +415,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
 
-        if (this::chargePoints.isInitialized) {
-            var chargersInCp = remoteChargerList.value.filter {it.chargePointID == chargePointId}
-            var chargePoint = chargePoints.filter { it.chargePointID == chargePointId }[0]
-            listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
-        }
+
+        val chargersInCp = remoteChargerList.value.filter {it.chargePointID == chargePointId}
+        val chargePoint = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
+        listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
 
         // Only add decoration on first-time display
         if( listOfChargersRecyclerView.itemDecorationCount == 0) {
@@ -440,58 +440,36 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargePointsNearMe.visibility = View.VISIBLE
         }
         listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
-        updateChargePointList().invokeOnCompletion {
-            if (this::chargePoints.isInitialized) {
-                val distanceToChargePoint = mutableListOf<String>()
-                val chargerCount = mutableListOf<Int>()
+        remoteChargePoints.refresh(lifecycleScope).invokeOnCompletion {
+            val distanceToChargePoint = mutableListOf<String>()
+            val chargerCount = mutableListOf<Int>()
 
-                chargePoints.forEachIndexed { index, chargePoint ->
-                    val dist = FloatArray(1)
-                    var couldGetLocation = true
-                    try {
-                        Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
-                    }
-                    catch (e: UninitializedPropertyAccessException) {
-                        dist[0] = 0f
-                        couldGetLocation = false
-                    }
-
-                    val df = DecimalFormat("#.##")
-                    val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
-                        "?"
-                    }
-
-                    val count = remoteChargerList.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                    distanceToChargePoint.add(distanceStr)
-                    chargerCount.add(count)
+            remoteChargePoints.value.forEachIndexed { index, chargePoint ->
+                val dist = FloatArray(1)
+                var couldGetLocation = true
+                try {
+                    Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
                 }
-                lifecycleScope.launch(Dispatchers.Main) {
-                    listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this@MainActivity, distanceToChargePoint, chargerCount)
+                catch (e: UninitializedPropertyAccessException) {
+                    dist[0] = 0f
+                    couldGetLocation = false
                 }
+
+                val df = DecimalFormat("#.##")
+                val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
+                    "?"
+                }
+
+                val count = remoteChargerList.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                distanceToChargePoint.add(distanceStr)
+                chargerCount.add(count)
             }
+            lifecycleScope.launch(Dispatchers.Main) {
+                listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceToChargePoint, chargerCount)
+            }
+
         }
         //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
-    }
-
-    private fun updateChargePointList() : Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getChargePointList()
-                if (response.isSuccessful) {
-                    val chargePoints = response.body() as ChargePoints
-                    if (!chargePoints.isEmpty()) {
-                        this@MainActivity.chargePoints = response.body() as ChargePoints
-                    }
-                    else {
-                        this@MainActivity.chargePoints = ChargePoints()
-                    }
-                }
-            } catch (e: HttpException) {
-                Log.d("validateConnection", "Http Error")
-            } catch (e: IOException) {
-                Log.d("validateConnection", "No Internet Error - ChargePointList will not be initialized")
-            }
-        }
     }
 
 
@@ -676,6 +654,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
         return true
     }
+
     private fun checkPendingTransaction() {
         //TODO Fix fetching transaction ID smartly
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
@@ -739,7 +718,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 paymentText?.visibility = View.GONE
                 chargerInput?.isEnabled = true
             }
-            chargerLocationText?.text = chargePoints.filter { it.chargePointID == chargePointId }[0].name
+            chargerLocationText?.text = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0].name
             if (chargerInputView != null) {
                 displayChargerList(chargerInputView, chargePointId)
             }
