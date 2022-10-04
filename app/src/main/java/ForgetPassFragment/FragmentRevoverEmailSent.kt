@@ -1,4 +1,4 @@
-package ForgetPassFragment
+package FragmentRecoverPass
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,41 +6,83 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import com.flexicharge.bolt.R
-import com.flexicharge.bolt.activities.ForgotPasswordActivity
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.activities.LoginActivity
+import com.flexicharge.bolt.api.flexicharge.ResetRequestBody
+import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import com.flexicharge.bolt.databinding.FragmentRevoverEmailSentBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-/**
- * A simple [Fragment] subclass.
- */
 class FragmentRevoverEmailSent : Fragment() {
 
-    var emailAddress:String? = ""
+    var emailAddress: String? = ""
+    private var _binding: FragmentRevoverEmailSentBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val view =  inflater.inflate(R.layout.fragment_revover_email_sent, container, false)
+    ): View {
+        _binding = FragmentRevoverEmailSentBinding.inflate(inflater, container, false)
+        // Displey Email
         emailAddress = arguments?.getString("EmailAddress")
+        binding.textViewEmailRecover.text = emailAddress
 
-        view.findViewById<TextView>(R.id.textView_emailRecover).text = emailAddress
-        view.findViewById<TextView>(R.id.textView_Send_again).setOnClickListener{
-            val fragmentRecoverPass = FragmentRecoverPass()
-            requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragmentRecoverPass).commit()
-        }
-        view.findViewById<Button>(R.id.buttin_backToLogin).setOnClickListener {
-            val intent = Intent(activity, LoginActivity::class.java)
-            startActivity(intent)
-        }
-        return view
+        binding.buttinConfirm.setOnClickListener {
+            val email = binding.emailConfirmEditText.text.toString()
+            val newPassword = binding.newPassword.text.toString()
+            val confirmCode = binding.confrimCode.text.toString()
 
+            lifecycleScope.launch(Dispatchers.Main) {
+                try {
+                    val body = ResetRequestBody(email, newPassword, confirmCode)
+                    val response = RetrofitInstance.flexiChargeApi.confReset(body)
+                    if (response.code() == 200) {
+                        navigateToLogIn()
+                    } else if (response.code() == 400) {
+                        Toast.makeText(activity,  " Please try later.", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: HttpException) {
+                    Toast.makeText(activity, e.message, Toast.LENGTH_SHORT).show()
+                } catch (e: IOException) {
+                    Toast.makeText(activity, e.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        binding.textViewSendAgain.setOnClickListener {
+            val sendAgain = binding.textViewEmailRecover.text.toString()
+            lifecycleScope.launch(Dispatchers.Main){
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.resetPass(sendAgain)
+                    if (response.code() == 200){
+                        Toast.makeText(
+                            activity,
+                            "A message with a verification code has been sent",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else if(response.code() == 400){
+                        Toast.makeText(activity,  " Attempt limit exceeded, please try later.", Toast.LENGTH_SHORT).show()
+                    }
+                }catch (e: HttpException){
+                    Toast.makeText(activity,  e.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        return binding.root
+    }
+    private fun navigateToLogIn() {
+        val intent = Intent(activity, LoginActivity::class.java)
+        startActivity(intent)
     }
 
 }
+
+
+
+
+
+
