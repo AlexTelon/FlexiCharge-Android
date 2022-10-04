@@ -1,7 +1,8 @@
 package com.flexicharge.bolt.activities
 
-import ForgetPassFragment.FragmentRecoverPass
-import ForgetPassFragment.FragmentRevoverEmailSent
+
+import FragmentRecoverPass.FragmentRecoverPass
+import FragmentRecoverPass.FragmentRevoverEmailSent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.flexicharge.bolt.Communicator_
