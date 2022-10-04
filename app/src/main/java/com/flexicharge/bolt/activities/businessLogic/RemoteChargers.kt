@@ -12,8 +12,9 @@ import kotlinx.coroutines.NonCancellable.cancel
 import retrofit2.HttpException
 import java.io.IOException
 
-class RemoteChargers(override var value: Chargers) : RemoteObject<Chargers>() {
+class RemoteChargers() : RemoteObject<Chargers>() {
 
+    override var value = Chargers()
 
     override fun retrieve(lifecycleScope: LifecycleCoroutineScope) : Job {
 
