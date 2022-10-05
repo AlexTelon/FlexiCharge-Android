@@ -19,9 +19,13 @@ abstract class RemoteObject<T> {
     }
 
     fun refresh(lifecycleScope: LifecycleCoroutineScope) : Job {
-        val remoteObjectJob = retrieve(lifecycleScope)
 
+        val remoteObjectJob = retrieve(lifecycleScope)
         remoteObjectJob.invokeOnCompletion {
+            if(remoteObjectJob.isCancelled) {
+                return@invokeOnCompletion
+            }
+
             onRefreshed?.invoke(value)
         }
 
