@@ -1,6 +1,8 @@
 package com.flexicharge.bolt.api.flexicharge
 import okhttp3.Credentials
 
+import android.telephony.TelephonyCallback
+
 class Chargers : ArrayList<Charger>()
 
 data class Credentials(
@@ -74,3 +76,13 @@ class UserDetailsGotten(
     val code : String,
     val statusCode : Int
 )
+
+
+data class ResetResponseBody(val status: String)
+
+data class ResetRequestBody(
+    val username: String,
+    val password: String,
+    val confirmationCode: String
+)
+

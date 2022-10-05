@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             startActivityForResult(intent, 12345)
         }
 
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
