@@ -5,11 +5,9 @@ import android.text.TextWatcher
 import android.widget.EditText
 
 class Validator {
-    var isValidEmail : Boolean = false
-    var isValidPassword : Boolean = false
 
     fun validateUserInput(field: EditText, isWhat: String) {
-
+        var valid = false
         field.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
@@ -24,7 +22,6 @@ class Validator {
                             }
                             else{
                                 field.error = null
-                                isValidEmail = true
                             }
 
                         TextInputType.isPassword ->
@@ -39,7 +36,6 @@ class Validator {
                             }
                             else {
                                 field.error = null
-                                isValidPassword = true
                             }
                     }
                 }
