@@ -2,15 +2,10 @@ package com.flexicharge.bolt.activities.businessLogic
 
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
-import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import com.flexicharge.bolt.api.flexicharge.Transaction
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import com.flexicharge.bolt.api.flexicharge.*
+import kotlinx.coroutines.*
 
-class RemoteTransaction() : RemoteObject<Transaction>() {
-    private var transactionId : Int = -1
+class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Transaction>() {
 
     override var value =
         Transaction(-1, "invalid", 0,
@@ -19,12 +14,43 @@ class RemoteTransaction() : RemoteObject<Transaction>() {
 
     override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
-            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
-            if (!response.isSuccessful) {
-                cancel("Could not fetch transaction!")
+            try {
+                val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                if (!response.isSuccessful) {
+                    cancel("Could not fetch transaction!")
+                }
+                else {
+                    value = response.body() as Transaction
+                }
             }
-            else {
-                value = response.body() as Transaction
+            catch (e: Exception) {
+                cancel(CancellationException(e.message))
+            }
+
+        }
+    }
+
+    fun createSession(lifecycleScope: LifecycleCoroutineScope, transactionSession: TransactionSession): Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.flexiChargeApi.postTransactionSession(transactionSession)
+                if(!response.isSuccessful) {
+                    cancel(response.message())
+                }
+                else {
+                    val transactionSessionResponse = response.body() as TransactionSessionResponse
+                    transactionId = transactionSessionResponse.transactionID
+                    try {
+                        val refreshJob = refresh(lifecycleScope)
+                        refreshJob.join()
+                    }
+                    catch (e: CancellationException) {
+                        cancel(e)
+                    }
+                }
+            }
+            catch (e: Exception) {
+                cancel(CancellationException(e.message))
             }
         }
     }
@@ -46,6 +72,20 @@ class RemoteTransaction() : RemoteObject<Transaction>() {
                 }
             }
 
+        }
+    }
+
+    fun start(lifecycleScope: LifecycleCoroutineScope): Job {
+        return lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
+                if(!response.isSuccessful) {
+                    cancel(response.message())
+                }
+            }
+            catch (e: Exception) {
+                cancel(CancellationException(e.message))
+            }
         }
     }
 

@@ -24,10 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
-import com.flexicharge.bolt.activities.businessLogic.RemoteChargePoints
-import com.flexicharge.bolt.activities.businessLogic.RemoteCharger
-import com.flexicharge.bolt.activities.businessLogic.RemoteChargers
-import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
+import com.flexicharge.bolt.activities.businessLogic.*
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
 import com.flexicharge.bolt.helpers.MapHelper.currLocation
 import com.flexicharge.bolt.helpers.MapHelper.currentLocation
@@ -45,8 +42,16 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okio.ByteString
+import org.json.JSONArray
+import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
+import java.nio.file.attribute.AclEntry.newBuilder
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -63,9 +68,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
 
+    private companion object {
+        const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 5000
+    }
+
     private val remoteChargers = RemoteChargers()
     private val remoteChargePoints = RemoteChargePoints()
     private val currentRemoteTransaction = RemoteTransaction()
+    private val remoteChargersRefresher = RemoteObjectRefresher(remoteChargers, REMOTE_CHARGERS_REFRESH_INTERVAL_MS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +103,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 })
             }
         }
-        remoteChargers.refresh(lifecycleScope)
+        remoteChargersRefresher.run(lifecycleScope)
 
         binding.mainActivityButtonPinPosition.setOnClickListener {
             currLocation(this)
@@ -147,6 +157,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()
         //, for your activity to start interacting with the user.
+        remoteChargersRefresher.run(lifecycleScope)
         val refreshChargers = remoteChargers.refresh(lifecycleScope)
         refreshChargers.invokeOnCompletion {
             if(refreshChargers.isCancelled) {
@@ -224,7 +235,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
 
-    private suspend fun setupChargingInProgressDialog() {
+    private fun setupChargingInProgressDialog() {
         if (this::chargerInputDialog.isInitialized) {
             chargerInputDialog.dismiss()
         }
@@ -244,72 +255,50 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
         val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
-        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.behavior.isDraggable = false;
         bottomSheetDialog.setCancelable(false)
 
-        var continueLooping = true;
-
         val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
 
+        progressbar.progress = initialPercentage
+        val httpClient = OkHttpClient()
+        val request = Request.Builder().url("ws://18.202.253.30:1337/user/" + currentRemoteTransaction.value.userID).build()
+        val listener = object: WebSocketListener() {
+            override fun onMessage(webSocket: WebSocket, string: String) {
+                super.onMessage(webSocket, string)
+                val liveMetricsMessage = WebSocketJsonMessage.parseLiveMetrics(string)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val percent = liveMetricsMessage.chargingPercent.value.toDouble()
+                    progressbar.progress = percent.toInt()
+                    progressbarPercent.text = percent.toString()
+                    chargeSpeed.text = liveMetricsMessage.chargingPower.value.toString() +
+                            liveMetricsMessage.chargingPower.unit
+
+                    val minutesLeft = (100 - percent) / 60
+                    val secondsLeft = (100 - percent) % 60
+                    val timeString = String.format("%02d:%02d", minutesLeft.toInt(), secondsLeft.toInt())
+                    chargingTimeStatus.text = timeString + " until fully charged"
+                }
+
+                if(liveMetricsMessage.chargingPercent.value.toDouble() >= 100) {
+                    webSocket.cancel()
+                    stopChargingProcess(initialPercentage, bottomSheetDialog)
+                }
+            }
+        }
+        val webSocket = httpClient.newWebSocket(request, listener)
+        httpClient.dispatcher.executorService.shutdown()
+
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
-            continueLooping = false
+            webSocket.cancel()
             stopChargingProcess(initialPercentage, bottomSheetDialog)
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-
-        if (!currentRemoteTransaction.value.paymentConfirmed) {
-            val df = DecimalFormat("#.##")
-            var percent = initialPercentage
-            val delayBetweenUpdatesMs : Long = 2000
-
-            chargingLocation.text = chargePoint.name
-            chargeSpeed.text = (currentRemoteTransaction.value.kwhTransfered/100).toString() + " kWh transferred"
-            GlobalScope.launch {
-                while (percent < 100 && continueLooping) {
-
-                    try {
-                        currentRemoteTransaction.refresh(lifecycleScope).invokeOnCompletion {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                percent = currentRemoteTransaction.value.currentChargePercentage
-                                progressbar.progress = percent
-                                progressbarPercent.text = percent.toString()
-                                chargeSpeed.text = currentRemoteTransaction.value.kwhTransfered.toString() + " kWh"
-
-                                val minutesLeft = (100 - percent) / 60
-                                val secondsLeft = (100 - percent) % 60
-                                val timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
-                                chargingTimeStatus.text = timeString + " until fully charged"
-                            }
-                        }
-                    }
-                    catch (e: Exception) {
-                        val couldNotRetrieve = "Could not get data from server"
-                        chargingTimeStatus.text = couldNotRetrieve
-                        chargeSpeed.text = couldNotRetrieve
-                        delay(delayBetweenUpdatesMs)
-                        continue
-                    }
-
-                    Log.d("tag", percent.toString())
-                    if (percent == 100) {
-                        stopChargingProcess(initialPercentage, bottomSheetDialog)
-                    }
-                    else {
-                        delay(delayBetweenUpdatesMs)
-                    }
-                }
-            }
-        }
-        else {
-            continueLooping = false
-            stopChargingProcess(initialPercentage, bottomSheetDialog)
-        }
     }
 
     private fun displayPaymentSummaryDialog(dateTime: String, initialPercentage: Int) {
@@ -473,7 +462,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
     private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
+        // TODO: Implement actual price per kwh measure
+        val transactionSession = TransactionSession(userId, chargerId, true, 75)
+        val createSessionJob = currentRemoteTransaction.createSession(lifecycleScope, transactionSession)
+        try{
+            createSessionJob.invokeOnCompletion {
+                if(createSessionJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
 
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val intent = Intent(this@MainActivity, KlarnaActivity::class.java)
+                    intent.putExtra("ChargerId", chargerId)
+                    intent.putExtra("ClientToken", currentRemoteTransaction.value.client_token)
+                    intent.putExtra("TransactionId", currentRemoteTransaction.value.transactionID)
+                    startActivity(intent)
+                }
+
+            }
+        }
+        catch (e: CancellationException) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(applicationContext, "Couldn't start transaction: " + e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+        /*
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestBody = TransactionSession(chargerId, userId) // post request is stored in HTTP body.
@@ -512,7 +525,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     )
                 }
             }
-        }
+        }*/
     }
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
@@ -729,5 +742,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargerInput?.text?.clear()
             setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 3)
         }
+    }
+
+    override fun finish() {
+        super.finish()
+        remoteChargersRefresher.stop()
     }
 }

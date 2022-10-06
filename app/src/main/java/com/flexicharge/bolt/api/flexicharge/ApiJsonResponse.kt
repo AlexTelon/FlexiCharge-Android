@@ -51,10 +51,15 @@ data class Transaction(
     val userID: String
 )
 
-
 data class TransactionSession(
+    val userID: String,
     val chargerID: Int,
-    val userID: String
+    val isKlarnaPayment: Boolean,
+    val pricePerKwh: Int
+)
+
+data class TransactionSessionResponse(
+    val transactionID: Int
 )
 
 data class TransactionOrder(
