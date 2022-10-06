@@ -3,6 +3,7 @@ package com.flexicharge.bolt.helpers
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
+import androidx.core.text.isDigitsOnly
 
 class Validator {
 
@@ -35,6 +36,15 @@ class Validator {
                                 field.error = "Password must have 8 chars containing upper- and lower case characters, digits and symbols"
                             }
                             else {
+                                field.error = null
+                            }
+                        TextInputType.isConfirmationCode ->
+                            if (s.length < 6
+                                || !s.isDigitsOnly()
+                            ) {
+                                field.error = "Conformation code must have 6 digits."
+                            }
+                            else{
                                 field.error = null
                             }
                     }
