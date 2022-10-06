@@ -71,8 +71,8 @@ class ConfirmEmailActivity : AppCompatActivity() {
                     val response = RetrofitInstance.flexiChargeApi.resetPass(emailAddress_)
                     if (response.code() == 200) {
                         sendAgainEmail.text = "A message with a verification code has been sent"
-                        delay(1500)
-                        error.text = ""
+                        delay(2000)
+                        sendAgainEmail.text = " "
                     } else if (response.code() == 400) {
                         error.text = "Please try later."
 
