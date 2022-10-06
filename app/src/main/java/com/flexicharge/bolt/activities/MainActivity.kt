@@ -95,8 +95,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 addNewMarkers(this@MainActivity, remoteChargers.value, fun (charger: Charger?) : Boolean {
                     if(charger != null && validateChargerId(charger.chargerID.toString())) {
                         lifecycleScope.launch(Dispatchers.Main) {
-                            setupChargerInputDialog()
-                            changeInput(charger.chargerID.toString())
+                            setupChargerInputDialog(charger.chargerID)
                         }
                     }
                     return false;
@@ -340,7 +339,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun setupChargerInputDialog() {
+    private fun setupChargerInputDialog(chargerId: Int? = null) {
 
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
@@ -361,17 +360,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             showCheckout(false, -1, false, -1)
         }
 
-        setupChargerInput(bottomSheetView)
+        setupChargerInput(bottomSheetView, chargerId)
 
         chargerInputDialog.setContentView(bottomSheetView)
         chargerInputDialog.show()
     }
 
-    private fun setupChargerInput(bottomSheetView: View) {
+    private fun setupChargerInput(bottomSheetView: View, chargerId: Int? = null) {
         Log.d("displayChargerList", "displayChargerList")
 
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
         chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
+
+        if(chargerId != null) {
+            if(validateChargerId(chargerId.toString())) {
+                pinView.setText(chargerId.toString())
+                displayChargerStatus(chargerId, chargerInputStatus)
+            }
+        }
+
         pinView.doOnTextChanged { text, start, before, count ->
             if (text?.length == 6) {
                 val chargerId = text.toString().toUInt().toInt()
@@ -384,7 +391,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 }
             }
         }
-
     }
 
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
@@ -488,46 +494,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 Toast.makeText(applicationContext, "Couldn't start transaction: " + e.message, Toast.LENGTH_LONG).show()
             }
         }
-        /*
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val requestBody = TransactionSession(chargerId, userId) // post request is stored in HTTP body.
-                val response = RetrofitInstance.flexiChargeApi.postTransactionSession(requestBody)
-                if (response.isSuccessful) {
-                    //TODO Backend Klarna/Order/Session Request if successful
-                    val transaction = response.body() as Transaction
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        val intent = Intent(this@MainActivity, KlarnaActivity::class.java)
-                        intent.putExtra("ChargerId", chargerId)
-                        intent.putExtra("ClientToken", transaction.client_token)
-                        intent.putExtra("TransactionId", transaction.transactionID)
-                        startActivity(intent)
-                    }
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        // TODO Dont fake that it was successful
-                    }
-                }
-            } catch (e: HttpException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(
-                        chargerInputStatus,
-                        false,
-                        "Could not get all data correctly",
-                        0
-                    )
-                }
-            } catch (e: IOException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(
-                        chargerInputStatus,
-                        false,
-                        "Unable to establish connection",
-                        0
-                    )
-                }
-            }
-        }*/
     }
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
