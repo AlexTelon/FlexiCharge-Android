@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var listOfChargersRecyclerView: RecyclerView
 
     private companion object {
-        const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 5000
+        const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 10000
     }
 
     private val remoteChargers = RemoteChargers()
@@ -113,7 +113,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             val intent = Intent(this, QrActivity::class.java)
             startActivityForResult(intent, 12345)
         }
-
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
@@ -169,11 +168,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 if(refreshChargePoints.isCancelled) {
                     return@invokeOnCompletion
                 }
-
                 checkPendingTransaction()
             }
         }
-
         fetchLocation(this)
     }
 
@@ -214,7 +211,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val dateTime = unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
 
         try {
-            currentRemoteTransaction.stop(lifecycleScope).invokeOnCompletion {
+            val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
+            stopRemoteTransactionJob.invokeOnCompletion {
+                if(stopRemoteTransactionJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
+
                 lifecycleScope.launch(Dispatchers.Main) {
                     val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
