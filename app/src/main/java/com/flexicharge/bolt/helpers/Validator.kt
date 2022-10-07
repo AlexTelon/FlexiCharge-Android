@@ -39,7 +39,7 @@ class Validator {
                                 field.error = null
                             }
                         TextInputType.isConfirmationCode ->
-                            if (s.length < 6
+                            if (s.length != 6
                                 || !s.isDigitsOnly()
                             ) {
                                 field.error = "Conformation code must have 6 digits."
