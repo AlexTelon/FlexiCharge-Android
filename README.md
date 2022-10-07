@@ -89,3 +89,7 @@ If you want to report a bug or suggest a new feature, please submit an issue.
 ## Support
 
 Create an issue on GitHub or contact our Scrum Leader at jofi1617@student.ju.se
+
+## Register Activity 
+self explanatory, the user registers using email and password, gets a conformation code and 
+verifies it in the Verify Activity 
