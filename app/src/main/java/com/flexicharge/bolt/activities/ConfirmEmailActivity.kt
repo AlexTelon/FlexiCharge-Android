@@ -3,7 +3,6 @@ package com.flexicharge.bolt.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.api.flexicharge.ResetRequestBody
@@ -23,6 +22,7 @@ class ConfirmEmailActivity : AppCompatActivity() {
     private var emailAddress_ = " "
     private var newPassword_ = " "
     private var confirmCode_ = ""
+    private var confirmPassword_ = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_confirm_email)
@@ -37,18 +37,28 @@ class ConfirmEmailActivity : AppCompatActivity() {
         val confirmCode = binding.confirmCode
         val error = binding.confirmEmailActivityErrorMessage
         val sendAgainEmail= binding.sendAgainEmailMessage
+        val confirmPassword = binding.confirmNewPassword
         validator.validateUserInput(newPassword, TextInputType.isPassword)
         validator.validateUserInput(confirmCode, TextInputType.isConfirmationCode)
         emailAddress_ = emailAdd.text.toString()
+
         binding.buttonConfirm.setOnClickListener {
             newPassword_ = newPassword.text.toString()
             confirmCode_ = confirmCode.text.toString()
-            lifecycleScope.launch(Dispatchers.IO) {
+            confirmPassword_ = confirmPassword.text.toString()
+            lifecycleScope.launch(Dispatchers.Main) {
                 try {
                     val body = ResetRequestBody(emailAddress_, newPassword_, confirmCode_)
                     val response = RetrofitInstance.flexiChargeApi.confReset(body)
                     if (response.code() == 200) {
-                        navigateToLogIn()
+                        if (confirmPassword_ == newPassword_) {
+                            navigateToLogIn()
+                        }else if(confirmCode_.isEmpty()){
+                            error.text = "Confirmation code can not be empty"
+                        }
+                        else{
+                            error.text = "Passwords does not match"
+                        }
                     } else{
                         lifecycleScope.launch(Dispatchers.Main){
                             if (response.message() == "Bad Request" ) {
@@ -75,7 +85,6 @@ class ConfirmEmailActivity : AppCompatActivity() {
                         sendAgainEmail.text = " "
                     } else if (response.code() == 400) {
                         error.text = "Please try later."
-
                     }
                 } catch (e: HttpException) {
                     error.text ="Internal Server Error"
@@ -88,5 +97,6 @@ class ConfirmEmailActivity : AppCompatActivity() {
     private fun navigateToLogIn() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
+        finish()
     }
-    }
+}

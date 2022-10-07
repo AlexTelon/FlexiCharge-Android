@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activities.ConfirmEmailActivity">
 
-
     <ImageView
         android:id="@+id/loginActivity_imageView_title"
         android:layout_width="0dp"
@@ -34,7 +33,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <Button
         android:id="@+id/button_confirm"
@@ -78,7 +76,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_RecoverEmailSent" />
 
-
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -99,19 +96,45 @@
             android:ems="15"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/confirmCode"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="160dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Repeat Password"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_RecoverEmailSent" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/confirmNewPassword"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textPassword"
+            android:ems="15"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="240dp"
         android:layout_marginEnd="32dp"
         android:hint="Confirmation Code"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_emailRecover" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_RecoverEmailSent" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/confirmCode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textNoSuggestions"
+            android:ems="15"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/textView_no_Email"
@@ -141,23 +164,22 @@
         android:id="@+id/confirmEmailActivity_error_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="260dp"
         android:textColor="@color/red"
         app:layout_constraintBottom_toTopOf="@+id/button_confirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmCode"/>
+        app:layout_constraintTop_toBottomOf="@+id/textView_emailRecover"/>
     <TextView
         android:id="@+id/sendAgainEmail_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="260dp"
         android:layout_marginBottom="64dp"
         android:textColor="@color/green"
         app:layout_constraintBottom_toTopOf="@+id/button_confirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmCode"/>
-
-
-
+        app:layout_constraintTop_toBottomOf="@+id/textView_emailRecover"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
