@@ -1,11 +1,14 @@
 package com.flexicharge.bolt.activities.businessLogic
 
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.flexicharge.bolt.api.flexicharge.Chargers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withTimeout
 
 abstract class RemoteObject<T> {
-    data class RemoteObjectJob<T>(val job: Job, val value: T)
+
+    companion object {
+        const val REMOTE_OBJECT_TIMEOUT_MILLISECONDS = 1300L
+    }
 
     abstract var value: T
         protected set
@@ -21,6 +24,7 @@ abstract class RemoteObject<T> {
     fun refresh(lifecycleScope: LifecycleCoroutineScope) : Job {
 
         val remoteObjectJob = retrieve(lifecycleScope)
+
         remoteObjectJob.invokeOnCompletion {
             if(remoteObjectJob.isCancelled) {
                 return@invokeOnCompletion
