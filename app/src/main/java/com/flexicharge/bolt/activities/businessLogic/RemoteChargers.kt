@@ -19,21 +19,24 @@ class RemoteChargers() : RemoteObject<Chargers>() {
     override fun retrieve(lifecycleScope: LifecycleCoroutineScope) : Job {
 
         val refreshJob = lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
-                if (!response.isSuccessful) {
-                    cancel("Failed retrieving chargers")
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
+                    if (!response.isSuccessful) {
+                        cancel("Failed retrieving chargers")
+                    }
+
+                    value = response.body() as Chargers
+
+
+                } catch (e: HttpException) {
+                    Log.d("validateConnection", "Http Error")
+                    cancel(e.message())
+                } catch (e: IOException) {
+                    Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
+                    cancel(e.toString())
                 }
 
-                value = response.body() as Chargers
-
-
-            } catch (e: HttpException) {
-                Log.d("validateConnection", "Http Error")
-                cancel(e.message())
-            } catch (e: IOException) {
-                Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
-                cancel(e.toString())
             }
         }
 
