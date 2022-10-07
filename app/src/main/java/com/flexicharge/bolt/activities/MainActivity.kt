@@ -526,58 +526,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             Toast.makeText(applicationContext, "Could not reserve charger: " + e.message, Toast.LENGTH_LONG).show()
         }
 
-        /*
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val requestParams: MutableMap<String, String> = HashMap()
-                requestParams.put("chargerId", chargerId.toString())
-                requestParams.put("connectorId", "1")
-                requestParams.put("idTag", "1")
-                requestParams.put("reservationId", "1")
-                requestParams.put("parentIdTag", "1")
-                val response = RetrofitInstance.flexiChargeApi.reserveCharger(chargerId, requestParams)
-                if (response.isSuccessful) {
-                    //TODO Backend Klarna/Order/Session Request if successful
-                    val status = response.body() as String
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        when (status) {
-                            "Accepted" -> {
-                                createKlarnaTransactionSession("BoltGuest", chargerId)
-                            }
-                            "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
-                            }
-                            "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
-                            }
-                            "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
-                            }
-                            "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
-                            }
-                            else -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 2)
-                            }
-                        }
-                    }
-                }
-                else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        // TODO Dont fake that it was successful
-                        createKlarnaTransactionSession("BoltGuest", chargerId)
-                    }
-                }
-            } catch (e: HttpException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 0)
-                }
-            } catch (e: IOException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
-                }
-            }
-        }*/
     }
 
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
