@@ -4,7 +4,6 @@ package com.flexicharge.bolt.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.EditText
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
@@ -30,7 +29,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
         val emailEdittext :EditText = binding.resetActivityEditTextEmail
         val error = binding.resetPassActivityErrorMessage
         validator.validateUserInput(emailEdittext, TextInputType.isEmail)
-
         binding.buttonConfirmRecoverPassword.setOnClickListener {
             emailAddress = emailEdittext.text.toString()
             lifecycleScope.launch(Dispatchers.Main) {
