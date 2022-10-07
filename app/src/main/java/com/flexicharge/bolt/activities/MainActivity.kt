@@ -488,6 +488,45 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
+        val remoteCharger = RemoteCharger(chargerId)
+        try {
+            val reserveChargerJob = remoteCharger.reserve(lifecycleScope)
+            reserveChargerJob.invokeOnCompletion {
+                if(reserveChargerJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
+
+                when (remoteCharger.status) {
+                    "Accepted" -> {
+                        createKlarnaTransactionSession("BoltGuest", chargerId)
+                    }
+                    "Faulted" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
+                    }
+                    "Occupied" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
+                    }
+                    "Rejected" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
+                    }
+                    "Unavailable" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
+                    }
+                    else -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 2)
+                    }
+                }
+
+            }
+        }
+        catch (e: CancellationException) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                setChargerButtonStatus(chargerInputStatus, false, "Could not reserve charger", 0)
+            }
+            Toast.makeText(applicationContext, "Could not reserve charger: " + e.message, Toast.LENGTH_LONG).show()
+        }
+
+        /*
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestParams: MutableMap<String, String> = HashMap()
@@ -538,7 +577,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
                 }
             }
-        }
+        }*/
     }
 
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
