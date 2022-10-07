@@ -37,13 +37,12 @@ interface ApiInterface {
     suspend fun getTransaction(@Path("transactionId") transactionId: Int): Response<Transaction>
 
     @POST("transactions/session")
-    suspend fun postTransactionSession(@Body body: TransactionSession): Response<Transaction>
+    suspend fun postTransactionSession(@Body body: TransactionSession): Response<TransactionSessionResponse>
 
     @PUT("transactions/start/{transactionId}")
     suspend fun transactionStart(
         @Path("transactionId") transactionId: Int,
-        @Body body: TransactionOrder
-    ): Response<TransactionList>
+    ): Response<Unit>
 
     @PUT("transactions/stop/{transactionId}")
     suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<TransactionList>

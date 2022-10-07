@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
+import com.flexicharge.bolt.activities.businessLogic.*
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
 import com.flexicharge.bolt.helpers.MapHelper.currLocation
 import com.flexicharge.bolt.helpers.MapHelper.currentLocation
@@ -51,8 +52,6 @@ import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
-    private lateinit var chargers: Chargers
-    private lateinit var chargePoints: ChargePoints
     private lateinit var chargerInputDialog: BottomSheetDialog
     private lateinit var paymentSummaryDialog: BottomSheetDialog
     private lateinit var hours : String
@@ -60,13 +59,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var pinView: PinView
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
-    private lateinit var currentTransaction: Transaction
+
+    private companion object {
+        const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 10000
+    }
+
+    private val remoteChargers = RemoteChargers()
+    private val remoteChargePoints = RemoteChargePoints()
+    private val currentRemoteTransaction = RemoteTransaction()
+    private val remoteChargersRefresher = RemoteObjectRefresher(remoteChargers, REMOTE_CHARGERS_REFRESH_INTERVAL_MS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val isGuest = sharedPreferences.getBoolean("isGuest", true) //Set to true to enable registration
-
 
         if (!isGuest) {
             startActivity(Intent(this, RegisterActivity::class.java))
@@ -76,6 +82,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        remoteChargers.setOnRefreshedCallBack {
+            lifecycleScope.launch(Dispatchers.Main) {
+                addNewMarkers(this@MainActivity, remoteChargers.value, fun (charger: Charger?) : Boolean {
+                    if(charger != null && validateChargerId(charger.chargerID.toString())) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            setupChargerInputDialog(charger.chargerID)
+                        }
+                    }
+                    return false;
+                })
+            }
+        }
+        remoteChargersRefresher.run(lifecycleScope)
+
         binding.mainActivityButtonPinPosition.setOnClickListener {
             currLocation(this)
         }
@@ -84,7 +104,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             val intent = Intent(this, QrActivity::class.java)
             startActivityForResult(intent, 12345)
         }
-
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
@@ -126,13 +145,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
-        super.onResume()       //, for your activity to start interacting with the user.
-        fetchLocation(this)
-        updateChargerList().invokeOnCompletion {
-            updateChargePointList().invokeOnCompletion {
+        super.onResume()
+        //, for your activity to start interacting with the user.
+        remoteChargersRefresher.run(lifecycleScope)
+        val refreshChargers = remoteChargers.refresh(lifecycleScope)
+        refreshChargers.invokeOnCompletion {
+            if(refreshChargers.isCancelled) {
+                return@invokeOnCompletion
+            }
+            val refreshChargePoints = remoteChargePoints.refresh(lifecycleScope)
+
+            refreshChargePoints.invokeOnCompletion {
+                if(refreshChargePoints.isCancelled) {
+                    return@invokeOnCompletion
+                }
                 checkPendingTransaction()
             }
         }
+        fetchLocation(this)
     }
 
     override fun changeInput(newInput: String){
@@ -168,33 +198,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         initialPercentage: Int,
         bottomSheetDialog: BottomSheetDialog,
     ) {
-        val dateTime = unixToDateTime(currentTransaction.timestamp.toString())
-        //hours = Calendar.getInstance().time.hours.toString()
-        //minutes = Calendar.getInstance().time.minutes.toString()
+        currentRemoteTransaction.refresh(lifecycleScope)
+        val dateTime = unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
+
         try {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val response = RetrofitInstance.flexiChargeApi.transactionStop(currentTransaction.transactionID)
-                if (response.isSuccessful) {
-                    currentTransaction = (response.body() as TransactionList)[0]
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
-                        bottomSheetDialog.dismiss()
-                        displayPaymentSummaryDialog(dateTime, initialPercentage)
-                    }
+            val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
+            stopRemoteTransactionJob.invokeOnCompletion {
+                if(stopRemoteTransactionJob.isCancelled) {
+                    return@invokeOnCompletion
                 }
-                else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
-                        bottomSheetDialog.dismiss()
-                        displayPaymentSummaryDialog(dateTime, initialPercentage)
-                    }
+
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                    bottomSheetDialog.dismiss()
+                    displayPaymentSummaryDialog(dateTime, initialPercentage)
                 }
             }
         }
-        catch (e: IOException) {
+        catch (e: Exception) {
             lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                 bottomSheetDialog.dismiss()
@@ -203,24 +227,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun updateCurrentTransaction(transactionID: Int) : Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionID)
-            if (!response.isSuccessful) {
-                cancel("Could not fetch transaction!")
-            } else {
-                currentTransaction = response.body() as Transaction
-            }
-        }
-    }
 
-    private suspend fun setupChargingInProgressDialog() {
+    private fun setupChargingInProgressDialog() {
         if (this::chargerInputDialog.isInitialized) {
             chargerInputDialog.dismiss()
         }
 
-        val charger = chargers.filter { it.chargerID == currentTransaction.chargerID }.getOrNull(0)
-        val chargePoint = chargePoints.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
+        val charger = remoteChargers.value.filter { it.chargerID == currentRemoteTransaction.value.chargerID }.getOrNull(0)
+        val chargePoint = remoteChargePoints.value.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
         if(charger == null || chargePoint == null) {
             throw Exception("Tried to display charging information for a charger that doesn't exist.")
@@ -234,71 +248,49 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
         val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
-        val chargingLocation = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.behavior.isDraggable = false;
         bottomSheetDialog.setCancelable(false)
 
-        var continueLooping = true;
+        val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
 
-        val initialPercentage = currentTransaction.currentChargePercentage
+        progressbar.progress = initialPercentage
+
+        val liveChargingMetricsListener = LiveChargingMetricsListener(currentRemoteTransaction.value.userID) { liveMetricsMessage ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                val percent = liveMetricsMessage.chargingPercent.value.toDouble()
+                progressbar.progress = percent.toInt()
+                progressbarPercent.text = percent.toString()
+                chargeSpeed.text = liveMetricsMessage.chargingPower.value.toString() +
+                        liveMetricsMessage.chargingPower.unit
+
+                val minutesLeft = (100 - percent) / 60
+                val secondsLeft = (100 - percent) % 60
+                val timeString =
+                    String.format("%02d:%02d", minutesLeft.toInt(), secondsLeft.toInt())
+                chargingTimeStatus.text = timeString + " until fully charged"
+            }
+        }
+
+        liveChargingMetricsListener.stopWhen { liveMetricsMessage ->
+            if(liveMetricsMessage.chargingPercent.value.toDouble() >= 100.0) {
+                stopChargingProcess(initialPercentage, bottomSheetDialog)
+                return@stopWhen true
+            }
+            else {
+                return@stopWhen false
+            }
+        }
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
-            continueLooping = false
+            liveChargingMetricsListener.stop()
             stopChargingProcess(initialPercentage, bottomSheetDialog)
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-
-        if (!currentTransaction.paymentConfirmed) {
-            val df = DecimalFormat("#.##")
-            //val distanceStr = df.format(currentTransaction.kwhTransfered/100).toString()
-            var percent = initialPercentage
-            val delayBetweenUpdatesMs : Long = 2000
-
-            chargingLocation.text = chargePoint.name
-            chargeSpeed.text = (currentTransaction.kwhTransfered/100).toString() + " kWh transferred"
-            GlobalScope.launch {
-                while (percent < 100 && continueLooping) {
-                    try {
-                        updateCurrentTransaction(currentTransaction.transactionID)
-                    }
-                    catch (e: Exception) {
-                        chargingTimeStatus.text = e.message
-                        chargeSpeed.text = e.message
-                        delay(delayBetweenUpdatesMs)
-                        continue
-                    }
-
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        percent = currentTransaction.currentChargePercentage
-                        progressbar.progress = percent
-                        progressbarPercent.text = percent.toString()
-                        chargeSpeed.text = currentTransaction.kwhTransfered.toString() + " kWh"
-
-                        val minutesLeft = (100 - percent) / 60
-                        val secondsLeft = (100 - percent) % 60
-                        val timeString = String.format("%02d:%02d", minutesLeft, secondsLeft)
-                        chargingTimeStatus.text = timeString + " until fully charged"
-                    }
-
-                    Log.d("tag", percent.toString())
-                    if (percent == 100) {
-                        stopChargingProcess(initialPercentage, bottomSheetDialog)
-                    }
-                    else {
-                        delay(delayBetweenUpdatesMs)
-                    }
-                }
-            }
-        }
-        else {
-            continueLooping = false
-            stopChargingProcess(initialPercentage, bottomSheetDialog)
-        }
     }
 
     private fun displayPaymentSummaryDialog(dateTime: String, initialPercentage: Int) {
@@ -317,34 +309,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             paymentSummaryDialog.dismiss()
         }
 
-        var kwhTransfered = 0.toDouble()
-        var totalCost = 0.toFloat()
-        var duration = 0
-        var pricePerKwh = "0"
-        if (this::currentTransaction.isInitialized) {
-            if (currentTransaction.kwhTransfered != null) {
-                kwhTransfered = currentTransaction.kwhTransfered
-                totalCost = (currentTransaction.kwhTransfered.toString().toDouble() * currentTransaction.pricePerKwh.toDouble()/100).toFloat()
-            }
-            if (currentTransaction.pricePerKwh != null) {
-                pricePerKwh = currentTransaction.pricePerKwh
-            }
-            if (currentTransaction.currentChargePercentage != null) {
-                duration = currentTransaction.currentChargePercentage - initialPercentage
+        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope);
+        refreshJob.invokeOnCompletion {
+            val transaction = currentRemoteTransaction.value
+            val kwhTransferred = transaction.kwhTransfered
+            val totalCost = (transaction.kwhTransfered.toString().toDouble() * transaction.pricePerKwh.toDouble()/100).toFloat()
+            val pricePerKwh = transaction.pricePerKwh
+            val duration = transaction.currentChargePercentage - initialPercentage
+
+            lifecycleScope.launch(Dispatchers.Main) {
+
+                energyUsedTextView.text = kwhTransferred.toString() + " kWh @" + pricePerKwh + "kr kWh"
+                durationTextView.text = duration.toString() + " Seconds"
+                chargingStopTimeTextView.text = "Charging stopped at " + dateTime
+                totalCostTextView.text = totalCost.toString() + "kr"
+
+                paymentSummaryDialog.setContentView(bottomSheetView)
+                paymentSummaryDialog.show()
             }
         }
-
-        energyUsedTextView.text = kwhTransfered.toString() + " kWh @" + pricePerKwh + "kr kWh"
-        durationTextView.text = duration.toString() + " Seconds"
-        chargingStopTimeTextView.text = "Charging stopped at " + dateTime
-        totalCostTextView.text = totalCost.toString() + "kr"
-
-        paymentSummaryDialog.setContentView(bottomSheetView)
-        paymentSummaryDialog.show()
-
     }
 
-    private fun setupChargerInputDialog() {
+    private fun setupChargerInputDialog(chargerId: Int? = null) {
 
         chargerInputDialog = BottomSheetDialog(
             this@MainActivity, R.style.BottomSheetDialogTheme
@@ -365,16 +351,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             showCheckout(false, -1, false, -1)
         }
 
-        setupChargerInput(bottomSheetView)
+        setupChargerInput(bottomSheetView, chargerId)
 
         chargerInputDialog.setContentView(bottomSheetView)
         chargerInputDialog.show()
     }
 
-    private fun setupChargerInput(bottomSheetView: View) {
+    private fun setupChargerInput(bottomSheetView: View, chargerId: Int? = null) {
+        Log.d("displayChargerList", "displayChargerList")
 
         pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
         chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
+
+        if(chargerId != null) {
+            if(validateChargerId(chargerId.toString())) {
+                pinView.setText(chargerId.toString())
+                displayChargerStatus(chargerId, chargerInputStatus)
+            }
+        }
+
         pinView.doOnTextChanged { text, start, before, count ->
             if (text?.length == 6) {
                 val chargerId = text.toString().toUInt().toInt()
@@ -387,25 +382,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 }
             }
         }
-
     }
 
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
         val chargerId = pinView.text.toString()
+        val refreshJob = remoteChargers.refresh(lifecycleScope);
+        refreshJob.invokeOnCompletion {
+            if(refreshJob.isCancelled) {
+                return@invokeOnCompletion
+            }
 
-        listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
-        listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            lifecycleScope.launch(Dispatchers.Main) {
+                listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
+                listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
 
+                val chargersInCp = remoteChargers.value.filter {it.chargePointID == chargePointId}
+                val chargePoint = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
+                listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this@MainActivity)
 
-        if (this::chargePoints.isInitialized) {
-            var chargersInCp = chargers.filter {it.chargePointID == chargePointId}
-            var chargePoint = chargePoints.filter { it.chargePointID == chargePointId }[0]
-            listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this)
-        }
-
-        // Only add decoration on first-time display
-        if( listOfChargersRecyclerView.itemDecorationCount == 0) {
-            listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+                // Only add decoration on first-time display
+                if( listOfChargersRecyclerView.itemDecorationCount == 0) {
+                    listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+                }
+            }
         }
     }
 
@@ -423,131 +422,67 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargePointsNearMe.visibility = View.VISIBLE
         }
         listOfChargePointsRecyclerView.layoutManager = LinearLayoutManager(this)
-        updateChargePointList().invokeOnCompletion {
-            if (this::chargePoints.isInitialized) {
-                val distanceToChargePoint = mutableListOf<String>()
-                val chargerCount = mutableListOf<Int>()
-
-                chargePoints.forEachIndexed { index, chargePoint ->
-                    val dist = FloatArray(1)
-                    var couldGetLocation = true
-                    try {
-                        Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
-                    }
-                    catch (e: UninitializedPropertyAccessException) {
-                        dist[0] = 0f
-                        couldGetLocation = false
-                    }
-
-                    val df = DecimalFormat("#.##")
-                    val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
-                        "?"
-                    }
-
-                    val count = chargers.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                    distanceToChargePoint.add(distanceStr)
-                    chargerCount.add(count)
-                }
-                lifecycleScope.launch(Dispatchers.Main) {
-                    listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints, this@MainActivity, distanceToChargePoint, chargerCount)
-                }
+        val refreshChargePoints = remoteChargePoints.refresh(lifecycleScope)
+        refreshChargePoints.invokeOnCompletion {
+            if(refreshChargePoints.isCancelled) {
+                return@invokeOnCompletion
             }
+
+            val distanceToChargePoint = mutableListOf<String>()
+            val chargerCount = mutableListOf<Int>()
+
+            remoteChargePoints.value.forEachIndexed { index, chargePoint ->
+                val dist = FloatArray(1)
+                var couldGetLocation = true
+                try {
+                    Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
+                }
+                catch (e: UninitializedPropertyAccessException) {
+                    dist[0] = 0f
+                    couldGetLocation = false
+                }
+
+                val df = DecimalFormat("#.##")
+                val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
+                    "?"
+                }
+
+                val count = remoteChargers.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                distanceToChargePoint.add(distanceStr)
+                chargerCount.add(count)
+            }
+            lifecycleScope.launch(Dispatchers.Main) {
+                listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceToChargePoint, chargerCount)
+            }
+
         }
         //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
     }
 
-    private fun updateChargePointList() : Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getChargePointList()
-                if (response.isSuccessful) {
-                    val chargePoints = response.body() as ChargePoints
-                    if (!chargePoints.isEmpty()) {
-                        this@MainActivity.chargePoints = response.body() as ChargePoints
-                    }
-                    else {
-                        this@MainActivity.chargePoints = ChargePoints()
-                    }
-                }
-            } catch (e: HttpException) {
-                Log.d("validateConnection", "Http Error")
-            } catch (e: IOException) {
-                Log.d("validateConnection", "No Internet Error - ChargePointList will not be initialized")
-            }
-        }
-    }
-
-
-    private fun updateChargerList() : Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
-                if (!response.isSuccessful) {
-                    cancel("Failed retrieving chargers")
-                }
-                val chargers = response.body() as Chargers
-                lifecycleScope.launch(Dispatchers.Main) {
-                    this@MainActivity.chargers = response.body() as Chargers
-                    addNewMarkers(this@MainActivity, chargers, fun (charger: Charger?) : Boolean {
-                        if(charger != null && validateChargerId(charger.chargerID.toString())) {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                setupChargerInputDialog()
-                                changeInput(charger.chargerID.toString())
-                            }
-                        }
-                        return false;
-                    })
-                }
-
-            } catch (e: HttpException) {
-                Log.d("validateConnection", "Http Error")
-                cancel(e.message())
-            } catch (e: IOException) {
-                Log.d("validateConnection", "No Internet Error - ChargerList will not be initialized")
-                cancel(e.toString())
-            }
-        }
-    }
 
     private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
+        // TODO: Implement actual price per kwh measure
+        val transactionSession = TransactionSession(userId, chargerId, true, 75)
+        val createSessionJob = currentRemoteTransaction.createSession(lifecycleScope, transactionSession)
+        try{
+            createSessionJob.invokeOnCompletion {
+                if(createSessionJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val requestBody = TransactionSession(chargerId, userId) // post request is stored in HTTP body.
-                val response = RetrofitInstance.flexiChargeApi.postTransactionSession(requestBody)
-                if (response.isSuccessful) {
-                    //TODO Backend Klarna/Order/Session Request if successful
-                    val transaction = response.body() as Transaction
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        val intent = Intent(this@MainActivity, KlarnaActivity::class.java)
-                        intent.putExtra("ChargerId", chargerId)
-                        intent.putExtra("ClientToken", transaction.client_token)
-                        intent.putExtra("TransactionId", transaction.transactionID)
-                        startActivity(intent)
-                    }
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        // TODO Dont fake that it was successful
-                    }
-                }
-            } catch (e: HttpException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(
-                        chargerInputStatus,
-                        false,
-                        "Could not get all data correctly",
-                        0
-                    )
+                    val intent = Intent(this@MainActivity, KlarnaActivity::class.java)
+                    intent.putExtra("ChargerId", chargerId)
+                    intent.putExtra("ClientToken", currentRemoteTransaction.value.client_token)
+                    intent.putExtra("TransactionId", currentRemoteTransaction.value.transactionID)
+                    startActivity(intent)
                 }
-            } catch (e: IOException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(
-                        chargerInputStatus,
-                        false,
-                        "Unable to establish connection",
-                        0
-                    )
-                }
+
+            }
+        }
+        catch (e: CancellationException) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(applicationContext, "Couldn't start transaction: " + e.message, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -607,55 +542,51 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getCharger(chargerId)
-                if (response.isSuccessful) {
-                    val charger = response.body() as Charger
+        val remoteCharger = RemoteCharger(chargerId)
+        try {
+            val refreshJob = remoteCharger.refresh(lifecycleScope);
+            refreshJob.invokeOnCompletion {
+                if(refreshJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
 
-                    Log.d("validateConnection", "Connected to charger " + charger.chargerID)
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        when (charger.status) {
-                            "Available" -> {
-                                showCheckout(true, charger.chargePointID, true, chargerId)
-                                setChargerButtonStatus(chargerInputStatus, true, "Continue", 2)
-                            }
-                            "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
-                            }
-                            "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
-                            }
-                            "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
-                            }
-                            "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
-                            }
-                            "Charging" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 0)
-                            }
-                            "Reserved" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 0)
-                            }
-                            else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger is " + charger.status, 2) }
+                val charger = remoteCharger.value
+                Log.d("validateConnection", "Connected to charger " + charger.chargerID)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    when (charger.status) {
+                        "Available" -> {
+                            showCheckout(true, charger.chargePointID, true, chargerId)
+                            setChargerButtonStatus(chargerInputStatus, true, "Continue", 2)
                         }
+                        "Faulted" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 0)
+                        }
+                        "Occupied" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 0)
+                        }
+                        "Rejected" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 0)
+                        }
+                        "Unavailable" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 0)
+                        }
+                        "Charging" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger is occupied", 0)
+                        }
+                        "Reserved" -> {
+                            setChargerButtonStatus(chargerInputStatus, false, "Charger is reserved", 0)
+                        }
+                        else -> { setChargerButtonStatus(chargerInputStatus, false, "Charger is " + charger.status, 2) }
                     }
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        setChargerButtonStatus(chargerInputStatus, false, "Charger not identified", 2)
-                    }
-                }
-            } catch (e: HttpException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 2)
-                }
-            } catch (e: IOException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 2)
                 }
             }
         }
+        catch(e: CancellationException) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                setChargerButtonStatus(chargerInputStatus, false, e.message!!, 2)
+            }
+        }
+
     }
 
     private fun setChargerButtonStatus(chargerInputStatus: MaterialButton, active: Boolean, text: String, color: Int) {
@@ -690,6 +621,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
         return true
     }
+
     private fun checkPendingTransaction() {
         //TODO Fix fetching transaction ID smartly
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
@@ -699,7 +631,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             return
         }
 
-        updateCurrentTransaction(transactionId).invokeOnCompletion {
+        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId);
+        refreshJob.invokeOnCompletion {
+            if(refreshJob.isCancelled) {
+                return@invokeOnCompletion
+            }
+
             lifecycleScope.launch(Dispatchers.Main) {
                 try {
                     setupChargingInProgressDialog()
@@ -708,7 +645,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     Toast.makeText(applicationContext, e.message + " : " + e.cause, Toast.LENGTH_LONG).show()
                 }
             }
-
         }
 
     }
@@ -753,7 +689,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 paymentText?.visibility = View.GONE
                 chargerInput?.isEnabled = true
             }
-            chargerLocationText?.text = chargePoints.filter { it.chargePointID == chargePointId }[0].name
+            chargerLocationText?.text = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0].name
             if (chargerInputView != null) {
                 displayChargerList(chargerInputView, chargePointId)
             }
@@ -765,5 +701,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargerInput?.text?.clear()
             setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 3)
         }
+    }
+
+    override fun finish() {
+        super.finish()
+        remoteChargersRefresher.stop()
     }
 }
