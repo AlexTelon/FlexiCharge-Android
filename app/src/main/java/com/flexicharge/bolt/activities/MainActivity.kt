@@ -42,16 +42,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.WebSocket
-import okhttp3.WebSocketListener
-import okio.ByteString
-import org.json.JSONArray
-import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
-import java.nio.file.attribute.AclEntry.newBuilder
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -265,36 +257,35 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
 
         progressbar.progress = initialPercentage
-        val httpClient = OkHttpClient()
-        val request = Request.Builder().url("ws://18.202.253.30:1337/user/" + currentRemoteTransaction.value.userID).build()
-        val listener = object: WebSocketListener() {
-            override fun onMessage(webSocket: WebSocket, string: String) {
-                super.onMessage(webSocket, string)
-                val liveMetricsMessage = WebSocketJsonMessage.parseLiveMetrics(string)
-                lifecycleScope.launch(Dispatchers.Main) {
-                    val percent = liveMetricsMessage.chargingPercent.value.toDouble()
-                    progressbar.progress = percent.toInt()
-                    progressbarPercent.text = percent.toString()
-                    chargeSpeed.text = liveMetricsMessage.chargingPower.value.toString() +
-                            liveMetricsMessage.chargingPower.unit
 
-                    val minutesLeft = (100 - percent) / 60
-                    val secondsLeft = (100 - percent) % 60
-                    val timeString = String.format("%02d:%02d", minutesLeft.toInt(), secondsLeft.toInt())
-                    chargingTimeStatus.text = timeString + " until fully charged"
-                }
+        val liveChargingMetricsListener = LiveChargingMetricsListener(currentRemoteTransaction.value.userID) { liveMetricsMessage ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                val percent = liveMetricsMessage.chargingPercent.value.toDouble()
+                progressbar.progress = percent.toInt()
+                progressbarPercent.text = percent.toString()
+                chargeSpeed.text = liveMetricsMessage.chargingPower.value.toString() +
+                        liveMetricsMessage.chargingPower.unit
 
-                if(liveMetricsMessage.chargingPercent.value.toDouble() >= 100) {
-                    webSocket.cancel()
-                    stopChargingProcess(initialPercentage, bottomSheetDialog)
-                }
+                val minutesLeft = (100 - percent) / 60
+                val secondsLeft = (100 - percent) % 60
+                val timeString =
+                    String.format("%02d:%02d", minutesLeft.toInt(), secondsLeft.toInt())
+                chargingTimeStatus.text = timeString + " until fully charged"
             }
         }
-        val webSocket = httpClient.newWebSocket(request, listener)
-        httpClient.dispatcher.executorService.shutdown()
+
+        liveChargingMetricsListener.stopWhen { liveMetricsMessage ->
+            if(liveMetricsMessage.chargingPercent.value.toDouble() >= 100.0) {
+                stopChargingProcess(initialPercentage, bottomSheetDialog)
+                return@stopWhen true
+            }
+            else {
+                return@stopWhen false
+            }
+        }
 
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging).setOnClickListener {
-            webSocket.cancel()
+            liveChargingMetricsListener.stop()
             stopChargingProcess(initialPercentage, bottomSheetDialog)
         }
 
