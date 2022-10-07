@@ -101,7 +101,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="16dp"
-        android:enabled="false"
+
         android:text="Register"
         app:layout_constraintBottom_toTopOf="@+id/textViewLogIn"
         app:layout_constraintEnd_toEndOf="parent"
