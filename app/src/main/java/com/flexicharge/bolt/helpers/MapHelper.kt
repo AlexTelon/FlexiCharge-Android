@@ -27,6 +27,7 @@ object MapHelper {
     private var markerToChargerMap = mutableMapOf<Marker, Charger>()
     const val LOCATION_PERMISSION_REQUEST_CODE = 1
     const val PERMISSION_CODE = 101
+    private const val LOCATION_UPDATE_INTERVAL_MS = 5000L
 
     fun currLocation(activity: MainActivity){
         if (MapHelper::currentLocation.isInitialized) {
@@ -52,7 +53,7 @@ object MapHelper {
 
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-            interval = 2 * 1000
+            interval = LOCATION_UPDATE_INTERVAL_MS
         }
 
         val supportMapFragment =
@@ -119,9 +120,7 @@ object MapHelper {
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
 
-        markerToChargerMap.keys.forEach{
-            it.remove()
-        }
+        markerToChargerMap.clear()
 
         chargers.forEach { charger ->
             val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
