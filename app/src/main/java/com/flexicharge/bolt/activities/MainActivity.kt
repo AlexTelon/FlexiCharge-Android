@@ -47,6 +47,7 @@ import java.io.IOException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.collections.HashMap
 
 
@@ -391,20 +392,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             if(refreshJob.isCancelled) {
                 return@invokeOnCompletion
             }
+            val refreshRemoteChargePointsJob = remoteChargePoints.refresh(lifecycleScope)
+            refreshRemoteChargePointsJob.invokeOnCompletion {
+                if(refreshRemoteChargePointsJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
+                lifecycleScope.launch(Dispatchers.Main) {
+                    listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
+                    listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
 
-            lifecycleScope.launch(Dispatchers.Main) {
-                listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
-                listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
+                    val chargersInCp = remoteChargers.value.filter {it.chargePointID == chargePointId}
+                    val chargePoint = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
+                    listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this@MainActivity)
 
-                val chargersInCp = remoteChargers.value.filter {it.chargePointID == chargePointId}
-                val chargePoint = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
-                listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this@MainActivity)
-
-                // Only add decoration on first-time display
-                if( listOfChargersRecyclerView.itemDecorationCount == 0) {
-                    listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+                    // Only add decoration on first-time display
+                    if( listOfChargersRecyclerView.itemDecorationCount == 0) {
+                        listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+                    }
                 }
             }
+
         }
     }
 
@@ -676,7 +683,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 paymentText?.visibility = View.GONE
                 chargerInput?.isEnabled = true
             }
-            chargerLocationText?.text = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0].name
+            try{
+                val chargerWithChargePointId = remoteChargePoints.value.first { it.chargePointID == chargePointId }
+                chargerLocationText?.text = chargerWithChargePointId.name
+            }
+            catch (e: NoSuchElementException) {
+                Log.d("remoteChargePoints", "couldn't find a charger with chargePointID " + chargePointId)
+            }
+
             if (chargerInputView != null) {
                 displayChargerList(chargerInputView, chargePointId)
             }
