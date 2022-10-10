@@ -9,8 +9,6 @@ import com.flexicharge.bolt.R
 import com.flexicharge.bolt.helpers.StatusCode
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.VerificationDetails
-import com.flexicharge.bolt.databinding.ActivityRegisterBinding
-import com.flexicharge.bolt.databinding.ActivityVerifyEmailBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -18,14 +16,11 @@ import java.io.IOException
 
 
 class VerifyActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityVerifyEmailBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verify_email)
-        binding = ActivityVerifyEmailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        verificationCode = binding.verifyActivityEditTextCode
-        verificationEmail = binding.verifyActivityEditTextEmail
+        verificationCode = findViewById<EditText>(R.id.verifyActivity_editText_code)
+        verificationEmail = findViewById<EditText>(R.id.verifyActivity_editText_email)
 
 
         confirmVerification()
@@ -43,7 +38,7 @@ class VerifyActivity : AppCompatActivity() {
     }
 
     // send verification code form backend
-    private fun verifyUser (userEmail: String, userCode : String) {
+    fun verifyUser (userEmail: String, userCode : String) {
         lifecycleScope.launch(Dispatchers.IO) {
             // handle request to backend.
             try {

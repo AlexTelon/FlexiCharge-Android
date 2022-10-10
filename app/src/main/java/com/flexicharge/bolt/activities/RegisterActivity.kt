@@ -52,6 +52,7 @@ class RegisterActivity : AppCompatActivity() {
         validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
         validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
         checkRepeatPass()
+        makeBtnUnclickable()
 
         registerBtn.setOnClickListener {
             sendDataToBackend()
@@ -132,6 +133,14 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    fun makeBtnUnclickable () {
+        if (validateHelper.isValidEmail && validateHelper.isValidPassword && registerUserRepeatPass.error == null) {
+            registerBtn.setEnabled(true)
+        }
+        else {
+            registerBtn.setEnabled(false)
+        }
+    }
 
 
     fun goToSignIn(view: View) {
