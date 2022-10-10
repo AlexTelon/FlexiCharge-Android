@@ -132,7 +132,6 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-        }
 
 
     fun goToSignIn(view: View) {
