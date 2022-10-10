@@ -17,6 +17,8 @@
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_verify_email.xml" value="0.25" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/chargepoint_list_item.xml" value="0.27760416666666665" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.67" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/fragment_recover_pass.xml" value="0.19972826086956522" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/fragment_revover_email_sent.xml" value="0.19972826086956522" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_checkout.xml" value="0.5" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_in_progress.xml" value="0.2545289855072464" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.5383319292333614" />

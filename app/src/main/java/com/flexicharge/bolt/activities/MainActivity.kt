@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 intent.putExtra("userId", userId)
                 startActivity(intent)
             } else {
-                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
+                startActivity(Intent(this, RegisterActivity::class.java))
             }
         }
     }
