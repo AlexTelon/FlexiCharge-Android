@@ -17,6 +17,8 @@
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/activity_verify_email.xml" value="0.25" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/chargepoint_list_item.xml" value="0.27760416666666665" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.67" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/fragment_recover_pass.xml" value="0.19972826086956522" />
+        <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/fragment_revover_email_sent.xml" value="0.19972826086956522" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_checkout.xml" value="0.5" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_in_progress.xml" value="0.2545289855072464" />
         <entry key="..\:/FlexiCharge Android/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.5383319292333614" />
@@ -31,6 +33,11 @@
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/charger_list_item.xml" value="0.3333333333333333" />
         <entry key="..\:/Github/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/Admin/year3/FlexiCharge-Android/app/src/main/res/layout/activity_confirm.xml" value="0.35052083333333334" />
+        <entry key="..\:/Users/Admin/year3/FlexiCharge-Android/app/src/main/res/layout/activity_forgot_password.xml" value="0.35052083333333334" />
+        <entry key="..\:/Users/Admin/year3/FlexiCharge-Android/app/src/main/res/layout/activity_login.xml" value="0.22" />
+        <entry key="..\:/Users/Admin/year3/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_in.xml" value="0.17046605876393112" />
+        <entry key="..\:/Users/Admin/year3/FlexiCharge-Android/app/src/main/res/layout/activity_profile_menu_logged_out.xml" value="0.16108949416342414" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable-anydpi/ic_charger.xml" value="0.11666666666666667" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/ic_cross_2x.xml" value="0.25625" />
         <entry key="..\:/Users/Dennis Smajic/Appar-labbar/FlexiCharge-Android/app/src/main/res/drawable/ic_green_marker.xml" value="0.11666666666666667" />
@@ -62,6 +69,7 @@
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/layout/layout_payment_summary.xml" value="0.3759057971014493" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.346875" />
         <entry key="..\:/Users/filip/Documents/GitHub/FlexiCharge-Android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.346875" />
+        <entry key="..\:/Users/reza/OneDrive/FlexiCharge-Android/Ex/1/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.1757852077001013" />
         <entry key="..\:/dev/Skola/SEPM/FlexiCharge-Android/app/src/main/res/layout/activity_klarna.xml" value="0.13196555217831812" />
         <entry key="..\:/dev/Skola/SEPM/FlexiCharge-Android/app/src/main/res/layout/activity_main.xml" value="0.11141304347826086" />
         <entry key="..\:/dev/Skola/SEPM/FlexiCharge-Android/app/src/main/res/layout/layout_charger_input.xml" value="0.2" />

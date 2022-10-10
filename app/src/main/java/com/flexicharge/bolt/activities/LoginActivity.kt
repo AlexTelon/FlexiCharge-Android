@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 entryManager.singIn(username, password) { loginBody, message, isOK ->
                     if (isOK) {
-                        navigateToMain(loginBody.accessToken, loginBody.userID, loginBody.username, loginBody.email)
+                        navigateToMain(loginBody.accessToken, loginBody.user_id, loginBody.username, loginBody.email)
                     }
                     else {
                         lifecycleScope.launch (Dispatchers.Main) {
@@ -54,6 +54,11 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
+
+        binding.guest.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
+
     }
 
     private fun navigateToMain(accessToken: String, userId: String, username: String, email:String) {
@@ -65,6 +70,8 @@ class LoginActivity : AppCompatActivity() {
             putString("userName", username)
             putString("email", email)
             putInt("isLoggedIn", 1 )
+//            putBoolean("loggedIn", true)
+            putString("loggedIn", "true")
         }.apply()
 
         startActivity(Intent(this, MainActivity::class.java))

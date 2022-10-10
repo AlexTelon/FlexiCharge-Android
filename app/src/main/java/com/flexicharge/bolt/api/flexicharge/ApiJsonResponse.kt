@@ -1,6 +1,8 @@
 package com.flexicharge.bolt.api.flexicharge
 import okhttp3.Credentials
 
+import android.telephony.TelephonyCallback
+
 class Chargers : ArrayList<Charger>()
 
 data class Credentials(
@@ -11,7 +13,7 @@ data class LoginBody(
     val accessToken: String,
     val email : String,
     val username: String,
-    val userID: String
+    val user_id: String
 )
 
 data class Charger(
@@ -49,14 +51,18 @@ data class Transaction(
     val userID: String
 )
 
-
 data class TransactionSession(
+    val userID: String,
     val chargerID: Int,
-    val userID: String
+    val isKlarnaPayment: Boolean,
+    val pricePerKwh: Int
+)
+
+data class TransactionSessionResponse(
+    val transactionID: Int
 )
 
 data class TransactionOrder(
-    val transactionID: Int,
     val authorization_token: String
 )
 // Every user has his own email, password
@@ -75,3 +81,13 @@ class UserDetailsGotten(
     val code : String,
     val statusCode : Int
 )
+
+
+data class ResetResponseBody(val status: String)
+
+data class ResetRequestBody(
+    val username: String,
+    val password: String,
+    val confirmationCode: String
+)
+

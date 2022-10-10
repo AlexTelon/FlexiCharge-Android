@@ -73,4 +73,5 @@
         map:layout_constraintEnd_toEndOf="@+id/mainActivity_button_camera"
         map:layout_constraintStart_toStartOf="@+id/mainActivity_button_camera" />
 
+
 </androidx.constraintlayout.widget.ConstraintLayout>
