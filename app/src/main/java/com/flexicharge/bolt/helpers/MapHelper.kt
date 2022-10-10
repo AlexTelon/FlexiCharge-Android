@@ -120,7 +120,9 @@ object MapHelper {
         val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
         val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
 
-        markerToChargerMap.clear()
+        markerToChargerMap.keys.forEach{
+            it.remove()
+        }
 
         chargers.forEach { charger ->
             val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
