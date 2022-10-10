@@ -8,7 +8,7 @@ import androidx.core.text.isDigitsOnly
 class Validator {
 
     fun validateUserInput(field: EditText, isWhat: String) {
-        var valid = false
+
         field.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
@@ -23,6 +23,7 @@ class Validator {
                             }
                             else{
                                 field.error = null
+
                             }
 
                         TextInputType.isPassword ->
@@ -37,6 +38,7 @@ class Validator {
                             }
                             else {
                                 field.error = null
+
                             }
                         TextInputType.isConfirmationCode ->
                             if (s.length != 6

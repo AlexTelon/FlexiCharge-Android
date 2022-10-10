@@ -5,19 +5,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.*
+import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionList
 import com.flexicharge.bolt.api.flexicharge.TransactionOrder
 import com.flexicharge.bolt.api.klarna.OrderClient
 import com.klarna.mobile.sdk.api.payments.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -110,35 +110,27 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         finalizedRequired: Boolean?
     ) {
         if (authToken != null) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val requestBody = TransactionOrder(authToken!!)
-                    val response = RetrofitInstance.flexiChargeApi.transactionStart(transactionId, requestBody)
-                    if (response.isSuccessful) {
-                        //TODO Backend Klarna/Order/Session Request if successful
-                        val transaction = response.body() as TransactionList
-                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+            val remoteTransaction = RemoteTransaction(transactionId)
+            try{
+                val startTransactionJob = remoteTransaction.start(lifecycleScope)
+                val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                startTransactionJob.invokeOnCompletion {
+                    if(!startTransactionJob.isCancelled) {
                         sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            finish()
-                        }
-                    } else {
-                        //TODO Don't fake a successful transaction
-                        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                        sharedPreferences.edit().apply() { putInt("TransactionId", transactionId) }.apply()
+                    }
+                    else {
+                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                    }
 
-                        /* Actual expected behaviour:
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            authorizeButton.text = "Transaction Failed, try again!"
-                        }
-                        */
-
+                    lifecycleScope.launch(Dispatchers.Main) {
                         finish()
                     }
-                } catch (e: HttpException) {
+                }
 
-                } catch (e: IOException) {
-
+            }
+            catch (e: CancellationException) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    Toast.makeText(applicationContext, "Transaction could not be started: " + e.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
