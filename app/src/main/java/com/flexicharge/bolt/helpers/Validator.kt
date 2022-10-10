@@ -5,8 +5,6 @@ import android.text.TextWatcher
 import android.widget.EditText
 
 class Validator {
-    var isValidEmail : Boolean = false
-    var isValidPassword : Boolean = false
 
     fun validateUserInput(field: EditText, isWhat: String) {
 
@@ -24,7 +22,7 @@ class Validator {
                             }
                             else{
                                 field.error = null
-                                isValidEmail = true
+
                             }
 
                         TextInputType.isPassword ->
@@ -39,7 +37,7 @@ class Validator {
                             }
                             else {
                                 field.error = null
-                                isValidPassword = true
+
                             }
                     }
                 }
