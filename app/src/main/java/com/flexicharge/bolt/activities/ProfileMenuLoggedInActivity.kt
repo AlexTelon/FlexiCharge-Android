@@ -24,7 +24,7 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
                 clear()
             }.apply()
 
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
             finish()
         }
