@@ -22,24 +22,8 @@ class SplashscreenActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
         }, 1000)
-
-        //if the app is newly installed (user not logged in), this should happen.
-        initializeLoginSharedPreference()
-        //otherwise, check if the user has been logged in
-        //TODO: act if the user logged in
     }
 
-    private fun initializeLoginSharedPreference() {
-        Log.d("sharedoPre", "splash called")
-        val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.apply {
-            putString("accessToken", " ")
-            putString("userId", " ")
-            putInt("isLoggedIn", 0)
-            putString("loggedIn", "false")
-        }.apply()
-    }
 
     private val permissionRequestCode = 521
     private fun checkP(p: String): Boolean {
