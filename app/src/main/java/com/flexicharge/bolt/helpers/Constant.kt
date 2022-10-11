@@ -12,3 +12,7 @@ object TextInputType {
     const val  isEmail = "is email"
     const val isPassword = "is password"
 }
+
+object LoginChecker {
+    var LOGGED_IN = false
+}

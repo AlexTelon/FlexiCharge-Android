@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.databinding.ActivityLoginBinding
+import com.flexicharge.bolt.helpers.LoginChecker
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 entryManager.singIn(username, password) { responseBody, message, isOK ->
                     if (isOK) {
+                        LoginChecker.LOGGED_IN = true
                         navigateToMain(responseBody.accessToken, responseBody.user_id, responseBody.username, responseBody.email)
                     }
                     else {
