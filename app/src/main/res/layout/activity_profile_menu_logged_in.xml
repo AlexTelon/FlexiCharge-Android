@@ -196,6 +196,7 @@
         app:layout_constraintTop_toBottomOf="@+id/aboutTextView" />
 
     <Button
+        android:textColor="@color/red"
         android:id="@+id/loginActivity_button_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -203,8 +204,6 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
         android:text="Logout"
-        android:clickable="false"
-        android:alpha="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
