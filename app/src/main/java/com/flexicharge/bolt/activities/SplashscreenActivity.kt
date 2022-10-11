@@ -14,6 +14,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.helpers.LoginChecker
 
 class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,15 @@ class SplashscreenActivity : AppCompatActivity() {
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivityForResult(intent, REQUEST_LOCATION)
         } else {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
+            val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
+            if(isLoggedIn == "true"){
+                LoginChecker.LOGGED_IN = true
+                startActivity(Intent(this, MainActivity::class.java))
+            } else {
+                startActivity(Intent(this, RegisterActivity::class.java))
+            }
+
             this.finish()
         }
     }
