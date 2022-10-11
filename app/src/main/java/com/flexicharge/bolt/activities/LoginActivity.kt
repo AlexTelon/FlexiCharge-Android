@@ -55,10 +55,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        binding.guest.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-        }
-
     }
 
     private fun buildAlertDialog(message: String) {
