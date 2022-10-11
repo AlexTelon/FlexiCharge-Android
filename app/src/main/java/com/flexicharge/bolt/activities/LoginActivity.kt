@@ -40,9 +40,9 @@ class LoginActivity : AppCompatActivity() {
             username = emailEditText.text.toString()
             password = passwordEditText.text.toString()
             lifecycleScope.launch(Dispatchers.IO) {
-                entryManager.singIn(username, password) { loginBody, message, isOK ->
+                entryManager.singIn(username, password) { responseBody, message, isOK ->
                     if (isOK) {
-                        navigateToMain(loginBody.accessToken, loginBody.user_id, loginBody.username, loginBody.email)
+                        navigateToMain(responseBody.accessToken, responseBody.user_id, responseBody.username, responseBody.email)
                     }
                     else {
                         lifecycleScope.launch (Dispatchers.Main) {

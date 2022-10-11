@@ -47,5 +47,5 @@ interface ApiInterface {
     suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<TransactionList>
 
     @POST("/auth/sign-in")
-    suspend fun signIn(@Body body: Credentials): Response<LoginBody>
+    suspend fun signIn(@Body body: Credentials): Response<LoginResponseBody>
 }

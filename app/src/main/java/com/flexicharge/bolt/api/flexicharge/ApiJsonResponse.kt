@@ -7,7 +7,7 @@ data class Credentials(
     val username: String,
     val password: String
 )
-data class LoginBody(
+data class LoginResponseBody(
     val accessToken: String,
     val email : String,
     val username: String,
