@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.EntryManager
@@ -44,11 +46,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                     else {
                         lifecycleScope.launch (Dispatchers.Main) {
-                            if (message == "Bad Request"){
-                                error.text = "Incorrect username or password."
-                            } else {
-                                error.text = message
-                            }
+                            buildAlertDialog(message)
                         }
                     }
                 }
@@ -61,6 +59,14 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
+    private fun buildAlertDialog(message: String) {
+        AlertDialog.Builder(this@LoginActivity)
+            .setTitle("Oops!")
+            .setMessage(message)
+            .setNegativeButton("Ok") { _, _ ->
+
+            }.show()
+    }
     private fun navigateToMain(accessToken: String, userId: String, username: String, email:String) {
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()

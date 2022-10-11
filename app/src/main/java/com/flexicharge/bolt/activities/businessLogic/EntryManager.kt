@@ -23,12 +23,12 @@ class EntryManager {
                     callback.invoke(it, " ", true)
                 }
             } else if (response.code() == StatusCode.badRequest) {
-                callback(loginBody, response.message(), false)
+                callback(loginBody, "Invalid username or password! Try again.", false)
             }
         } catch (e: HttpException) {
-            callback(loginBody, "Internal Server Error", false)
+            callback(loginBody, "Internal Server Error!", false)
         } catch (e: IOException) {
-            callback(loginBody, "Internal Server Error", false)
+            callback(loginBody, "You have no internet connection!", false)
         }
     }
 }
