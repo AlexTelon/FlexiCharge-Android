@@ -69,8 +69,6 @@ class LoginActivity : AppCompatActivity() {
             putString("userId", userId)
             putString("userName", username)
             putString("email", email)
-            putInt("isLoggedIn", 1 )
-//            putBoolean("loggedIn", true)
             putString("loggedIn", "true")
         }.apply()
 
