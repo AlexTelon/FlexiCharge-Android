@@ -35,6 +35,7 @@ import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.helpers.MapHelper
 import com.flexicharge.bolt.api.flexicharge.*
+import com.flexicharge.bolt.helpers.LoginChecker
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -72,13 +73,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val isGuest = sharedPreferences.getBoolean("isGuest", true) //Set to true to enable registration
-
-        if (!isGuest) {
-            startActivity(Intent(this, RegisterActivity::class.java))
-            finish()
-        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -120,13 +114,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
 
         binding.mainActivityButtonUser.setOnClickListener {
-            if (isLoggedIn == "true") {
+            if (LoginChecker.LOGGED_IN) {
                 val intent = Intent(this, ProfileMenuLoggedInActivity::class.java)
                 intent.putExtra("accessToken", accessToken)
                 intent.putExtra("userId", userId)
                 startActivity(intent)
             } else {
-                startActivity(Intent(this, ProfileMenuLoggedOutActivity::class.java))
+                startActivity(Intent(this, RegisterActivity::class.java))
             }
         }
     }

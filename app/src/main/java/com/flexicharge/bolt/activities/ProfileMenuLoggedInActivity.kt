@@ -8,6 +8,7 @@ import android.view.View
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.databinding.ActivityProfileMenuLoggedInBinding
+import com.flexicharge.bolt.helpers.LoginChecker
 
 class ProfileMenuLoggedInActivity : AppCompatActivity() {
     lateinit var binding: ActivityProfileMenuLoggedInBinding
@@ -18,12 +19,14 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
 
 
         binding.loginActivityButtonLogout.setOnClickListener {
+            LoginChecker.LOGGED_IN = false
             getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
                 clear()
             }.apply()
 
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }
