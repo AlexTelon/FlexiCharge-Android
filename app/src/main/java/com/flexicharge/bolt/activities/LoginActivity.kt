@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
         validator.validateUserInput(emailEditText, TextInputType.isEmail)
         validator.validateUserInput(passwordEditText, TextInputType.isPassword)
 
-        binding.loginActivityButtonLogout.setOnClickListener {
+        binding.loginActivityButtonLogin.setOnClickListener {
             username = emailEditText.text.toString()
             password = passwordEditText.text.toString()
             lifecycleScope.launch(Dispatchers.IO) {
