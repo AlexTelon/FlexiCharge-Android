@@ -31,4 +31,20 @@ class EntryManager {
             callback(emptyResponseBody, "You have no internet connection!", false)
         }
     }
+
+    suspend fun resetPassword(
+        email: String,
+        callback: (message: String, isOK: Boolean) -> Unit
+    ) {
+        try {
+            val response = RetrofitInstance.flexiChargeApi.resetPass(email)
+            if (response.code() == StatusCode.ok) {
+                callback.invoke("", true)
+            }
+        } catch (e: HttpException) {
+            callback.invoke("Internal Server Error! Try later.", false)
+        } catch (e: IOException) {
+            callback.invoke("You have no internet connection!", false)
+        }
+    }
 }
