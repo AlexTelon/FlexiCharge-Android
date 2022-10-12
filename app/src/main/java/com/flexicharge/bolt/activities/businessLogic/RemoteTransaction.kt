@@ -14,77 +14,78 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
 
     override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
-                if (!response.isSuccessful) {
-                    cancel("Could not fetch transaction!")
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                    if (!response.isSuccessful) {
+                        cancel("Could not fetch transaction!")
+                    }
+                    else {
+                        value = response.body() as Transaction
+                    }
                 }
-                else {
-                    value = response.body() as Transaction
+                catch (e: Exception) {
+                    cancel(CancellationException(e.message))
                 }
             }
-            catch (e: Exception) {
-                cancel(CancellationException(e.message))
-            }
-
         }
     }
 
     fun createSession(lifecycleScope: LifecycleCoroutineScope, transactionSession: TransactionSession): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.postTransactionSession(transactionSession)
-                if(!response.isSuccessful) {
-                    cancel(response.message())
-                }
-                else {
-                    val transactionSessionResponse = response.body() as TransactionSessionResponse
-                    transactionId = transactionSessionResponse.transactionID
-                    try {
-                        val refreshJob = refresh(lifecycleScope)
-                        refreshJob.join()
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.postTransactionSession(transactionSession)
+                    if(!response.isSuccessful) {
+                        cancel(response.message())
                     }
-                    catch (e: CancellationException) {
-                        cancel(e)
+                    else {
+                        val transactionSessionResponse = response.body() as TransactionSessionResponse
+                        transactionId = transactionSessionResponse.transactionID
+                        try {
+                            val refreshJob = refresh(lifecycleScope)
+                            refreshJob.join()
+                        }
+                        catch (e: CancellationException) {
+                            cancel(e)
+                        }
                     }
                 }
-            }
-            catch (e: Exception) {
-                cancel(CancellationException(e.message))
+                catch (e: Exception) {
+                    cancel(CancellationException(e.message))
+                }
             }
         }
     }
 
     fun stop(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
-                if (!response.isSuccessful) {
-                    cancel(response.message())
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
+                    if (!response.isSuccessful) {
+                        cancel(response.message())
+                    }
+                }
+                catch (e: Exception) {
+                    cancel(CancellationException(e.message))
                 }
             }
-            catch (e: Exception) {
-                if(e.message != null) {
-                    cancel(e.message!!)
-                }
-                else {
-                    cancel("an unspecified error occurred")
-                }
-            }
-
         }
     }
 
     fun start(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
-                if(!response.isSuccessful) {
-                    cancel(response.message())
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
+                    if(!response.isSuccessful) {
+                        cancel(response.message())
+                    }
                 }
-            }
-            catch (e: Exception) {
-                cancel(CancellationException(e.message))
+                catch (e: Exception) {
+                    cancel(CancellationException(e.message))
+                }
             }
         }
     }

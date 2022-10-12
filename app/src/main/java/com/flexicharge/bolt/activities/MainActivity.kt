@@ -35,6 +35,7 @@ import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.helpers.MapHelper
 import com.flexicharge.bolt.api.flexicharge.*
+import com.flexicharge.bolt.helpers.LoginChecker
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -47,6 +48,7 @@ import java.io.IOException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.collections.HashMap
 
 
@@ -71,13 +73,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val isGuest = sharedPreferences.getBoolean("isGuest", true) //Set to true to enable registration
-
-        if (!isGuest) {
-            startActivity(Intent(this, RegisterActivity::class.java))
-            finish()
-        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -119,7 +114,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
 
         binding.mainActivityButtonUser.setOnClickListener {
-            if (isLoggedIn == "true") {
+            if (LoginChecker.LOGGED_IN) {
                 val intent = Intent(this, ProfileMenuLoggedInActivity::class.java)
                 intent.putExtra("accessToken", accessToken)
                 intent.putExtra("userId", userId)
@@ -391,20 +386,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             if(refreshJob.isCancelled) {
                 return@invokeOnCompletion
             }
+            val refreshRemoteChargePointsJob = remoteChargePoints.refresh(lifecycleScope)
+            refreshRemoteChargePointsJob.invokeOnCompletion {
+                if(refreshRemoteChargePointsJob.isCancelled) {
+                    return@invokeOnCompletion
+                }
+                lifecycleScope.launch(Dispatchers.Main) {
+                    listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
+                    listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
 
-            lifecycleScope.launch(Dispatchers.Main) {
-                listOfChargersRecyclerView = bottomSheetView.findViewById(R.id.checkoutLayout_recyclerView_chargerList)
-                listOfChargersRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
+                    val chargersInCp = remoteChargers.value.filter {it.chargePointID == chargePointId}
+                    val chargePoint = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
+                    listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this@MainActivity)
 
-                val chargersInCp = remoteChargers.value.filter {it.chargePointID == chargePointId}
-                val chargePoint = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
-                listOfChargersRecyclerView.adapter = ChargersListAdapter(chargersInCp, chargerId, chargePoint,  this@MainActivity)
-
-                // Only add decoration on first-time display
-                if( listOfChargersRecyclerView.itemDecorationCount == 0) {
-                    listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+                    // Only add decoration on first-time display
+                    if( listOfChargersRecyclerView.itemDecorationCount == 0) {
+                        listOfChargersRecyclerView.addItemDecoration(SpacesItemDecoration(15))
+                    }
                 }
             }
+
         }
     }
 
@@ -488,57 +489,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val requestParams: MutableMap<String, String> = HashMap()
-                requestParams.put("chargerId", chargerId.toString())
-                requestParams.put("connectorId", "1")
-                requestParams.put("idTag", "1")
-                requestParams.put("reservationId", "1")
-                requestParams.put("parentIdTag", "1")
-                val response = RetrofitInstance.flexiChargeApi.reserveCharger(chargerId, requestParams)
-                if (response.isSuccessful) {
-                    //TODO Backend Klarna/Order/Session Request if successful
-                    val status = response.body() as String
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        when (status) {
-                            "Accepted" -> {
-                                createKlarnaTransactionSession("BoltGuest", chargerId)
-                            }
-                            "Faulted" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
-                            }
-                            "Occupied" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
-                            }
-                            "Rejected" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
-                            }
-                            "Unavailable" -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
-                            }
-                            else -> {
-                                setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 2)
-                            }
-                        }
-                    }
+        val remoteCharger = RemoteCharger(chargerId)
+        try {
+            val reserveChargerJob = remoteCharger.reserve(lifecycleScope)
+            reserveChargerJob.invokeOnCompletion {
+                if(reserveChargerJob.isCancelled) {
+                    return@invokeOnCompletion
                 }
-                else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        // TODO Dont fake that it was successful
+
+                when (remoteCharger.status) {
+                    "Accepted" -> {
                         createKlarnaTransactionSession("BoltGuest", chargerId)
                     }
+                    "Faulted" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
+                    }
+                    "Occupied" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Occupied", 2)
+                    }
+                    "Rejected" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Rejected", 2)
+                    }
+                    "Unavailable" -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
+                    }
+                    else -> {
+                        setChargerButtonStatus(chargerInputStatus, false, "Charger Unknown status", 2)
+                    }
                 }
-            } catch (e: HttpException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Could not get all data correctly", 0)
-                }
-            } catch (e: IOException) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    setChargerButtonStatus(chargerInputStatus, false, "Unable to establish connection", 0)
-                }
+
             }
         }
+        catch (e: CancellationException) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                setChargerButtonStatus(chargerInputStatus, false, "Could not reserve charger", 0)
+            }
+            Toast.makeText(applicationContext, "Could not reserve charger: " + e.message, Toast.LENGTH_LONG).show()
+        }
+
     }
 
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
@@ -689,7 +677,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 paymentText?.visibility = View.GONE
                 chargerInput?.isEnabled = true
             }
-            chargerLocationText?.text = remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0].name
+            try{
+                val chargerWithChargePointId = remoteChargePoints.value.first { it.chargePointID == chargePointId }
+                chargerLocationText?.text = chargerWithChargePointId.name
+            }
+            catch (e: NoSuchElementException) {
+                Log.d("remoteChargePoints", "couldn't find a charger with chargePointID " + chargePointId)
+            }
+
             if (chargerInputView != null) {
                 displayChargerList(chargerInputView, chargePointId)
             }

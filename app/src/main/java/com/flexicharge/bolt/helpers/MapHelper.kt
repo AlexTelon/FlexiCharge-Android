@@ -3,6 +3,7 @@ package com.flexicharge.bolt.helpers
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -12,8 +13,7 @@ import com.flexicharge.bolt.api.flexicharge.Chargers
 import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.api.flexicharge.Charger
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -21,13 +21,13 @@ import com.google.android.gms.maps.model.*
 import java.lang.Exception
 
 object MapHelper {
-    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var currentLocation: Location
     lateinit var mMap: GoogleMap
 
     private var markerToChargerMap = mutableMapOf<Marker, Charger>()
     const val LOCATION_PERMISSION_REQUEST_CODE = 1
     const val PERMISSION_CODE = 101
+    private const val LOCATION_UPDATE_INTERVAL_MS = 5000L
 
     fun currLocation(activity: MainActivity){
         if (MapHelper::currentLocation.isInitialized) {
@@ -39,7 +39,7 @@ object MapHelper {
     }
 
     fun fetchLocation(activity: MainActivity) {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
         if (ActivityCompat.checkSelfPermission(
                 activity, Manifest.permission.ACCESS_FINE_LOCATION) !=
             PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -50,7 +50,31 @@ object MapHelper {
             )
             return
         }
-        val task = fusedLocationProviderClient.lastLocation
+
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+            interval = LOCATION_UPDATE_INTERVAL_MS
+        }
+
+        val supportMapFragment =
+            activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
+        supportMapFragment.getMapAsync(activity)
+
+
+        val locationCallback = object: LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                super.onLocationResult(result)
+                val supportMapFragment =
+                    activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
+                supportMapFragment.getMapAsync(activity)
+                currentLocation = result.lastLocation
+
+            }
+        }
+
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+       /* val task = fusedLocationProviderClient.lastLocation
+
         task.addOnSuccessListener { location ->
             if (location != null) {
                 currentLocation = location
@@ -60,7 +84,7 @@ object MapHelper {
                 getLocationAccess(activity)
                 setCurrentLocation(activity)
             }
-        }
+        }*/
     }
 
     fun onRequestPermissionsResult(activity: MainActivity, requestCode: Int, grantResults: IntArray) {
@@ -72,7 +96,7 @@ object MapHelper {
         }
     }
 
-    fun setCurrentLocation(activity: MainActivity) {
+    private fun setCurrentLocation(activity: MainActivity) {
         try {
             val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
@@ -81,7 +105,7 @@ object MapHelper {
         }
     }
 
-    fun getLocationAccess(activity: MainActivity) {
+    private fun getLocationAccess(activity: MainActivity) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.isMyLocationEnabled = true
         }
@@ -127,5 +151,7 @@ object MapHelper {
         mMap = googleMap
         mMap.uiSettings.isMyLocationButtonEnabled = false
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(activity, R.raw.flexicharge_map_style) )
+        getLocationAccess(activity)
+
     }
 }

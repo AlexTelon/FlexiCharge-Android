@@ -49,7 +49,7 @@ interface ApiInterface {
 
 
     @POST("/auth/sign-in")
-    suspend fun signIn(@Body body: Credentials): Response<LoginBody>
+    suspend fun signIn(@Body body: Credentials): Response<LoginResponseBody>
 
     // post request to store new users' data into database
     @POST("/auth/sign-up")

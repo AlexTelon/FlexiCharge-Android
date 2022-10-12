@@ -14,6 +14,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.helpers.LoginChecker
 
 class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,24 +23,8 @@ class SplashscreenActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
         }, 1000)
-
-        //if the app is newly installed (user not logged in), this should happen.
-        initializeLoginSharedPreference()
-        //otherwise, check if the user has been logged in
-        //TODO: act if the user logged in
     }
 
-    private fun initializeLoginSharedPreference() {
-        Log.d("sharedoPre", "splash called")
-        val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.apply {
-            putString("accessToken", " ")
-            putString("userId", " ")
-            putInt("isLoggedIn", 0)
-            putString("loggedIn", "false")
-        }.apply()
-    }
 
     private val permissionRequestCode = 521
     private fun checkP(p: String): Boolean {
@@ -74,7 +59,15 @@ class SplashscreenActivity : AppCompatActivity() {
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivityForResult(intent, REQUEST_LOCATION)
         } else {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
+            val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
+            if(isLoggedIn == "true"){
+                LoginChecker.LOGGED_IN = true
+                startActivity(Intent(this, MainActivity::class.java))
+            } else {
+                startActivity(Intent(this, RegisterActivity::class.java))
+            }
+
             this.finish()
         }
     }

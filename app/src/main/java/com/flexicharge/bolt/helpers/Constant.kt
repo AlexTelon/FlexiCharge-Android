@@ -11,4 +11,10 @@ object StatusCode {
 object TextInputType {
     const val  isEmail = "is email"
     const val isPassword = "is password"
+    const val isConfirmationCode = "is conformation code"
+
+}
+
+object LoginChecker {
+    var LOGGED_IN = false
 }
