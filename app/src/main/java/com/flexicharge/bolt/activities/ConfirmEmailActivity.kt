@@ -3,8 +3,13 @@ package com.flexicharge.bolt.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.api.flexicharge.ResetRequestBody
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.databinding.ActivityConfirmEmailBinding
@@ -42,58 +47,76 @@ class ConfirmEmailActivity : AppCompatActivity() {
         validator.validateUserInput(confirmCode, TextInputType.isConfirmationCode)
         emailAddress_ = emailAdd.text.toString()
 
+        checkRepeatPass()
+
         binding.buttonConfirm.setOnClickListener {
             newPassword_ = newPassword.text.toString()
             confirmCode_ = confirmCode.text.toString()
             confirmPassword_ = confirmPassword.text.toString()
             lifecycleScope.launch(Dispatchers.Main) {
-                try {
-                    val body = ResetRequestBody(emailAddress_, newPassword_, confirmCode_)
-                    val response = RetrofitInstance.flexiChargeApi.confReset(body)
-                    if (response.code() == 200) {
-                        if (confirmPassword_ == newPassword_) {
-                            navigateToLogIn()
-                        }else if(confirmCode_.isEmpty()){
-                            error.text = "Confirmation code can not be empty"
-                        }
-                        else{
-                            error.text = "Passwords does not match"
-                        }
-                    } else{
-                        lifecycleScope.launch(Dispatchers.Main){
-                            if (response.message() == "Bad Request" ) {
-                                error.text = "Incorrect newPassword or conformation code"
-                            }else {
-                                error.text = response.message()
-                            }
+                EntryManager().confirmResetPass(emailAddress_, newPassword_, confirmCode_){ message, isOk ->
+                    if (isOk) {
+                        navigateToLogIn()
+                    } else {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            buildAlertDialog(message)
                         }
                     }
-                } catch (e: HttpException) {
-                    error.text ="Internal Server Error"
-                } catch (e: IOException) {
-                    error.text ="Internal Server Error"
                 }
             }
         }
         binding.textViewSendAgain.setOnClickListener {
             lifecycleScope.launch(Dispatchers.Main) {
-                try {
-                    val response = RetrofitInstance.flexiChargeApi.resetPass(emailAddress_)
-                    if (response.code() == 200) {
-                        sendAgainEmail.text = "A message with a verification code has been sent"
-                        delay(2000)
-                        sendAgainEmail.text = " "
-                    } else if (response.code() == 400) {
-                        error.text = "Please try later."
+                EntryManager().resetPassword(emailAddress_) { message, isOK ->
+                    if (isOK) {
+                        Toast.makeText(
+                            this@ConfirmEmailActivity,
+                            "New confirmation code is sent.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        lifecycleScope.launch (Dispatchers.Main) {
+                            buildAlertDialog(message)
+                        }
                     }
-                } catch (e: HttpException) {
-                    error.text ="Internal Server Error"
-                } catch (e: IOException) {
-                    error.text ="Internal Server Error"
                 }
             }
         }
     }
+
+    fun checkRepeatPass() {
+        val confirmPassEditText = binding.confirmNewPassword
+        val newPasswordEditText = binding.newPassword
+        confirmPassEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s != null) {
+                    if (confirmPassEditText.text.toString() != newPasswordEditText.text.toString()) {
+                        confirmPassEditText.error = "does not match"
+                    } else if (confirmPassEditText.text.toString() != newPasswordEditText.text.toString()) {
+                        confirmPassEditText.error = null
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+    }
+
+    private fun buildAlertDialog(message: String) {
+        AlertDialog.Builder(this@ConfirmEmailActivity)
+            .setTitle("Oops!")
+            .setMessage(message)
+            .setNegativeButton("Ok") { _, _ ->
+
+            }.show()
+    }
+
     private fun navigateToLogIn() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
