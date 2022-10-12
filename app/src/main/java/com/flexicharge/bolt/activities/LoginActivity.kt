@@ -55,6 +55,9 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+        binding.loginActivityTextViewForgotPassword.setOnClickListener {
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
+        }
     }
 
     private fun buildAlertDialog(message: String) {
