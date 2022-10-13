@@ -5,8 +5,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.activities.businessLogic.EntryManager
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.databinding.ActivityForgotPasswordBinding
 import com.flexicharge.bolt.helpers.TextInputType
@@ -31,26 +33,20 @@ class ForgotPasswordActivity : AppCompatActivity() {
         validator.validateUserInput(emailEdittext, TextInputType.isEmail)
         binding.buttonConfirmRecoverPassword.setOnClickListener {
             emailAddress = emailEdittext.text.toString()
-            lifecycleScope.launch(Dispatchers.Main) {
-                try {
-                    val response = RetrofitInstance.flexiChargeApi.resetPass(emailAddress)
-                    if (response.code() == 200) {
-                        if (emailAddress.isEmpty()){
-                            error.text = "Con not be empty"
-                        }else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()){
-                            error.text = "Invalid email"
-                        }
-                        else{
-                            navigateToConfirmEmail(emailAddress)
-                        }
-                    } else if (response.code() == 400) {
-                        error.text = "Please try later."
-                    }
-                } catch (e: HttpException) {
-                    error.text ="Internal Server Error"
+            lifecycleScope.launch(Dispatchers.IO) {
+                EntryManager().resetPassword(emailAddress) { message, isOK ->
+                    if (isOK) {
+                        navigateToConfirmEmail(emailAddress)
+                    } else {
+                        lifecycleScope.launch (Dispatchers.Main) {
+                            AlertDialog.Builder(this@ForgotPasswordActivity)
+                                .setTitle("Oops!")
+                                .setMessage(message)
+                                .setNegativeButton("Ok") { _, _ ->
 
-                } catch (e: IOException) {
-                    error.text ="Internal Server Error"
+                                }.show()
+                        }
+                    }
                 }
             }
         }

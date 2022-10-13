@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
@@ -53,8 +54,19 @@ class RegisterActivity : AppCompatActivity() {
         validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
         checkRepeatPass()
 
+
         registerBtn.setOnClickListener {
-            sendDataToBackend()
+            if(agreeCheckBox.isChecked){
+                sendDataToBackend()
+            }
+            else {
+                AlertDialog.Builder(this@RegisterActivity)
+                    .setTitle("Oops!")
+                    .setMessage("you have to agree to term and conditions")
+                    .setNegativeButton("Ok") { _,_  ->
+
+                    }.show()
+            }
         }
 
     }
