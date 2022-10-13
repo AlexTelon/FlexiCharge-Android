@@ -1,5 +1,10 @@
 # Documentation for FlexiCharge Native Android Application
 
+## In depth documentation can be found in the folder [Docs](./Docs/)
+
+   * [RemoteObjects](./Docs/RemoteObjects.md)
+
+
 ## Project Architecture
 
   This branch works with Android Studio 2020.3.1, uses Android SDK 30 and supports Android 10 and above.
