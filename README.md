@@ -1,8 +1,10 @@
 # Documentation for FlexiCharge Native Android Application
 
 ## In depth documentation can be found in the folder [Docs](./Docs/)
-
+### Or through these links:
    * [RemoteObjects](./Docs/RemoteObjects.md)
+   * [LiveChargingMetricsListener](./Docs/LiveMetricsFeature.md)
+   * [RegisterActivity](./Docs/RegisterFeature.md)
 
 
 ## Project Architecture
