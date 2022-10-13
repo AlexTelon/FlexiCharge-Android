@@ -1,3 +1,3 @@
-# Login feature/ Implementation Detail 
+## Login feature/ Implementation Detail 
 
-![Image. Illustrates the flow of the login process.](../images/login_flow.png)
+![The figure Illustrates the flow of the login process.](../images/login_flow.png)
