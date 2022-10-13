@@ -5,6 +5,7 @@
    * [RemoteObjects](./Docs/RemoteObjects.md)
    * [LiveChargingMetricsListener](./Docs/LiveMetricsFeature.md)
    * [RegisterActivity](./Docs/RegisterFeature.md)
+   * [LoginFeature](./Docs/LoginFeature.md )
 
 
 ## Project Architecture
