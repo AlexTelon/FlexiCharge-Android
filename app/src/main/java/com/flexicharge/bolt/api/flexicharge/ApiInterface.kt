@@ -66,4 +66,10 @@ interface ApiInterface {
     @POST("/auth/confirm-forgot-password")
     suspend fun confReset(@Body body: ResetRequestBody): Response<ResetResponseBody>
 
+    @GET("/auth/user-information")
+    suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
+
+    @PUT("/auth/user-information")
+    suspend fun updateUserInfo(@Header("Authorization") authorizationHeader : String, @Body body : UserFullDetails) : Response<UserFullDetails>
+
 }

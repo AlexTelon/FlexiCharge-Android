@@ -82,6 +82,8 @@ class RegisterActivity : AppCompatActivity() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         val intent =
                             Intent(this@RegisterActivity, VerifyActivity::class.java)
+                        intent.putExtra("userEmail",userEmail)
+                        intent.putExtra("userPass", userPass)
                         startActivity(intent)
                     }
                 } else {
