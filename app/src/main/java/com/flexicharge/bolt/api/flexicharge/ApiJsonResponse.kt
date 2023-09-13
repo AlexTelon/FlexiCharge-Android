@@ -70,6 +70,16 @@ class UserDetails(
     val username : String,
     val password : String
 )
+class UserFullDetails(
+    val firstName : String ?= null,
+    val lastName : String ?= null,
+    val phoneNumber : String ?= null,
+    val streetAddress : String ?= null,
+    val zipCode : String ?= null,
+    val city : String ?= null,
+    val country : String ?= null,
+
+    )
 
 class VerificationDetails (
     val username : String,

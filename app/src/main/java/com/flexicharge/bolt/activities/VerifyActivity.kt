@@ -70,8 +70,6 @@ class VerifyActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
 
 

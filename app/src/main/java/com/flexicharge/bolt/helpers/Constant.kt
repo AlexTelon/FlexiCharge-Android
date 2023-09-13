@@ -12,6 +12,7 @@ object TextInputType {
     const val  isEmail = "is email"
     const val isPassword = "is password"
     const val isConfirmationCode = "is conformation code"
+    const val isTooLong = "is too long"
 
 }
 
