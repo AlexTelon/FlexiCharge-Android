@@ -697,9 +697,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             setChargerButtonStatus(chargerInputStatus!!, false, getString(R.string.charger_status_enter_code), 3)
         }
     }
-    public fun addera() : Int {
-        return 4
-    }
 
     override fun finish() {
         super.finish()
