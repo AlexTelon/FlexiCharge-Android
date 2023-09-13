@@ -78,7 +78,6 @@ class RegisterActivity : AppCompatActivity() {
     //function to send users' data to backend
     private fun sendUserData(userEmail: String,userFirstName: String, userLastName : String ,userPass: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            // handle request to backend.
             try {
                 val requestBody = UserDetails(userEmail, userPass)
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
