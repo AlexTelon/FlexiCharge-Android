@@ -50,13 +50,12 @@ class Validator {
                                 field.error = null
                             }
                         TextInputType.isTooLong ->
-                            if (s.length > 15){
+                            if (s.length > 15) {
                                 field.error = "Name can't be longer than 15 characters"
                             }
-                        else{
-                            field.error = null
+                            else {
+                                field.error = null
                             }
-
                     }
                 }
             }
