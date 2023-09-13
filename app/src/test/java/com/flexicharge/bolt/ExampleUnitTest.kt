@@ -18,7 +18,11 @@ import org.junit.runner.RunWith
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
+<<<<<<< Updated upstream
         assertEquals(4, 2 + 2)
+=======
+        assertEquals(4, 1 + 3)
+>>>>>>> Stashed changes
     }
 
 
