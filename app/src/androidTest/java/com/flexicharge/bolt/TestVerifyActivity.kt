@@ -32,22 +32,6 @@ class TestVerifyActivity {
 
         val activityScenario = ActivityScenario.launch(VerifyActivity::class.java)
 
-
-/*
-        activityScenario.onActivity { activity ->
-            val userInfo: Map<String, String> = mapOf(
-                "email" to "didiwa6692@searpen.com",
-                "pass" to "Test1234!",
-                "firstName" to "TESTAR",
-                "lastName" to "TESTARSSON"
-            )
-
-        activity.signIn(userInfo)
-
-
-        }
-
-         */
         assert(2 == 2)
     }
 }
