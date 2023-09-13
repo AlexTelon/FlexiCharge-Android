@@ -115,6 +115,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
+
+
     <CheckBox
         android:id="@+id/checkBoxTosAgreement"
         android:layout_width="wrap_content"

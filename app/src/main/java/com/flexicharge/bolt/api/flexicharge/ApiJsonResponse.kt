@@ -70,6 +70,7 @@ class UserDetails(
     val username : String,
     val password : String
 )
+
 class UserFullDetails(
     val firstName : String ?= null,
     val lastName : String ?= null,
@@ -78,8 +79,7 @@ class UserFullDetails(
     val zipCode : String ?= null,
     val city : String ?= null,
     val country : String ?= null,
-
-    )
+)
 
 class VerificationDetails (
     val username : String,
@@ -91,7 +91,6 @@ class UserDetailsGotten(
     val code : String,
     val statusCode : Int
 )
-
 
 data class ResetResponseBody(val status: String)
 

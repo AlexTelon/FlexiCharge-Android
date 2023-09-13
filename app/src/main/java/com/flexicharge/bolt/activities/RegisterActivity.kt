@@ -10,8 +10,10 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.flexicharge.bolt.R
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserDetails
+import com.flexicharge.bolt.databinding.ActivityLoginBinding
 import com.flexicharge.bolt.databinding.ActivityRegisterBinding
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
@@ -83,6 +85,11 @@ class RegisterActivity : AppCompatActivity() {
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
                 if (response.isSuccessful) {
                     lifecycleScope.launch(Dispatchers.Main) {
+                        val intent =
+                            Intent(this@RegisterActivity, VerifyActivity::class.java)
+                        intent.putExtra("userEmail",userEmail)
+                        intent.putExtra("userPass", userPass)
+                        startActivity(intent)
                         if(userFirstName!=null && userLastName!=null){
                             val intent =
                                 Intent(this@RegisterActivity, VerifyActivity::class.java)
@@ -118,7 +125,6 @@ class RegisterActivity : AppCompatActivity() {
                     Toast.makeText(this@RegisterActivity, e.message, Toast.LENGTH_LONG)
                 }
             }
-
         }
     }
 
