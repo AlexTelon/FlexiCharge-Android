@@ -96,7 +96,7 @@ If you want to report a bug or suggest a new feature, please submit an issue.
 
 ## Support
 
-Create an issue on GitHub or contact our Scrum Leader at jofi1617@student.ju.se
+Create an issue on GitHub or contact the Scrum Master emely.kara6@gmail.com or Product Owner foal20ym@student.ju.se / alexander-forsanker2011@hotmail.com
 
 ## Register Activity 
 self explanatory, the user registers using email and password, gets a conformation code and 
