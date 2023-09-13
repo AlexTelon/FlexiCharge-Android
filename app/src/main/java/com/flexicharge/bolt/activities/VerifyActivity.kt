@@ -17,6 +17,7 @@ import com.flexicharge.bolt.databinding.ActivityVerifyEmailBinding
 import com.flexicharge.bolt.helpers.LoginChecker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -30,11 +31,15 @@ class VerifyActivity : AppCompatActivity() {
         binding = ActivityVerifyEmailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         verificationCode = binding.verifyActivityEditTextCode
-        verificationEmail = binding.verifyActivityEditTextEmail
         val userPass = intent.getStringExtra("userPass")
         val userEmail = intent.getStringExtra("userEmail")
-        val userFirstName = intent.getStringExtra("userFirstName")
-        val userLastName = intent.getStringExtra("userLastName")
+        var userFirstName = intent.getStringExtra("userFirstName")
+        var userLastName = intent.getStringExtra("userLastName")
+
+        if(userFirstName == null)
+            userFirstName ="NoValue"
+        if(userLastName == null)
+            userLastName = "NoValue"
 
         confirmVerification(userEmail = userEmail!!,userPass = userPass!!, userFirstName!!, userLastName!!)
     }
@@ -46,12 +51,12 @@ class VerifyActivity : AppCompatActivity() {
         val verifyBtn = findViewById<Button>(R.id.buttonVerify)
 
         verifyBtn.setOnClickListener {
-            verifyUser(verificationEmail.text.toString(), verificationCode.text.toString(), userEmail, userPass, userFirstName, userLastName)
+            verifyUser( verificationCode.text.toString(), userEmail, userPass, userFirstName, userLastName)
         }
     }
 
     // send verification code form backend
-    private fun verifyUser (userEmail: String, userCode : String, userEmail2: String,userPass : String, userFirstName : String, userLastName : String) {
+    private fun verifyUser ( userCode : String, userEmail: String,userPass : String, userFirstName : String, userLastName : String) {
         lifecycleScope.launch(Dispatchers.IO) {
             // handle request to backend.
             try {
@@ -61,15 +66,13 @@ class VerifyActivity : AppCompatActivity() {
                     lifecycleScope.launch( Dispatchers.Main) {
 
                         val userInfo: Map<String, String> = mapOf(
-                            "email" to userEmail2,
+                            "email" to userEmail,
                             "pass" to userPass,
                             "firstName" to userFirstName,
                             "lastName" to userLastName
                         )
 
-                        SignIn(userInfo)
-                        val intent = Intent(this@VerifyActivity, LoginActivity::class.java)
-                        startActivity(intent)
+                        signIn(userInfo)
                     }
                 }
                 else {
@@ -89,7 +92,7 @@ class VerifyActivity : AppCompatActivity() {
     }
 
 
-    private fun SignIn(userData : Map<String, String>){
+    fun signIn(userData : Map<String, String>){
         lifecycleScope.launch(Dispatchers.IO) {
             entryManager.singIn(userData["email"]!!, userData["pass"]!!) { responseBody, message, isOK ->
                 if (isOK) {
@@ -101,18 +104,17 @@ class VerifyActivity : AppCompatActivity() {
                     )
 
                     val collectedData = loggedInData + userData
-                    SendToMain(collectedData)
+                    sendToMain(collectedData)
                 }
                 else {
                     lifecycleScope.launch (Dispatchers.Main) {
-
                     }
                 }
             }
         }
     }
 
-    private fun SendToMain(userData : Map<String, String>){
+    private fun sendToMain(userData : Map<String, String>){
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.apply {
@@ -123,23 +125,25 @@ class VerifyActivity : AppCompatActivity() {
             putString("loggedIn", "true")
         }.apply()
         val userInfo = UserFullDetails(
-           firstName =  userData["firstname"],
-            lastName = userData["lastName"]
+            "TESTING",
+            userData["lastName"],
+            "",
+            "",
+            "",
+            "",
+            "",
         )
         lifecycleScope.launch(Dispatchers.IO) {
-            val updating = RetrofitInstance.flexiChargeApi.updateUserInfo(userData["accessToken"]!!, userInfo)
-            if(updating.isSuccessful){
-
+            val token = userData["accessToken"]
+           val test = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token", userInfo)
+            if(test.isSuccessful){
+                withContext(Dispatchers.Main){
+                    startActivity(Intent(this@VerifyActivity, MainActivity::class.java))
+                    finish()
+                }
             }
-
         }
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-
     }
-
-
-
 
 }
 
