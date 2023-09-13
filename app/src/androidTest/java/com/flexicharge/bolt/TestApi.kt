@@ -78,13 +78,6 @@ class TestApi{
         val token = login.body()?.accessToken
         assert(login.isSuccessful)
 
-        val userData = mapOf(
-            "accessToken" to token,
-            "userId" to "HEJ",
-            "username" to "HEJ"
-        )
-
-
         val userInfo = UserFullDetails(
             "test33",
             "Testarsson",
@@ -94,9 +87,7 @@ class TestApi{
             "",
             ""
         )
-        val token2 = userData["accessToken"]
-        val response = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token2", userInfo)
-      //  val update = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token",details)
-        assert(response.isSuccessful)
+        val update = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token",userInfo)
+        assert(update.isSuccessful)
     }
 }
