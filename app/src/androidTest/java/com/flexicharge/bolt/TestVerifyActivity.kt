@@ -32,7 +32,6 @@ class TestVerifyActivity {
 
         val activityScenario = ActivityScenario.launch(VerifyActivity::class.java)
 
-        assert(2 == 2)
     }
 }
 
