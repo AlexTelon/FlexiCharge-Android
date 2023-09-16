@@ -8,10 +8,10 @@
     tools:context=".activities.RegisterActivity">
 
     <RelativeLayout
-        android:id="@+id/accountSettings_emailInputBox"
+        android:id="@+id/nameAndAddress_nameInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="60dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
         app:layout_constraintTop_toBottomOf="@+id/accountSettings_textView_title">
@@ -23,12 +23,12 @@
             android:orientation="vertical"
             android:padding="5dp">
             <EditText
-                android:id="@+id/accountSettings_editTextEmail"
+                android:id="@+id/nameAndAddress_editName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
-                android:hint="jill.valentine@starrs.gov"
+                android:hint="Test"
                 android:textColorHint="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:background="@color/white"
-            android:text="Email"
+            android:text="Name"
             android:paddingHorizontal="10dp"
             android:textColor="@color/black"
             android:textSize="17sp"/>
@@ -50,13 +50,13 @@
 
 
     <RelativeLayout
-        android:id="@+id/accountSettings_phoneInputBox"
+        android:id="@+id/nameAndAddress_addressInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/accountSettings_emailInputBox">
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_nameInputBox">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,11 +66,12 @@
             android:padding="5dp">
 
             <EditText
+                android:id="@+id/nameAndAddress_editAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
-                android:hint="+46 704 555 232"
+                android:hint="Test street 33"
                 android:textColorHint="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -86,23 +87,99 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:background="@color/white"
-            android:text="Mobile number"
+            android:text="Address"
             android:paddingHorizontal="10dp"
             android:textColor="@color/black"
             android:textSize="17sp"/>
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/accountSettings_changePassword"
+    <RelativeLayout
+        android:id="@+id/nameAndAddress_postcodeInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_marginTop="25dp"
-        android:textColor="@color/green"
-        android:text="Change Password"
-        app:layout_constraintTop_toBottomOf="@id/accountSettings_phoneInputBox" />
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_addressInputBox">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text_border"
+            android:orientation="vertical"
+            android:padding="5dp">
 
+            <EditText
+                android:id="@+id/nameAndAddress_editPostcode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingLeft="10dp"
+                android:hint="12345"
+                android:textColorHint="@color/black"
+                android:ems="10"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                />
 
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="20dp"
+            android:background="@color/white"
+            android:text="Postcode"
+            android:paddingHorizontal="10dp"
+            android:textColor="@color/black"
+            android:textSize="17sp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/nameAndAddress_townInputBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_postcodeInputBox">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text_border"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <EditText
+                android:id="@+id/nameAndAddress_editTown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingLeft="10dp"
+                android:hint="Jönköping"
+                android:textColorHint="@color/black"
+                android:ems="10"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="20dp"
+            android:background="@color/white"
+            android:text="Town"
+            android:paddingHorizontal="10dp"
+            android:textColor="@color/black"
+            android:textSize="17sp"/>
+    </RelativeLayout>
 
 
     <ImageView
@@ -122,15 +199,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
-
-
+    
     <TextView
         android:id="@+id/accountSettings_textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-black"
-        android:text="Account\nSettings "
+        android:text="Name and\n  Address "
         android:textColor="@android:color/primary_text_dark"
         android:textSize="48sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,31 +214,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-   
-
     <Button
-        android:id="@+id/buttonRegisterConfirm"
+        android:id="@+id/nameAndAddress_update"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="30dp"
         android:background="@drawable/update_button"
         android:text="Update"
-        app:layout_constraintBottom_toTopOf="@+id/loginActivity_deleteAccount"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-
-    <TextView
-        android:id="@+id/loginActivity_deleteAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:minHeight="48dp"
-        android:text="Delete my account"
-        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
