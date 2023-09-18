@@ -23,7 +23,7 @@
             android:orientation="vertical"
             android:padding="5dp">
             <EditText
-                android:id="@+id/accountSettings_editTextEmail"
+                android:id="@+id/accountSettings_editTextCurrenPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
