@@ -9,17 +9,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.flexicharge.bolt.*
+import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
-import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import com.flexicharge.bolt.api.flexicharge.Transaction
-import com.flexicharge.bolt.api.flexicharge.TransactionList
-import com.flexicharge.bolt.api.flexicharge.TransactionOrder
 import com.flexicharge.bolt.api.klarna.OrderClient
-import com.klarna.mobile.sdk.api.payments.*
+import com.klarna.mobile.sdk.api.payments.KlarnaPaymentCategory
+import com.klarna.mobile.sdk.api.payments.KlarnaPaymentView
+import com.klarna.mobile.sdk.api.payments.KlarnaPaymentViewCallback
+import com.klarna.mobile.sdk.api.payments.KlarnaPaymentsSDKError
 import kotlinx.coroutines.*
-import retrofit2.HttpException
-import java.io.IOException
 
 class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }

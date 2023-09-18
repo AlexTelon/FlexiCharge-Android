@@ -1,7 +1,6 @@
 package com.flexicharge.bolt.activities.businessLogic
 
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import kotlinx.coroutines.*

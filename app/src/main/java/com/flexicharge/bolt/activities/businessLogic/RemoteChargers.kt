@@ -2,13 +2,9 @@ package com.flexicharge.bolt.activities.businessLogic
 
 import android.util.Log
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
-import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.Chargers
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import com.flexicharge.bolt.helpers.MapHelper
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.cancel
 import retrofit2.HttpException
 import java.io.IOException
 

@@ -1,15 +1,11 @@
 package com.flexicharge.bolt
 
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.flexicharge.bolt.activities.VerifyActivity
 import com.flexicharge.bolt.api.flexicharge.Credentials
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserFullDetails
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.junit.Assert.*
-import org.junit.runner.RunWith
 
 
 /**

@@ -1,8 +1,10 @@
 package com.flexicharge.bolt.activities.businessLogic
 
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
-import com.flexicharge.bolt.api.flexicharge.*
+import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import com.flexicharge.bolt.api.flexicharge.Transaction
+import com.flexicharge.bolt.api.flexicharge.TransactionSession
+import com.flexicharge.bolt.api.flexicharge.TransactionSessionResponse
 import kotlinx.coroutines.*
 
 class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Transaction>() {
