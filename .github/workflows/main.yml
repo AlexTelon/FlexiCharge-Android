@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ "Update_main.yml" ]
+    branches: [ "dev" ]
   pull_request:
-    branches: [ "Update_main.yml" ]
+    branches: [ "dev" ]
 
 jobs:
   build:
