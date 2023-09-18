@@ -1,16 +1,15 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.flexicharge.bolt"
         minSdk 29
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
@@ -37,6 +36,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.flexicharge.bolt'
 }
 
 dependencies {
@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
 
     testImplementation 'org.mockito:mockito-core:3.12.4'
