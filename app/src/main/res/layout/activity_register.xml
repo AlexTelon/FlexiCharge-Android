@@ -8,7 +8,6 @@
     android:background="@color/white"
     tools:context=".activities.RegisterActivity" >
 
-
     <RelativeLayout
         android:id="@+id/register_emailInputBox"
         android:layout_width="match_parent"
@@ -26,7 +25,7 @@
             android:padding="5dp" >
             <EditText
                 android:id="@+id/loginActivity_editText_email"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
@@ -66,7 +65,7 @@
             android:padding="5dp" >
             <EditText
                 android:id="@+id/loginActivity_editText_firstName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
@@ -107,7 +106,7 @@
             android:padding="5dp" >
             <EditText
                 android:id="@+id/loginActivity_editText_lastName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
@@ -153,7 +152,7 @@
 
             <EditText
                 android:id="@+id/loginActivity_editText_password"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
@@ -197,7 +196,7 @@
 
             <EditText
                 android:id="@+id/editTextPasswordRepeat"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
