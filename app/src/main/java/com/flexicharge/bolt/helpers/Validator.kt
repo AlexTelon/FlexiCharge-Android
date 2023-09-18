@@ -10,6 +10,7 @@ class Validator {
     fun validateUserInput(field: EditText, isWhat: String) {
 
         field.addTextChangedListener(object : TextWatcher {
+            val letters = Regex("^[a-zA-ZåÅäÄöÖ]+$")
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
                     if(s.isEmpty()) {
@@ -52,6 +53,16 @@ class Validator {
                         TextInputType.isTooLong ->
                             if (s.length > 15) {
                                 field.error = "Name can't be longer than 15 characters"
+                            }
+                            else {
+                                field.error = null
+                            }
+                        TextInputType.isName ->
+                            if (s.length > 15) {
+                                field.error = "Name can't be longer than 15 characters"
+                            }
+                            else if(!letters.matches(s)){
+                                field.error = "Name can only contain letters"
                             }
                             else {
                                 field.error = null

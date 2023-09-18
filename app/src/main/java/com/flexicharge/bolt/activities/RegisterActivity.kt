@@ -56,8 +56,9 @@ class RegisterActivity : AppCompatActivity() {
     private fun confirmRegistration() {
         validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
         validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
-        validateHelper.validateUserInput(registerUserFirstName, TextInputType.isTooLong)
-        validateHelper.validateUserInput(registerUserLastName, TextInputType.isTooLong)
+        validateHelper.validateUserInput(registerUserFirstName, TextInputType.isName)
+        validateHelper.validateUserInput(registerUserLastName, TextInputType.isName)
+
         checkRepeatPass()
 
 
