@@ -10,16 +10,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.EntryManager
-import com.flexicharge.bolt.api.flexicharge.ResetRequestBody
-import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.databinding.ActivityConfirmEmailBinding
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class ConfirmEmailActivity : AppCompatActivity() {
     private lateinit var binding:ActivityConfirmEmailBinding
