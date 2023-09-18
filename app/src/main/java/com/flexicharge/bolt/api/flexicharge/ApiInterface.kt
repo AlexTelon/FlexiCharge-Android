@@ -1,10 +1,7 @@
 package com.flexicharge.bolt.api.flexicharge
 
-import android.service.autofill.UserData
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
-
 
 
 interface ApiInterface {

@@ -2,11 +2,8 @@ package com.flexicharge.bolt.activities
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import com.flexicharge.bolt.R
-import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import androidx.appcompat.app.AppCompatActivity
 import com.flexicharge.bolt.databinding.ActivityProfileMenuLoggedInBinding
 import com.flexicharge.bolt.helpers.LoginChecker
 

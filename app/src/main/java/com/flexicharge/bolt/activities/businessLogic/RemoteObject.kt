@@ -2,7 +2,6 @@ package com.flexicharge.bolt.activities.businessLogic
 
 import androidx.lifecycle.LifecycleCoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.withTimeout
 
 abstract class RemoteObject<T> {
 

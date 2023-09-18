@@ -1,11 +1,10 @@
 package com.flexicharge.bolt.activities.businessLogic
 
-import com.flexicharge.bolt.helpers.StatusCode
 import com.flexicharge.bolt.api.flexicharge.Credentials
 import com.flexicharge.bolt.api.flexicharge.LoginResponseBody
 import com.flexicharge.bolt.api.flexicharge.ResetRequestBody
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import retrofit2.Callback
+import com.flexicharge.bolt.helpers.StatusCode
 import retrofit2.HttpException
 import java.io.IOException
 

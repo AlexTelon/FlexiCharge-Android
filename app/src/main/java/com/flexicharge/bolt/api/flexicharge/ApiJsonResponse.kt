@@ -1,7 +1,4 @@
 package com.flexicharge.bolt.api.flexicharge
-import okhttp3.Credentials
-
-import android.telephony.TelephonyCallback
 
 class Chargers : ArrayList<Charger>()
 

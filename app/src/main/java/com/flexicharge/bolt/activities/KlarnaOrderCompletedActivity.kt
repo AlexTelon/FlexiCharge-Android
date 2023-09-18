@@ -13,6 +13,7 @@ class KlarnaOrderCompletedActivity : AppCompatActivity() {
         var textView = findViewById<TextView>(R.id.klarnaOrderCompletedActivity_textView_message)
         textView.text = message
     }
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         super.onBackPressed()
         finish()
