@@ -34,6 +34,8 @@ class RegisterActivity : AppCompatActivity() {
 
         registerBtn              = binding.buttonRegisterConfirm
         registerUserEmail        = binding.loginActivityEditTextEmail
+        registerUserFirstName    = binding.loginActivityEditTextFirstName
+        registerUserLastName     = binding.loginActivityEditTextLastName
         registerUserPass         = binding.loginActivityEditTextPassword
         registerUserRepeatPass   = binding.editTextPasswordRepeat
         agreeCheckBox            = binding.checkBoxTosAgreement
@@ -45,6 +47,8 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var agreeCheckBox : CheckBox
     lateinit var registerBtn : Button
     lateinit var registerUserEmail: EditText
+    lateinit var registerUserFirstName: EditText
+    lateinit var registerUserLastName: EditText
     lateinit var registerUserPass: EditText
     lateinit var registerUserRepeatPass: EditText
 
@@ -52,6 +56,8 @@ class RegisterActivity : AppCompatActivity() {
     private fun confirmRegistration() {
         validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
         validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
+        validateHelper.validateUserInput(registerUserFirstName, TextInputType.isTooLong)
+        validateHelper.validateUserInput(registerUserLastName, TextInputType.isTooLong)
         checkRepeatPass()
 
 
@@ -72,9 +78,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     //function to send users' data to backend
-    private fun sendUserData(userEmail: String, userPass: String) {
+    private fun sendUserData(userEmail: String,userFirstName: String, userLastName : String ,userPass: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            // handle request to backend.
             try {
                 val requestBody = UserDetails(userEmail, userPass)
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
@@ -82,7 +87,21 @@ class RegisterActivity : AppCompatActivity() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         val intent =
                             Intent(this@RegisterActivity, VerifyActivity::class.java)
+                        intent.putExtra("userEmail",userEmail)
+                        intent.putExtra("userPass", userPass)
                         startActivity(intent)
+                        if(userFirstName!=null && userLastName!=null){
+                            val intent =
+                                Intent(this@RegisterActivity, VerifyActivity::class.java)
+                            intent.putExtra("userFirstName", userFirstName)
+                            intent.putExtra("userLastName",userLastName)
+                            startActivity(intent)
+                        } else {
+                            val intent =
+                                Intent(this@RegisterActivity, VerifyActivity::class.java)
+                            startActivity(intent)
+                        }
+
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
@@ -133,6 +152,8 @@ class RegisterActivity : AppCompatActivity() {
                     if (registerUserPass.error == null) {
                         sendUserData(
                             registerUserEmail.text.toString(),
+                            registerUserFirstName.text.toString(),
+                            registerUserLastName.text.toString(),
                             registerUserPass.text.toString()
                         )
                     }
