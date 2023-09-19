@@ -38,9 +38,9 @@ class VerifyActivity : AppCompatActivity() {
         var userLastName = intent.getStringExtra("userLastName")
 
         if(userFirstName == null)
-            userFirstName ="NoValue"
+            userFirstName =""
         if(userLastName == null)
-            userLastName = "NoValue"
+            userLastName = ""
 
         confirmVerification(userEmail = userEmail!!, userPass = userPass!!, userFirstName, userLastName)
     }
@@ -122,7 +122,7 @@ class VerifyActivity : AppCompatActivity() {
             putString("loggedIn", "true")
         }.apply()
         val userInfo = UserFullDetails(
-            "TESTING",
+            userData["firstName"],
             userData["lastName"],
             "",
             "",

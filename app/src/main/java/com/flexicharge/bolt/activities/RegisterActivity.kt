@@ -57,25 +57,28 @@ class RegisterActivity : AppCompatActivity() {
     private fun confirmRegistration() {
         validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
         validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
-        validateHelper.validateUserInput(registerUserFirstName, TextInputType.isTooLong)
-        validateHelper.validateUserInput(registerUserLastName, TextInputType.isTooLong)
+        validateHelper.validateUserInput(registerUserFirstName, TextInputType.isName)
+        validateHelper.validateUserInput(registerUserLastName, TextInputType.isName)
+
         checkRepeatPass()
 
 
         registerBtn.setOnClickListener {
-            if(agreeCheckBox.isChecked){
+
+
+            if(agreeCheckBox.isChecked && registerUserLastName.error == null && registerUserFirstName.error == null){
                 sendDataToBackend()
             }
             else {
-                AlertDialog.Builder(this@RegisterActivity)
-                    .setTitle("Oops!")
-                    .setMessage("you have to agree to term and conditions")
-                    .setNegativeButton("Ok") { _,_  ->
-
-                    }.show()
+                if(!agreeCheckBox.isChecked){
+                    AlertDialog.Builder(this@RegisterActivity)
+                        .setTitle("Oops!")
+                        .setMessage("you have to agree to term and conditions")
+                        .setNegativeButton("Ok") { _,_  ->
+                        }.show()
+                }
             }
         }
-
     }
 
     //function to send users' data to backend
@@ -90,18 +93,9 @@ class RegisterActivity : AppCompatActivity() {
                             Intent(this@RegisterActivity, VerifyActivity::class.java)
                         intent.putExtra("userEmail",userEmail)
                         intent.putExtra("userPass", userPass)
+                        intent.putExtra("userFirstName", userFirstName)
+                        intent.putExtra("userLastName",userLastName)
                         startActivity(intent)
-                        if(userFirstName!=null && userLastName!=null){
-                            val intent =
-                                Intent(this@RegisterActivity, VerifyActivity::class.java)
-                            intent.putExtra("userFirstName", userFirstName)
-                            intent.putExtra("userLastName",userLastName)
-                            startActivity(intent)
-                        } else {
-                            val intent =
-                                Intent(this@RegisterActivity, VerifyActivity::class.java)
-                            startActivity(intent)
-                        }
 
                     }
                 } else {
