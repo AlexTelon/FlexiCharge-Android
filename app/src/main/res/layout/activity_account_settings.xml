@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".activities.RegisterActivity">
+    tools:context=".activities.AccountSettingsActivity">
 
     <RelativeLayout
         android:id="@+id/accountSettings_emailInputBox"
@@ -30,6 +30,7 @@
                 android:paddingLeft="10dp"
                 android:hint="jill.valentine@starrs.gov"
                 android:textColorHint="@color/black"
+                android:textColor="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -72,6 +73,7 @@
                 android:paddingLeft="10dp"
                 android:hint="+46 704 555 232"
                 android:textColorHint="@color/black"
+                android:textColor="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

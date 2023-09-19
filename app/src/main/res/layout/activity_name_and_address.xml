@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".activities.RegisterActivity">
+    tools:context=".activities.NameAddressActivity">
 
     <RelativeLayout
         android:id="@+id/nameAndAddress_nameInputBox"
@@ -30,6 +30,7 @@
                 android:paddingLeft="10dp"
                 android:hint="Test"
                 android:textColorHint="@color/black"
+                android:textColor="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -73,6 +74,7 @@
                 android:paddingLeft="10dp"
                 android:hint="Test street 33"
                 android:textColorHint="@color/black"
+                android:textColor="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -117,6 +119,7 @@
                 android:paddingLeft="10dp"
                 android:hint="12345"
                 android:textColorHint="@color/black"
+                android:textColor="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -161,6 +164,7 @@
                 android:paddingLeft="10dp"
                 android:hint="Jönköping"
                 android:textColorHint="@color/black"
+                android:textColor="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
