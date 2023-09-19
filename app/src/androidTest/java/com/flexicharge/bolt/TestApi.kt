@@ -71,7 +71,7 @@ class TestApi{
 
     @Test
     fun updateUserInfo() = runBlocking {
-        val email = "hadokas834@vip4e.com"
+        val email = "kofap47986@viicard.com"
         val pass = "Test123!"
         val credentials = Credentials(email,pass)
         val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
