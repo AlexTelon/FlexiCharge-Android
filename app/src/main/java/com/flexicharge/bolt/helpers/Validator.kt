@@ -18,11 +18,12 @@ class Validator {
                     }
                     when (isWhat) {
                         TextInputType.isEmail ->
-                            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(field.text).matches()) {
+                            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(field.text)
+                                    .matches()
+                            ) {
 
                                 field.error = "Invalid email."
-                            }
-                            else{
+                            } else {
                                 field.error = null
 
                             }
@@ -31,13 +32,15 @@ class Validator {
                             if (
                                 s.length < 8
                                 || s.firstOrNull { it.isDigit() } == null
-                                || s.filter { it.isLetter() }.firstOrNull { it.isUpperCase() } == null
-                                || s.filter { it.isLetter() }.firstOrNull { it.isLowerCase() } == null
+                                || s.filter { it.isLetter() }
+                                    .firstOrNull { it.isUpperCase() } == null
+                                || s.filter { it.isLetter() }
+                                    .firstOrNull { it.isLowerCase() } == null
                                 || s.firstOrNull { !it.isLetterOrDigit() } == null
                             ) {
-                                field.error = "Password must have 8 chars containing upper- and lower case characters, digits and symbols"
-                            }
-                            else {
+                                field.error =
+                                    "Password must have 8 chars containing upper- and lower case characters, digits and symbols"
+                            } else {
                                 field.error = null
 
                             }
@@ -46,34 +49,37 @@ class Validator {
                                 || !s.isDigitsOnly()
                             ) {
                                 field.error = "Conformation code must have 6 digits."
-                            }
-                            else{
+                            } else {
                                 field.error = null
                             }
                         TextInputType.isTooLong ->
                             if (s.length > 15) {
                                 field.error = "Name can't be longer than 15 characters"
-                            }
-                            else {
+                            } else {
                                 field.error = null
                             }
                         TextInputType.isName ->
-                            if (s.length > 15) {
-                                field.error = "Name can't be longer than 15 characters"
-                            }
-                            else if(!letters.matches(s)){
-                                field.error = "Name can only contain letters"
-                            }
-                            else {
+                            if (s.isEmpty()) {
                                 field.error = null
+                            } else {
+                                if (s.length > 15) {
+                                    field.error = "Name can't be longer than 15 characters"
+                                } else if (s.length < 2 && s.isNotEmpty()) {
+                                    field.error = "Name must be at least two letters"
+                                } else if (!letters.matches(s)) {
+                                    field.error = "Name can only contain letters"
+                                } else {
+                                    field.error = null
+                                }
                             }
                     }
+
                 }
             }
-
             override fun afterTextChanged(s: Editable?) {   }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {  }
 
         })
+
     }
 }
