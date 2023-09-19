@@ -25,31 +25,30 @@ import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
 import com.flexicharge.bolt.activities.businessLogic.*
+import com.flexicharge.bolt.adapters.ChargePointListAdapter
+import com.flexicharge.bolt.adapters.ChargersListAdapter
+import com.flexicharge.bolt.api.flexicharge.Charger
+import com.flexicharge.bolt.api.flexicharge.TransactionSession
+import com.flexicharge.bolt.databinding.ActivityMainBinding
+import com.flexicharge.bolt.helpers.LoginChecker
+import com.flexicharge.bolt.helpers.MapHelper
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
 import com.flexicharge.bolt.helpers.MapHelper.currLocation
 import com.flexicharge.bolt.helpers.MapHelper.currentLocation
 import com.flexicharge.bolt.helpers.MapHelper.fetchLocation
 import com.flexicharge.bolt.helpers.MapHelper.panToPos
-import com.flexicharge.bolt.adapters.ChargePointListAdapter
-import com.flexicharge.bolt.adapters.ChargersListAdapter
-import com.flexicharge.bolt.databinding.ActivityMainBinding
-import com.flexicharge.bolt.helpers.MapHelper
-import com.flexicharge.bolt.api.flexicharge.*
-import com.flexicharge.bolt.helpers.LoginChecker
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.*
-import retrofit2.HttpException
-import java.io.IOException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.NoSuchElementException
-import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
@@ -85,7 +84,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             setupChargerInputDialog(charger.chargerID)
                         }
                     }
-                    return false;
+                    return false
                 })
             }
         }
@@ -619,7 +618,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             return
         }
 
-        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId);
+        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId)
         refreshJob.invokeOnCompletion {
             if(refreshJob.isCancelled) {
                 return@invokeOnCompletion

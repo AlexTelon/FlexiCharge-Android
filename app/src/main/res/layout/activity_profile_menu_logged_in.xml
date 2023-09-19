@@ -4,18 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".activities.ProfileMenuLoggedInActivity">
 
     <ImageView
         android:id="@+id/loginActivity_imageView_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="-999dp"
+        android:layout_marginStart="-799dp"
         android:layout_marginTop="-999dp"
         android:layout_marginEnd="-999dp"
         android:layout_marginBottom="-16dp"
         android:background="@color/mild_grey"
-        android:rotation="-7"
+        android:rotation="-10"
         app:layout_constraintBottom_toBottomOf="@+id/loginActivity_textView_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +44,7 @@
         android:layout_marginEnd="32dp"
         android:gravity="center_vertical"
         android:text="Charging History"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,6 +65,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:gravity="center_vertical"
+        android:textColor="@color/black"
         android:text="Invoices"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -107,6 +110,7 @@
         android:layout_marginEnd="32dp"
         android:gravity="center_vertical"
         android:text="Account Settings"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -137,6 +141,7 @@
         android:layout_marginEnd="32dp"
         android:gravity="center_vertical"
         android:text="Name and Address"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -167,6 +172,7 @@
         android:layout_marginEnd="32dp"
         android:gravity="center_vertical"
         android:text="About"
+        android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -189,19 +195,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/aboutTextView" />
-
     <Button
-        android:textColor="@color/red"
         android:id="@+id/loginActivity_button_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
+        android:background="@drawable/update_button"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="10dp"
         android:text="Logout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/aboutTextView"
+        app:layout_constraintStart_toStartOf="@+id/aboutTextView"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

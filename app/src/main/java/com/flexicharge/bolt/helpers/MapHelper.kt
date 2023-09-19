@@ -9,16 +9,18 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import com.flexicharge.bolt.api.flexicharge.Chargers
-import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.api.flexicharge.Charger
-import com.google.android.gms.location.*
+import com.flexicharge.bolt.api.flexicharge.Chargers
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import java.lang.Exception
 
 object MapHelper {
     lateinit var currentLocation: Location

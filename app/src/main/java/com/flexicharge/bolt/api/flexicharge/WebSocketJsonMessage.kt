@@ -1,7 +1,6 @@
 package com.flexicharge.bolt.api.flexicharge
 
 import org.json.JSONArray
-import org.json.JSONObject
 
 class WebSocketJsonMessage {
     data class ChargingStat(val value: Number, val unit: String)

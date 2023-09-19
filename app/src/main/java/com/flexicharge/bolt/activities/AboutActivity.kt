@@ -1,7 +1,7 @@
 package com.flexicharge.bolt.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.flexicharge.bolt.R
 
 class AboutActivity : AppCompatActivity() {

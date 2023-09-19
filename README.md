@@ -11,7 +11,7 @@
 
 ## Project Architecture
 
-  This branch works with Android Studio 2020.3.1, uses Android SDK 30 and supports Android 10 and above.
+  This branch works with Android Studio 2020.3.1, uses Android SDK 33 and supports Android 10 and above.
 
 ## The application
 

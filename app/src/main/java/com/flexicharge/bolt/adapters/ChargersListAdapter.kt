@@ -7,9 +7,9 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.flexicharge.bolt.R
 import com.flexicharge.bolt.api.flexicharge.ChargePoint
 import com.flexicharge.bolt.api.flexicharge.Charger
-import com.flexicharge.bolt.R
 
 class ChargersListAdapter(private val chargers: List<Charger>, private val enteredChargerId: String, private val chargePoint: ChargePoint, private val act: ChangeInputInterface): RecyclerView.Adapter<ChargersListAdapter.ViewHolder>() {
 

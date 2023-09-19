@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.api.flexicharge.ChargePoints
 
 class ChargePointListAdapter(
     private var chargePoints: ChargePoints,
