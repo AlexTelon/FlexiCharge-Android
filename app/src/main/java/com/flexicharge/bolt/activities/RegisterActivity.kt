@@ -96,20 +96,6 @@ class RegisterActivity : AppCompatActivity() {
                         intent.putExtra("userFirstName", userFirstName)
                         intent.putExtra("userLastName",userLastName)
                         startActivity(intent)
-                        /*
-                        if(userFirstName!=null && userLastName!=null){
-                            val intent =
-                                Intent(this@RegisterActivity, VerifyActivity::class.java)
-                            intent.putExtra("userFirstName", userFirstName)
-                            intent.putExtra("userLastName",userLastName)
-                            startActivity(intent)
-                        } else {
-                            val intent =
-                                Intent(this@RegisterActivity, VerifyActivity::class.java)
-                            startActivity(intent)
-                        }
-
-                         */
 
                     }
                 } else {
