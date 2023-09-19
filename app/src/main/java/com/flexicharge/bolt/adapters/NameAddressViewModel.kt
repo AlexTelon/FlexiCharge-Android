@@ -1,5 +1,4 @@
 package com.flexicharge.bolt.adapters
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,24 +8,47 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class NameAddressViewModel : ViewModel() {
-    private val _hintText = MutableLiveData<String>()
-    private val _updated = MutableLiveData(false)
+    private val _currentUserInfo    = MutableLiveData<UserFullDetails>()
+    private val _updated            = MutableLiveData(false)
+    private val _infoDone           = MutableLiveData(false)
+    private val _updateFailed        = MutableLiveData(false)
 
-    val hintText : LiveData<String>
-    get() = _hintText
+    val currentUserInfo : LiveData<UserFullDetails>
+        get() = _currentUserInfo
 
     val updated : LiveData<Boolean>
         get() = _updated
 
-    private suspend fun updateUserAPI(token : String, userDetails : UserFullDetails){
+    val infoDone : LiveData<Boolean>
+        get() = _infoDone
 
+    val updateFailed : LiveData<Boolean>
+        get() = _updateFailed
+
+    private suspend fun updateUserAPI(token : String, userDetails : UserFullDetails){
         val update = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token",userDetails)
         if (update.isSuccessful){
             withContext(Dispatchers.Main){
                 _updated.value = true
             }
+        }else{
+            _updateFailed.value = true
+        }
+    }
+
+    suspend fun getUserData(token: String){
+        val download = RetrofitInstance.flexiChargeApi.getUserInfo("Bearer $token")
+        if (download.isSuccessful){
+            withContext(Dispatchers.Main){
+                _currentUserInfo.value = download.body()
+                toggleInfoDone()
+            }
 
         }
+    }
+
+    fun toggleInfoDone(){
+        _infoDone.value = !_infoDone.value!!
     }
 
     suspend fun updateUser(token: String, firstName : String, address :String, postcode : String, town : String){
@@ -45,7 +67,6 @@ class NameAddressViewModel : ViewModel() {
             ""
         )
         updateUserAPI(token, userInfo)
-
     }
 
     private fun validateInput(name : String?) : String{
