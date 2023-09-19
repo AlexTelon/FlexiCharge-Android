@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".activities.RegisterActivity">
+        tools:context=".activities.ChargingHistoryActivity">
 
         <ImageView
             android:id="@+id/loginActivity_imageView_title2"
