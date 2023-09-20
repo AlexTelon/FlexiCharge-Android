@@ -53,6 +53,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
@@ -438,22 +439,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
             remoteChargePoints.value.forEachIndexed { index, chargePoint ->
                 val dist = FloatArray(1)
-                var couldGetLocation = true
                 try {
                     Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
                 }
                 catch (e: UninitializedPropertyAccessException) {
                     dist[0] = 0f
-                    couldGetLocation = false
                 }
 
                 val df = DecimalFormat("#.##")
-                val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
-                    "?"
-                }
-                val distanceFloat = df.format(dist[0] / 1000).toFloat()
+                val distanceFloat = (dist[0] / 1000)
+                val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
+
                 val count = remoteChargers.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                distanceToChargePoint.add(distanceFloat)
+                distanceToChargePoint.add(roundedDistance)
                 chargerCount.add(count)
             }
 
