@@ -473,7 +473,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
             lifecycleScope.launch(Dispatchers.Main) {
-              //  listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceAsString, sortedChargerCount)
                 listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(sortedChargePointsList, this@MainActivity, distanceAsString, sortedChargerCount)
 
             }
