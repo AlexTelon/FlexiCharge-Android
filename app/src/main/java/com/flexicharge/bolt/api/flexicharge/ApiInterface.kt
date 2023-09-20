@@ -6,6 +6,9 @@ import retrofit2.http.*
 
 interface ApiInterface {
 
+    @POST("/reservations")
+    suspend fun makeReservation(@Body reservation: ReservatioDetails) : Response<ReservatioDetails>
+
     @GET("chargers/{chargerId}")
     suspend fun getCharger(@Path("chargerId") chargerId: Int): Response<Charger>
 

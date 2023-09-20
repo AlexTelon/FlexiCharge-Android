@@ -6,18 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/dark_grey">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chargePointsNearMeLayout_recyclerView_chargePointList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chargePointsNearMeLayout_textView_nearMe"
-        tools:listitem="@layout/chargepoint_list_item" />
+
 
     <TextView
         android:id="@+id/chargePointsNearMeLayout_textView_nearMe"
@@ -41,5 +30,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chargePointsNearMeLayout_recyclerView_chargePointList"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:visibility="gone"
+
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chargePointsNearMeLayout_textView_nearMe"
+        tools:listitem="@layout/chargepoint_list_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
