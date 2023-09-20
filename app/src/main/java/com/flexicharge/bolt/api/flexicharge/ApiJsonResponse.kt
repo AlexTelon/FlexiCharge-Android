@@ -21,6 +21,13 @@ data class Charger(
     val status: String
 )
 
+data class ReservatioDetails(
+    val chargerID: String,
+    val userID: String,
+    val start: Int,
+    val end: Int
+)
+
 class ChargePoints : ArrayList<ChargePoint>()
 data class ChargePoint(
     val chargePointID: Int,

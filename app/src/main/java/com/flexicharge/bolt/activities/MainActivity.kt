@@ -1,5 +1,6 @@
 package com.flexicharge.bolt.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -27,6 +28,8 @@ import com.flexicharge.bolt.SpacesItemDecoration
 import com.flexicharge.bolt.activities.businessLogic.*
 import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.adapters.ChargersListAdapter
+import com.flexicharge.bolt.api.flexicharge.ChargePoint
+import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import com.flexicharge.bolt.databinding.ActivityMainBinding
@@ -49,6 +52,7 @@ import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
@@ -408,6 +412,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {       // display the chargers near u
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
@@ -428,7 +433,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 return@invokeOnCompletion
             }
 
-            val distanceToChargePoint = mutableListOf<String>()
+            val distanceToChargePoint = mutableListOf<Float>()
             val chargerCount = mutableListOf<Int>()
 
             remoteChargePoints.value.forEachIndexed { index, chargePoint ->
@@ -446,14 +451,36 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
                     "?"
                 }
-
+                val distanceFloat = df.format(dist[0] / 1000).toFloat()
                 val count = remoteChargers.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                distanceToChargePoint.add(distanceStr)
+                distanceToChargePoint.add(distanceFloat)
                 chargerCount.add(count)
             }
+
+            val chargePointList = ArrayList(remoteChargePoints.value)
+
+            val indices = distanceToChargePoint.indices.sortedBy { distanceToChargePoint[it] }
+
+            val sortedDistanceToChargePoint = indices.map { distanceToChargePoint[it] }
+            val sortedChargerCount = indices.map { chargerCount[it] }.toMutableList()
+            val sortedChargePoints = indices.map { chargePointList[it] }
+
+
+            val sortedChargePointsList = ChargePoints()
+            sortedChargePointsList.addAll(sortedChargePoints)
+
+            val distanceAsString = mutableListOf<String>()
+            distanceAsString.addAll(sortedDistanceToChargePoint.map { it.toString() })
+
+
+
             lifecycleScope.launch(Dispatchers.Main) {
-                listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceToChargePoint, chargerCount)
+              //  listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceAsString, sortedChargerCount)
+                listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(sortedChargePointsList, this@MainActivity, distanceAsString, sortedChargerCount)
+
             }
+
+
 
         }
         //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
