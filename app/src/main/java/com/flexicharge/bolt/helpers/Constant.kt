@@ -9,11 +9,14 @@ object StatusCode {
 }
 
 object TextInputType {
-    const val  isEmail = "is email"
-    const val isPassword = "is password"
-    const val isConfirmationCode = "is conformation code"
-    const val isTooLong = "is too long"
-    const val isName = "is name"
+    const val  isEmail              = "is email"
+    const val isPassword            = "is password"
+    const val isConfirmationCode    = "is conformation code"
+    const val isTooLong             = "is too long"
+    const val isName                = "is name"
+    const val isPostCode            = "is postcode"
+    const val isAddress             = "is address"
+    const val isTown                = "is Town"
 
 }
 
