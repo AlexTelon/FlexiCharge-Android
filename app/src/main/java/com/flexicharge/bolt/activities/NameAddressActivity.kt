@@ -31,14 +31,19 @@ class NameAddressActivity : AppCompatActivity() {
 
         binding                 = ActivityNameAndAddressBinding.inflate(layoutInflater)
         viewModel               = ViewModelProvider(this).get(NameAddressViewModel::class.java)
-         val name               = binding.nameAndAddressEditName
-         val address            = binding.nameAndAddressEditAddress
-         val postCode           = binding.nameAndAddressEditPostcode
-         val town               = binding.nameAndAddressEditTown
+        val firstname           = binding.nameAndAddressEditFirstName
+        val lastName            = binding.nameAndAddressEditLastName
+        val address             = binding.nameAndAddressEditAddress
+        val postCode            = binding.nameAndAddressEditPostcode
+        val town                = binding.nameAndAddressEditTown
         val sharedPreferences   = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
-         val token              = sharedPreferences.getString("accessToken", "")
+        val token               = sharedPreferences.getString("accessToken", "")
 
-        val firstNameError = validateHelper.validateUserInput(name, TextInputType.isName)
+        validateHelper.validateUserInput(firstname, TextInputType.isName)
+        validateHelper.validateUserInput(lastName, TextInputType.isName)
+        validateHelper.validateUserInput(postCode,TextInputType.isPostCode)
+        validateHelper.validateUserInput(town,TextInputType.isTown)
+        validateHelper.validateUserInput(address,TextInputType.isAddress)
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getUserData(token!!)
@@ -46,7 +51,7 @@ class NameAddressActivity : AppCompatActivity() {
 
         viewModel.infoDone.observe(this) {
             if(it)
-                updateTextFields(name,address,postCode,town)
+                updateTextFields(firstname,lastName,address,postCode,town)
         }
 
         viewModel.updateFailed.observe(this){
@@ -65,10 +70,11 @@ class NameAddressActivity : AppCompatActivity() {
 
 
         binding.nameAndAddressUpdate.setOnClickListener {
-            if(name.error == null){
+            if(firstname.error == null && lastName.error == null && postCode.error == null && town.error == null && address.error == null){
                 lifecycleScope.launch(Dispatchers.IO){
                     viewModel.updateUser(token!!,
-                        name.text.toString(),
+                        firstname.text.toString(),
+                        lastName.text.toString(),
                         address.text.toString(),
                         postCode.text.toString(),
                         town.text.toString()
@@ -78,15 +84,18 @@ class NameAddressActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateTextFields(name : EditText, address : EditText, postCode : EditText, town : EditText){
+    private fun updateTextFields(firstName : EditText, lastName : EditText, address : EditText, postCode : EditText, town : EditText){
         val userInfo    = viewModel.currentUserInfo.value
 
-        name.text       = Editable.Factory.getInstance().newEditable(userInfo?.firstName)
+        firstName.text  = Editable.Factory.getInstance().newEditable(userInfo?.firstName)
+        lastName.text   = Editable.Factory.getInstance().newEditable(userInfo?.lastName)
         address.text    = Editable.Factory.getInstance().newEditable(userInfo?.streetAddress)
         postCode.text   = Editable.Factory.getInstance().newEditable(userInfo?.zipCode)
         town.text       = Editable.Factory.getInstance().newEditable(userInfo?.city)
         viewModel.toggleInfoDone()
     }
+
+
 
 }
 

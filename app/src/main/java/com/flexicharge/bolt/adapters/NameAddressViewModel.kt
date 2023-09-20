@@ -32,7 +32,9 @@ class NameAddressViewModel : ViewModel() {
                 _updated.value = true
             }
         }else{
-            _updateFailed.value = true
+            withContext(Dispatchers.Main){
+                _updateFailed.value = true
+            }
         }
     }
 
@@ -51,15 +53,16 @@ class NameAddressViewModel : ViewModel() {
         _infoDone.value = !_infoDone.value!!
     }
 
-    suspend fun updateUser(token: String, firstName : String, address :String, postcode : String, town : String){
+    suspend fun updateUser(token: String, firstName : String, lastName : String,  address :String, postcode : String, town : String){
         val firstNameChecked    = validateInput(firstName)
+        val lastNameChecked    = validateInput(lastName)
         val addressChecked      = validateInput(address)
         val postcodeChecked     = validateInput(postcode)
         val townChecked         = validateInput(town)
 
         val userInfo = UserFullDetails(
             firstNameChecked,
-            "TESTARSSON",
+            lastNameChecked,
             "",
             addressChecked,
             postcodeChecked,
