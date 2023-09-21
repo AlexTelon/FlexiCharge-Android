@@ -413,8 +413,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
+<<<<<<< HEAD
 
-    private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {       // display the chargers near u
+    private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {    
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
@@ -473,7 +474,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
             lifecycleScope.launch(Dispatchers.Main) {
-              //  listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceAsString, sortedChargerCount)
                 listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(sortedChargePointsList, this@MainActivity, distanceAsString, sortedChargerCount)
 
             }
@@ -481,7 +481,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
         }
-        //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
     }
 
 
