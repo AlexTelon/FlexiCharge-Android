@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-    android:id="@+id/layout_invoice_list_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_charging_history_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
@@ -17,19 +17,20 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/invoiceTitle"
+            android:id="@+id/charger_location_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/mild_grey"
-            android:text="June 2021"/>
+            android:text="Per-Brahe Parkeringshus, Jönköping"/>
 
         <TextView
-            android:id="@+id/invoiceAmount"
+            android:id="@+id/charging_ammount_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:text="104.34kr"/>
+            android:textStyle="bold"
+            android:text="Total 27.74 kr"/>
 
     </LinearLayout>
 
@@ -37,8 +38,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="40dp"
-        android:background="@drawable/ic_black_arrow_right_2"/>
+        android:layout_marginEnd="10dp"
+        android:scaleY="-1"
+        android:background="@drawable/ic_arrow_up_48_black"/>
 
 
     <View
