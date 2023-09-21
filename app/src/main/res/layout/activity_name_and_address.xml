@@ -1,83 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".activities.RegisterActivity" >
+    tools:context=".activities.NameAddressActivity">
 
     <RelativeLayout
-        android:id="@+id/register_emailInputBox"
+        android:id="@+id/nameAndAddress_firstNameInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="60dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/loginActivity_textView_title" >
+        app:layout_constraintTop_toBottomOf="@+id/accountSettings_textView_title">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/edit_text_border"
             android:orientation="vertical"
-            android:padding="5dp" >
+            android:padding="5dp">
             <EditText
-                android:id="@+id/loginActivity_editText_email"
+                android:id="@+id/nameAndAddress_editFirstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
-                android:hint="Email"
                 android:textColor="@color/black"
-                android:textColorHint="@color/black"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent" />
-        </LinearLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="20dp"
-            android:background="@color/white"
-            android:text="Email"
-            android:paddingHorizontal="10dp"
-            android:textColor="@color/black"
-            android:textSize="17sp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/register_firstNameInputBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/register_emailInputBox" >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/edit_text_border"
-            android:orientation="vertical"
-            android:padding="5dp" >
-            <EditText
-                android:id="@+id/loginActivity_editText_firstName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:paddingLeft="10dp"
-                android:textColorHint="@color/black"
-                android:textColor="@color/black"
-                android:hint="Optional"
-                android:inputType="textPersonName"
-                android:ems="10"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                />
         </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
@@ -88,34 +44,32 @@
             android:text="First Name"
             android:paddingHorizontal="10dp"
             android:textColor="@color/black"
-            android:textSize="17sp" />
+            android:textSize="17sp"/>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/register_lastNameInputBox"
+        android:id="@+id/nameAndAddress_lastNameInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/register_firstNameInputBox" >
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_firstNameInputBox">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/edit_text_border"
             android:orientation="vertical"
-            android:padding="5dp" >
+            android:padding="5dp">
+
             <EditText
-                android:id="@+id/loginActivity_editText_lastName"
+                android:id="@+id/nameAndAddress_editLastName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
-                android:textColorHint="@color/black"
                 android:textColor="@color/black"
-                android:hint="Optional"
-                android:inputType="textPersonName"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -136,15 +90,15 @@
             android:textSize="17sp"/>
     </RelativeLayout>
 
+
     <RelativeLayout
-        android:id="@+id/register_passwordInputBox"
+        android:id="@+id/nameAndAddress_addressInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/register_lastNameInputBox">
-
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_lastNameInputBox">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -154,19 +108,19 @@
             android:padding="5dp">
 
             <EditText
-                android:id="@+id/loginActivity_editText_password"
+                android:id="@+id/nameAndAddress_editAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
-                android:textColorHint="@color/black"
+
                 android:textColor="@color/black"
-                android:hint=""
-                android:inputType="textPassword"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
         </LinearLayout>
 
         <TextView
@@ -175,136 +129,144 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:background="@color/white"
-            android:text="Password"
+            android:text="Address"
             android:paddingHorizontal="10dp"
             android:textColor="@color/black"
-            android:textSize="17sp" />
+            android:textSize="17sp"/>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/register_repeatPasswordInputBox"
+        android:id="@+id/nameAndAddress_postcodeInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/register_passwordInputBox" >
-
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_addressInputBox">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/edit_text_border"
             android:orientation="vertical"
-            android:padding="5dp" >
+            android:padding="5dp">
 
             <EditText
-                android:id="@+id/editTextPasswordRepeat"
+                android:id="@+id/nameAndAddress_editPostcode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
-                android:textColorHint="@color/black"
+
                 android:textColor="@color/black"
-                android:hint=""
-                android:inputType="textPassword"
                 android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
         </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:background="@color/white"
-            android:text="Repeat Password"
+            android:text="Postcode"
             android:paddingHorizontal="10dp"
             android:textColor="@color/black"
-            android:textSize="17sp" />
+            android:textSize="17sp"/>
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/nameAndAddress_townInputBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_postcodeInputBox">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text_border"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <EditText
+                android:id="@+id/nameAndAddress_editTown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingLeft="10dp"
+                android:textColor="@color/black"
+                android:ems="10"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="20dp"
+            android:background="@color/white"
+            android:text="Town"
+            android:paddingHorizontal="10dp"
+            android:textColor="@color/black"
+            android:textSize="17sp"/>
+    </RelativeLayout>
+
+
     <ImageView
-        android:id="@+id/loginActivity_imageView_title"
+        android:id="@+id/loginActivity_imageView_title2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="-899dp"
-        android:layout_marginTop="-299dp"
+        android:layout_marginStart="-999dp"
+        android:layout_marginTop="-999dp"
         android:layout_marginEnd="-999dp"
-        android:layout_marginBottom="-25dp"
+        android:layout_marginBottom="-10dp"
         android:background="@color/mild_grey"
         android:rotation="-10"
-        app:layout_constraintBottom_toBottomOf="@+id/loginActivity_textView_title"
+        app:layout_constraintBottom_toBottomOf="@+id/accountSettings_textView_title"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
+    
     <TextView
-        android:id="@+id/loginActivity_textView_title"
+        android:id="@+id/accountSettings_textView_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-black"
-        android:text="Register"
+        android:text="Name and\n  Address "
         android:textColor="@android:color/primary_text_dark"
         android:textSize="48sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <CheckBox
-        android:id="@+id/checkBoxTosAgreement"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/white"
-        android:buttonTint="@color/black"
-        android:text="I agree to the terms and conditions"
-        android:textColor="@android:color/primary_text_light"
-        app:layout_constraintStart_toStartOf="@+id/register_repeatPasswordInputBox"
-        app:layout_constraintTop_toBottomOf="@+id/register_repeatPasswordInputBox" />
 
     <Button
-        android:id="@+id/buttonRegisterConfirm"
+        android:id="@+id/nameAndAddress_update"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/update_button"
-        android:layout_marginBottom="15dp"
-        android:layout_marginTop="10dp"
-        android:text="Register"
-        app:layout_constraintBottom_toTopOf="@+id/textViewLogIn"
-        app:layout_constraintEnd_toEndOf="@+id/register_repeatPasswordInputBox"
-        app:layout_constraintStart_toStartOf="@+id/checkBoxTosAgreement"
-        app:layout_constraintTop_toBottomOf="@+id/checkBoxTosAgreement"
-        />
-
-    <TextView
-        android:id="@+id/textViewLogIn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="28dp"
-        android:onClick="goToSignIn"
-        android:text="Already have an account? Log in"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/loginActivity_textView_continueAsGuest"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonRegisterConfirm"/>
-    <TextView
-        android:id="@+id/loginActivity_textView_continueAsGuest"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:minHeight="8dp"
-        android:onClick="continueAsGuest"
-        android:text="Continue as Guest"
-        android:textColor="@color/black"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/update_button"
+        android:text="Update"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLogIn"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

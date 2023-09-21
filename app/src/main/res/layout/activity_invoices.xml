@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.InvoiceActivity"
+    android:background="@color/white"
+    >
+
+    <ImageView
+        android:id="@+id/invoices_imageView_title"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="-999dp"
+        android:layout_marginTop="-999dp"
+        android:layout_marginEnd="-999dp"
+        android:layout_marginBottom="-10dp"
+        android:background="@color/mild_grey"
+        android:rotation="-10"
+        app:layout_constraintBottom_toBottomOf="@+id/invoices_textView_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/invoices_textView_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-black"
+        android:text="Invoices"
+        android:textColor="@android:color/primary_text_dark"
+        android:textSize="48sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/invoiceRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@+id/invoices_imageView_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="60dp"
+            android:visibility="gone"
+            />
+
+    <LinearLayout
+        android:id="@+id/invoices_none"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:visibility="gone">
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/invoiceActivity_logo"
+            android:layout_width="200dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/ic_flexicharge_banner"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="50dp"
+            android:textSize="20sp"
+            android:text="Your invoices will become available after your first month of charging"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/invoices_not_setUp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:visibility="visible">
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/invoiceActivity_logo_second"
+            android:layout_width="200dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/ic_flexicharge_banner"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="30dp"
+            android:textSize="20sp"
+            android:text="You have not set up invoicing yet"
+            android:textColor="@color/black"/>
+
+
+        <Button
+            android:id="@+id/invoices_setUp_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/update_button"
+            android:text="Do it now"
+            app:layout_constraintBottom_toTopOf="@+id/loginActivity_deleteAccount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

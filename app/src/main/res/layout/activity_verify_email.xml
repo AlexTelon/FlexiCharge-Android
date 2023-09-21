@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activities.VerifyActivity">
 
-
     <TextView
         android:id="@+id/verifyActivity_textView_title"
         android:layout_width="wrap_content"
@@ -19,23 +18,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-    <EditText
-        android:id="@+id/verifyActivity_editText_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:ems="10"
-        android:hint="email"
-        android:inputType="textEmailAddress"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toTopOf="@+id/verifyActivity_editText_code"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verifyActivity_textView_title" />
 
     <EditText
         android:id="@+id/verifyActivity_editText_code"
@@ -53,8 +35,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/verifyActivity_textView_title" />
 
-
-
     <Button
         android:id="@+id/buttonVerify"
         android:layout_width="0dp"
@@ -66,8 +46,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/verifyActivity_editText_code" />
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

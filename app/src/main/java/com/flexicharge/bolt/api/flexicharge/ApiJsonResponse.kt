@@ -1,7 +1,4 @@
 package com.flexicharge.bolt.api.flexicharge
-import okhttp3.Credentials
-
-import android.telephony.TelephonyCallback
 
 class Chargers : ArrayList<Charger>()
 
@@ -22,6 +19,13 @@ data class Charger(
     val location: List<Double>,
     val serialNumber: String,
     val status: String
+)
+
+data class ReservatioDetails(
+    val chargerID: String,
+    val userID: String,
+    val start: Int,
+    val end: Int
 )
 
 class ChargePoints : ArrayList<ChargePoint>()
@@ -71,6 +75,16 @@ class UserDetails(
     val password : String
 )
 
+class UserFullDetails(
+    val firstName : String ?= null,
+    val lastName : String ?= null,
+    val phoneNumber : String ?= null,
+    val streetAddress : String ?= null,
+    val zipCode : String ?= null,
+    val city : String ?= null,
+    val country : String ?= null,
+)
+
 class VerificationDetails (
     val username : String,
     val code : String
@@ -81,7 +95,6 @@ class UserDetailsGotten(
     val code : String,
     val statusCode : Int
 )
-
 
 data class ResetResponseBody(val status: String)
 

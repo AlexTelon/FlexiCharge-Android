@@ -1,5 +1,6 @@
 package com.flexicharge.bolt.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -25,31 +26,34 @@ import com.chaos.view.PinView
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.SpacesItemDecoration
 import com.flexicharge.bolt.activities.businessLogic.*
+import com.flexicharge.bolt.adapters.ChargePointListAdapter
+import com.flexicharge.bolt.adapters.ChargersListAdapter
+import com.flexicharge.bolt.api.flexicharge.ChargePoint
+import com.flexicharge.bolt.api.flexicharge.ChargePoints
+import com.flexicharge.bolt.api.flexicharge.Charger
+import com.flexicharge.bolt.api.flexicharge.TransactionSession
+import com.flexicharge.bolt.databinding.ActivityMainBinding
+import com.flexicharge.bolt.helpers.LoginChecker
+import com.flexicharge.bolt.helpers.MapHelper
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
 import com.flexicharge.bolt.helpers.MapHelper.currLocation
 import com.flexicharge.bolt.helpers.MapHelper.currentLocation
 import com.flexicharge.bolt.helpers.MapHelper.fetchLocation
 import com.flexicharge.bolt.helpers.MapHelper.panToPos
-import com.flexicharge.bolt.adapters.ChargePointListAdapter
-import com.flexicharge.bolt.adapters.ChargersListAdapter
-import com.flexicharge.bolt.databinding.ActivityMainBinding
-import com.flexicharge.bolt.helpers.MapHelper
-import com.flexicharge.bolt.api.flexicharge.*
-import com.flexicharge.bolt.helpers.LoginChecker
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.*
-import retrofit2.HttpException
-import java.io.IOException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.NoSuchElementException
-import kotlin.collections.HashMap
+import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAdapter.showChargePointInterface, ChargersListAdapter.ChangeInputInterface {
@@ -85,7 +89,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                             setupChargerInputDialog(charger.chargerID)
                         }
                     }
-                    return false;
+                    return false
                 })
             }
         }
@@ -409,7 +413,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {       // display the chargers near u
+    @SuppressLint("SuspiciousIndentation")
+    private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
@@ -429,35 +434,52 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 return@invokeOnCompletion
             }
 
-            val distanceToChargePoint = mutableListOf<String>()
+            val distanceToChargePoint = mutableListOf<Float>()
             val chargerCount = mutableListOf<Int>()
 
             remoteChargePoints.value.forEachIndexed { index, chargePoint ->
                 val dist = FloatArray(1)
-                var couldGetLocation = true
                 try {
                     Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
                 }
                 catch (e: UninitializedPropertyAccessException) {
                     dist[0] = 0f
-                    couldGetLocation = false
                 }
 
                 val df = DecimalFormat("#.##")
-                val distanceStr = if(couldGetLocation) { df.format(dist[0] / 1000).toString() } else {
-                    "?"
-                }
+                val distanceFloat = (dist[0] / 1000)
+                val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
 
                 val count = remoteChargers.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
-                distanceToChargePoint.add(distanceStr)
+                distanceToChargePoint.add(roundedDistance)
                 chargerCount.add(count)
             }
+
+            val chargePointList = ArrayList(remoteChargePoints.value)
+
+            val indices = distanceToChargePoint.indices.sortedBy { distanceToChargePoint[it] }
+
+            val sortedDistanceToChargePoint = indices.map { distanceToChargePoint[it] }
+            val sortedChargerCount = indices.map { chargerCount[it] }.toMutableList()
+            val sortedChargePoints = indices.map { chargePointList[it] }
+
+
+            val sortedChargePointsList = ChargePoints()
+            sortedChargePointsList.addAll(sortedChargePoints)
+
+            val distanceAsString = mutableListOf<String>()
+            distanceAsString.addAll(sortedDistanceToChargePoint.map { it.toString() })
+
+
+
             lifecycleScope.launch(Dispatchers.Main) {
-                listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(remoteChargePoints.value, this@MainActivity, distanceToChargePoint, chargerCount)
+                listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(sortedChargePointsList, this@MainActivity, distanceAsString, sortedChargerCount)
+
             }
 
+
+
         }
-        //listOfChargePointsRecyclerView.adapter = ChargePointListAdapter(chargePoints.map { it.chargePointAddress }, chargePoints.map {it.chargePointId}, chargePoints.map { it.chargePointId})
     }
 
 
@@ -619,7 +641,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             return
         }
 
-        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId);
+        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId)
         refreshJob.invokeOnCompletion {
             if(refreshJob.isCancelled) {
                 return@invokeOnCompletion

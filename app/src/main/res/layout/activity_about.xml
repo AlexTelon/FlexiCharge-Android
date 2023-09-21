@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.AboutActivity">
-    android:background="@color/green"
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/splashscreen_imageView_flexiChargeBanner"

@@ -1,13 +1,13 @@
 package com.flexicharge.bolt.api.flexicharge
 
-import android.service.autofill.UserData
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
 
-
 interface ApiInterface {
+
+    @POST("/reservations")
+    suspend fun makeReservation(@Body reservation: ReservatioDetails) : Response<ReservatioDetails>
 
     @GET("chargers/{chargerId}")
     suspend fun getCharger(@Path("chargerId") chargerId: Int): Response<Charger>
@@ -66,4 +66,9 @@ interface ApiInterface {
     @POST("/auth/confirm-forgot-password")
     suspend fun confReset(@Body body: ResetRequestBody): Response<ResetResponseBody>
 
+    @PUT("/auth/user-information")
+    suspend fun updateUserInfo(@Header("Authorization") authorizationHeader : String, @Body body : UserFullDetails) : Response<UserFullDetails>
+
+    @GET("/auth/user-information")
+    suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
 }

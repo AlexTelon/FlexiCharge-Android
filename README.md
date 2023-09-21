@@ -11,7 +11,7 @@
 
 ## Project Architecture
 
-  This branch works with Android Studio 2020.3.1, uses Android SDK 30 and supports Android 10 and above.
+  This branch works with Android Studio 2020.3.1, uses Android SDK 33 and supports Android 10 and above.
 
 ## The application
 
@@ -26,7 +26,7 @@
    
      ![image-20211011145831799](./images/image-20211011145831799.png)
    
-   **Credit Card Details**
+   **Credit Card Details** <br/>
    ![image-20211013123905119](./images/image-20211013123905119.png)
 
 ### Build Steps
@@ -65,39 +65,56 @@
 5. Upon finished charging a charging summary will be presented as such.
 
    ![image-20211011152445124](./images/image-20211011152445124.png)
-## Contributing Guidelines
+
+<br/>
+
+# Contributing Guidelines
 
 Want to contribute to this repository? Please follow the following guidelines.
 
-### Missing Features or bugs?
+## Missing Features or bugs?
+If you want to report a bug or suggest a new feature, please submit an issue and follow the templates down below: 
 
-If you want to report a bug or suggest a new feature, please submit an issue.
+For features:
+* Description
+* Tasks
+* Requirements
+* Acceptance Test
 
-### Creating a pull request
+For Bugs: 
+* When did the bug occur?
+* How did the bug occur?
+* How can another developer reproduce the bug? Be VERY detailed and explain every click and action required
+  * This step is **MANDATORY!** The bug must be reproducable with a step-by-step guide.
+
+## Creating a pull request
 
 * When you have work that you want to merge, create a pull request.
-* When your pull request is created, tag it with an issue.
+* The title of your pull request should be the same as you branch name but without camelCase.
+  * For example a branch with name "bug/createLoginScreen" translates to "Bug/create login screen".
+* Assign yourself as the Assigne.
+* Assign 1...* squad members for the review
+* Select the appropiate label.
+* Tag the related issue in the description and explain the purpose of your pull request.
+* After receiving and addressing comments or requested changes, you should re-request a review to notify the reviewers. 
 
-### Coding Rules
+## Coding Rules
+* **Class files are categorized into different packages, depending on their application.** <br/>
+  * Example 1: A map helper class is stored in ".../bolt/helper/MapHelper.kt" <br/>
+  * Example 2: A QR scanner activity is stored in ".../bolt/activities/QrActivity.kt" <br/>
 
-* **Class files are categorized into different packages, depending on their application.**
-  Example 1: A map helper class is stored in ".../bolt/helper/MapHelper.kt"
-  Example 2: A QR scanner activity is stored in ".../bolt/activities/QrActivity.kt"
-
-* **Camel casing is used for variable names.**
-  Example: A list of chargers is named chargerList
+* **Camel casing is used for variable names.** <br/>
+  * Example: A list of chargers is named chargerList
 * **Snake casing is used for class file names**
-* **ID's in Layout view's are identified by context, type of view and then name, separated by underscores**
-  Example: A menu button in mainActivity would be named mainActivity_button_menu
+* **ID's in Layout view's are identified by context, type of view and then name, separated by underscores** <br/>
+    * Example: A menu button in mainActivity would be named mainActivity_button_menu
 
-### Commits
-
+## Commits
 * Please commit your code frequently with relevant description for each associated change.
 
 ## Support
 
-Create an issue on GitHub or contact our Scrum Leader at jofi1617@student.ju.se
+Create an issue on GitHub or contact either:
+* Scrum Master emely.kara6@gmail.com
+* Product Owner foal20ym@student.ju.se | alexander-forsanker2011@hotmail.com
 
-## Register Activity 
-self explanatory, the user registers using email and password, gets a conformation code and 
-verifies it in the Verify Activity 

@@ -6,14 +6,15 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.flexicharge.bolt.R
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserDetails
-import com.flexicharge.bolt.databinding.ActivityLoginBinding
 import com.flexicharge.bolt.databinding.ActivityRegisterBinding
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
@@ -34,6 +35,8 @@ class RegisterActivity : AppCompatActivity() {
 
         registerBtn              = binding.buttonRegisterConfirm
         registerUserEmail        = binding.loginActivityEditTextEmail
+        registerUserFirstName    = binding.loginActivityEditTextFirstName
+        registerUserLastName     = binding.loginActivityEditTextLastName
         registerUserPass         = binding.loginActivityEditTextPassword
         registerUserRepeatPass   = binding.editTextPasswordRepeat
         agreeCheckBox            = binding.checkBoxTosAgreement
@@ -45,6 +48,8 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var agreeCheckBox : CheckBox
     lateinit var registerBtn : Button
     lateinit var registerUserEmail: EditText
+    lateinit var registerUserFirstName: EditText
+    lateinit var registerUserLastName: EditText
     lateinit var registerUserPass: EditText
     lateinit var registerUserRepeatPass: EditText
 
@@ -52,29 +57,33 @@ class RegisterActivity : AppCompatActivity() {
     private fun confirmRegistration() {
         validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
         validateHelper.validateUserInput(registerUserPass, TextInputType.isPassword)
+        validateHelper.validateUserInput(registerUserFirstName, TextInputType.isName)
+        validateHelper.validateUserInput(registerUserLastName, TextInputType.isName)
+
         checkRepeatPass()
 
 
         registerBtn.setOnClickListener {
-            if(agreeCheckBox.isChecked){
+
+
+            if(agreeCheckBox.isChecked && registerUserLastName.error == null && registerUserFirstName.error == null){
                 sendDataToBackend()
             }
             else {
-                AlertDialog.Builder(this@RegisterActivity)
-                    .setTitle("Oops!")
-                    .setMessage("you have to agree to term and conditions")
-                    .setNegativeButton("Ok") { _,_  ->
-
-                    }.show()
+                if(!agreeCheckBox.isChecked){
+                    AlertDialog.Builder(this@RegisterActivity)
+                        .setTitle("Oops!")
+                        .setMessage("you have to agree to term and conditions")
+                        .setNegativeButton("Ok") { _,_  ->
+                        }.show()
+                }
             }
         }
-
     }
 
     //function to send users' data to backend
-    private fun sendUserData(userEmail: String, userPass: String) {
+    private fun sendUserData(userEmail: String,userFirstName: String, userLastName : String ,userPass: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            // handle request to backend.
             try {
                 val requestBody = UserDetails(userEmail, userPass)
                 val response = RetrofitInstance.flexiChargeApi.registerNewUser(requestBody)
@@ -82,7 +91,12 @@ class RegisterActivity : AppCompatActivity() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         val intent =
                             Intent(this@RegisterActivity, VerifyActivity::class.java)
+                        intent.putExtra("userEmail",userEmail)
+                        intent.putExtra("userPass", userPass)
+                        intent.putExtra("userFirstName", userFirstName)
+                        intent.putExtra("userLastName",userLastName)
                         startActivity(intent)
+
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
@@ -133,6 +147,8 @@ class RegisterActivity : AppCompatActivity() {
                     if (registerUserPass.error == null) {
                         sendUserData(
                             registerUserEmail.text.toString(),
+                            registerUserFirstName.text.toString(),
+                            registerUserLastName.text.toString(),
                             registerUserPass.text.toString()
                         )
                     }
