@@ -43,6 +43,7 @@
         android:background="@drawable/ic_arrow_up_48_black"/>
 
 
+
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
@@ -51,3 +52,4 @@
         android:background="@android:color/darker_gray"/>
 
 </FrameLayout>
+
