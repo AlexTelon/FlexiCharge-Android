@@ -413,8 +413,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-
-
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {    
         val listOfChargePointsRecyclerView = bottomSheetView.findViewById<RecyclerView>(R.id.chargePointsNearMeLayout_recyclerView_chargePointList)
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
