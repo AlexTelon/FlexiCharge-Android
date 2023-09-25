@@ -1,13 +1,15 @@
 package com.flexicharge.bolt.activities.businessLogic
 
+import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import com.flexicharge.bolt.api.flexicharge.initTransactionDetails
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 
-class RemoteCharger(private var id: Int = -1) : RemoteObject<Charger>() {
+class RemoteCharger(private var id: Int = -1, private var userId : String ?= null) : RemoteObject<Charger>() {
 
     override var value: Charger =
         Charger(0, id, listOf(0.0, 0.0), "", "")
@@ -41,22 +43,23 @@ class RemoteCharger(private var id: Int = -1) : RemoteObject<Charger>() {
         return lifecycleScope.launch (Dispatchers.IO){
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val requestParams: MutableMap<String, String> = HashMap()
-                    requestParams["chargerId"] = value.chargerID.toString()
-                    requestParams["connectorId"] = "1"
-                    requestParams["idTag"] = "1"
-                    requestParams["reservationId"] = "1"
-                    requestParams["parentIdTag"] = "1"
-                    val response = RetrofitInstance.flexiChargeApi.reserveCharger(value.chargerID, requestParams)
-                    if(!response.isSuccessful) {
+
+
+                    val details = initTransactionDetails(userId!!, value.chargerID.toString())
+                    val response = RetrofitInstance.flexiChargeApi.initTransaction(details)
+                    if (!response.isSuccessful) {
                         cancel(response.message())
                     }
+                    println("-----------------------------------------------------")
+                    println(response.body())
+                    println("-----------------------------------------------------")
+                    status = "Accepted"
 
-                    status = response.body() as String
                 }
                 catch (e: Exception) {
                     cancel(CancellationException(e.message))
                 }
+
             }
         }
     }

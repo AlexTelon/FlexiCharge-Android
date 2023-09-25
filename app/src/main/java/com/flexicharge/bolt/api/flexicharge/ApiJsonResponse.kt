@@ -104,3 +104,8 @@ data class ResetRequestBody(
     val confirmationCode: String
 )
 
+data class initTransactionDetails(
+    val userID : String,
+    val chargerID : String
+)
+

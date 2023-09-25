@@ -113,6 +113,9 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 startTransactionJob.invokeOnCompletion {
                     if(!startTransactionJob.isCancelled) {
+                        println("----------------------------------------------------------------")
+                        println(transactionId)
+                        println("----------------------------------------------------------------")
                         sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
                     }
                     else {
@@ -120,6 +123,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                     }
 
                     lifecycleScope.launch(Dispatchers.Main) {
+
                         finish()
                     }
                 }

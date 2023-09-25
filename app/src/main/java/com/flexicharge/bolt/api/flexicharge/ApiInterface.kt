@@ -71,4 +71,17 @@ interface ApiInterface {
 
     @GET("/auth/user-information")
     suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
+
+
+    @POST("/transactions/session")
+    suspend fun initTransaction(@Body body : initTransactionDetails) : Response<initTransactionDetails>
+
+    @GET("/transactions/userTransactions/{userId}")
+    suspend fun transactionsByUserID(@Path("userId") userId : String) :Response<List<Transaction>>
+
+    @PUT("/transactions/stop/{id}")
+    suspend fun stopTransaction(@Path("id") id : Int) : Response<Transaction>
+
+    @PUT("/transactions/start/{id}")
+    suspend fun startTransaction(@Path("id") id : Int) : Response<Transaction>
 }

@@ -513,7 +513,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
-        val remoteCharger = RemoteCharger(chargerId)
+
+        val sharedPreferences   = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
+        val userId               = sharedPreferences.getString("userId", "")
+
+        val remoteCharger = RemoteCharger(chargerId, userId!!)
         try {
             val reserveChargerJob = remoteCharger.reserve(lifecycleScope)
             reserveChargerJob.invokeOnCompletion {
@@ -523,7 +527,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
                 when (remoteCharger.status) {
                     "Accepted" -> {
-                        createKlarnaTransactionSession("BoltGuest", chargerId)
+                        createKlarnaTransactionSession(userId, chargerId)
+
                     }
                     "Faulted" -> {
                         setChargerButtonStatus(chargerInputStatus, false, "Charger Faulted", 2)
@@ -651,6 +656,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
             lifecycleScope.launch(Dispatchers.Main) {
                 try {
+                    Toast.makeText(applicationContext, "HÄÄR ÄR VI", Toast.LENGTH_LONG).show()
                     setupChargingInProgressDialog()
                 }
                 catch (e: Exception) {
