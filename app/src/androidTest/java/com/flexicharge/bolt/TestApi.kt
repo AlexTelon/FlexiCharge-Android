@@ -121,8 +121,25 @@ class TestApi{
         val chargerID = "100030"
         assert(login.isSuccessful)
 
-        val details = initTransactionDetails(userID,chargerID)
+        val details = InitTransactionDetails(userID,chargerID)
         val initTrans = RetrofitInstance.flexiChargeApi.initTransaction(details)
+        assert(initTrans.isSuccessful)
+        println(initTrans)
+    }
+
+
+    @Test
+    fun initTransactionForUserV2() = runBlocking {
+        val email = "kofap47986@viicard.com"
+        val pass = "Test123!"
+        val credentials = Credentials(email,pass)
+        val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
+        val userID = login.body()?.user_id.toString()
+        val chargerID = "100000"
+        assert(login.isSuccessful)
+
+        val details = InitTransactionDetailsV2(userID,chargerID.toInt(),true, 333)
+        val initTrans = RetrofitInstance.flexiChargeApi.initTransaction2(details)
         assert(initTrans.isSuccessful)
         println(initTrans)
     }
@@ -150,15 +167,17 @@ class TestApi{
         val credentials = Credentials(email,pass)
         val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
         val userID = login.body()?.user_id.toString()
-        val chargerID = "100030"
+        val chargerID = "100000"
         assert(login.isSuccessful)
-
+/*
         val transactions = RetrofitInstance.flexiChargeApi.transactionsByUserID(userID)
 
         val transactionId = transactions.body()?.get(0)?.transactionID
         println(transactionId)
 
-        val startTransaction = RetrofitInstance.flexiChargeApi.startTransaction(transactionId!!)
+ */     val id : Int = 9999
+
+        val startTransaction = RetrofitInstance.flexiChargeApi.startTransaction(id)
         println(startTransaction)
         assert(startTransaction.isSuccessful)
 

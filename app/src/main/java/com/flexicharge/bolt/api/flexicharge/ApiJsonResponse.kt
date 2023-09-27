@@ -50,9 +50,10 @@ data class Transaction(
     val paymentID: String,
     val pricePerKwh: String,
     val session_id: String,
-    val timestamp: Int,
+    val timestamp: Long,
     val transactionID: Int,
-    val userID: String
+    val userID: String,
+    val startTimeStamp : Int ?= null
 )
 
 data class TransactionSession(
@@ -104,8 +105,18 @@ data class ResetRequestBody(
     val confirmationCode: String
 )
 
-data class initTransactionDetails(
+data class InitTransactionDetails(
     val userID : String,
     val chargerID : String
+)
+
+data class InitTransactionDetailsV2(
+    val userID : String,
+    val chargerID : Int,
+    val isKlarnaPayment: Boolean,
+    val pricePerKwh: Int
+)
+data class TransactionId(
+    val transactionID : Int
 )
 

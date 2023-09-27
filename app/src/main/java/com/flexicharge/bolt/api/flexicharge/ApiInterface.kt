@@ -42,7 +42,7 @@ interface ApiInterface {
     @PUT("transactions/start/{transactionId}")
     suspend fun transactionStart(
         @Path("transactionId") transactionId: Int,
-    ): Response<Unit>
+    ): Response<Transaction>
 
     @PUT("transactions/stop/{transactionId}")
     suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<TransactionList>
@@ -74,7 +74,10 @@ interface ApiInterface {
 
 
     @POST("/transactions/session")
-    suspend fun initTransaction(@Body body : initTransactionDetails) : Response<initTransactionDetails>
+    suspend fun initTransaction(@Body body : InitTransactionDetails) : Response<InitTransactionDetails>
+
+    @POST("/transactions")
+    suspend fun initTransaction2(@Body body : InitTransactionDetailsV2) : Response<TransactionId>
 
     @GET("/transactions/userTransactions/{userId}")
     suspend fun transactionsByUserID(@Path("userId") userId : String) :Response<List<Transaction>>

@@ -1,5 +1,6 @@
 package com.flexicharge.bolt.activities.businessLogic
 
+import android.widget.Toast
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.Transaction
@@ -24,6 +25,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                     }
                     else {
                         value = response.body() as Transaction
+                        println("-----------------------------------")
+                        println(value)
+                        println("-----------------------------------")
                     }
                 }
                 catch (e: Exception) {

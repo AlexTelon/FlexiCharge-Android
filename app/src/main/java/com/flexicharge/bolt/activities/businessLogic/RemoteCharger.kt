@@ -3,8 +3,8 @@ package com.flexicharge.bolt.activities.businessLogic
 import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.flexicharge.bolt.api.flexicharge.Charger
+import com.flexicharge.bolt.api.flexicharge.InitTransactionDetails
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import com.flexicharge.bolt.api.flexicharge.initTransactionDetails
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
@@ -45,13 +45,13 @@ class RemoteCharger(private var id: Int = -1, private var userId : String ?= nul
                 try {
 
 
-                    val details = initTransactionDetails(userId!!, value.chargerID.toString())
+                    val details = InitTransactionDetails(userId!!, value.chargerID.toString())
                     val response = RetrofitInstance.flexiChargeApi.initTransaction(details)
                     if (!response.isSuccessful) {
                         cancel(response.message())
                     }
                     println("-----------------------------------------------------")
-                    println(response.body())
+
                     println("-----------------------------------------------------")
                     status = "Accepted"
 

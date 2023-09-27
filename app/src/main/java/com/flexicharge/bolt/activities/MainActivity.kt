@@ -204,7 +204,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
             stopRemoteTransactionJob.invokeOnCompletion {
                 if(stopRemoteTransactionJob.isCancelled) {
-                    return@invokeOnCompletion
+                  //  return@invokeOnCompletion
+
+                    //THIS IS ONLY FOR DUMMY WHEN API ENDPOINT DOESNT WORK
+                    lifecycleScope.launch(Dispatchers.Main) {
+                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                    bottomSheetDialog.dismiss()
+                    displayPaymentSummaryDialog(dateTime, initialPercentage)
+
+                    }
                 }
 
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -656,7 +665,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
             lifecycleScope.launch(Dispatchers.Main) {
                 try {
-                    Toast.makeText(applicationContext, "HÄÄR ÄR VI", Toast.LENGTH_LONG).show()
                     setupChargingInProgressDialog()
                 }
                 catch (e: Exception) {

@@ -119,7 +119,9 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                         sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
                     }
                     else {
-                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+
+                        //sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+                        sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
                     }
 
                     lifecycleScope.launch(Dispatchers.Main) {
