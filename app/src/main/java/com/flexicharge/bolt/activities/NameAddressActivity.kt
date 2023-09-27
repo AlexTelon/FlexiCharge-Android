@@ -61,7 +61,6 @@ class NameAddressActivity : AppCompatActivity() {
 
         viewModel.updated.observe(this) {
             if (it) {
-                startActivity(Intent(this, ProfileMenuLoggedInActivity::class.java))
                 finish()
             }
         }
