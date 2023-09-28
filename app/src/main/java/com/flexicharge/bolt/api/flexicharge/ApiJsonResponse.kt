@@ -41,7 +41,7 @@ class TransactionList : ArrayList<Transaction>()
 
 data class Transaction(
     val chargerID: Int,
-    val client_token: String,
+    val klarna_consumer_token: String,
     val currentChargePercentage: Int,
     val isKlarnaPayment: Boolean,
     val kwhTransfered: Double,

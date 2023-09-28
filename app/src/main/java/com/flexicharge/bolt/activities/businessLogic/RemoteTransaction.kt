@@ -52,7 +52,8 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                         cancel(response.message())
                     }
                     else {
-                        val transactionSessionResponse = response.body() as TransactionSessionResponse
+                        val transactionSessionResponse = response.body() as Transaction
+
                         transactionId = transactionSessionResponse.transactionID
                         status = "Accepted"
                         try {
@@ -75,11 +76,12 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    println("----------------------------------------")
-                    println(value.transactionID)
-                    println("----------------------------------------")
                     val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
                     if (!response.isSuccessful) {
+                        println("----------------------------------------")
+                        println(response)
+                        println("RESPONSE NOT SUCCESS")
+                        println("----------------------------------------")
                         cancel(response.message())
                     }
                 }
