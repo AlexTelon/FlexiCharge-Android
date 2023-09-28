@@ -82,7 +82,7 @@ class TestApi{
         val userInfo = UserFullDetails(
             "test22",
             "TESTARSSON",
-            "",
+            "+46712345678",
             "",
             "",
             "",

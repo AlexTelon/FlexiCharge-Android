@@ -85,6 +85,15 @@ class UserFullDetails(
     val country : String ?= null,
 )
 
+class ChargingHistoryObject(
+    val location : String,
+    val totalSum : String,
+    val startTime : String,
+    val chargeTime : String,
+    val transferedKwh : String,
+    val priceKwh : String
+)
+
 class VerificationDetails (
     val username : String,
     val code : String

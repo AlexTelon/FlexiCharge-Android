@@ -4,17 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout_editor_absoluteY="25dp">
+    tools:layout_editor_absoluteY="25dp"
+    android:background="@color/white"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:context=".activities.ChargingHistoryActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:context=".activities.ChargingHistoryActivity">
+
 
         <ImageView
-            android:id="@+id/loginActivity_imageView_title2"
+            android:id="@+id/invoices_imageView_title"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="-999dp"
@@ -23,49 +21,110 @@
             android:layout_marginBottom="-10dp"
             android:background="@color/mild_grey"
             android:rotation="-10"
-            app:layout_constraintBottom_toBottomOf="@+id/accountSettings_textView_title"
+            app:layout_constraintBottom_toBottomOf="@+id/chargingHistory_textView_title"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintDimensionRatio="1:1" />
+            app:layout_constraintVertical_bias="1.0" />
 
         <TextView
-            android:id="@+id/accountSettings_textView_title"
+            android:id="@+id/chargingHistory_textView_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-black"
-            android:text="Charging\nHistory "
+            android:text="Charging\nHistory"
+            android:textAlignment="center"
             android:textColor="@android:color/primary_text_dark"
             android:textSize="48sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+
+        <LinearLayout
+            android:id="@+id/chargingHistory_noCharges"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="220dp"
             android:layout_height="220dp"
+            android:layout_marginTop="200dp"
             app:srcCompat="@drawable/ic_launcher_foreground"
-            app:layout_constraintTop_toBottomOf="@+id/accountSettings_textView_title"
+            app:layout_constraintTop_toBottomOf="@+id/chargingHistory_textView_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/textView" />
 
+
+
         <TextView
             android:id="@+id/textView"
-            android:layout_width="320dp"
-            android:layout_height="24dp"
-            android:text="You haven't made any charging sessions yet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:text="You haven't made any charging sessions yet."
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@+id/imageView3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="200dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+                <LinearLayout
+                    android:id="@+id/charging_period_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Select Charging period"
+                            android:layout_marginStart="10dp"
+                            android:textColor="@color/green"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:text="June 2021"
+                            android:textColor="@color/black"/>
+
+                </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chargingHistory_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@+id/charging_period_layout">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+
+
+        </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

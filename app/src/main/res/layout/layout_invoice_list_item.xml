@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
+    android:id="@+id/layout_invoice_list_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:orientation="horizontal">
 
-    <!-- TextViews for invoice details -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/invoiceTitle"
+            android:id="@+id/invoiceTitleDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/mild_grey"
@@ -31,10 +31,8 @@
             android:textColor="@color/black"
             android:text="104.34kr"/>
 
-        <!-- Add other views for displaying invoice details as needed -->
     </LinearLayout>
 
-    <!-- ImageView for the arrow -->
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +40,7 @@
         android:layout_marginEnd="40dp"
         android:background="@drawable/ic_black_arrow_right_2"/>
 
-    <!-- Line divider -->
+
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"

@@ -3,9 +3,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         maven { url "https://x.klarnacdn.net/mobile-sdk/" }
+        maven { url 'https://jitpack.io'}
         mavenCentral()
-        jcenter() // Warning: this repository is going to shut down soon
     }
 }
+
 rootProject.name = "Bolt"
 include ':app'

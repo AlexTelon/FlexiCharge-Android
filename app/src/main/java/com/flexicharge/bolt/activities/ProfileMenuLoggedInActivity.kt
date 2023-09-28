@@ -32,6 +32,7 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
         binding.nameAddressTextView.setOnClickListener{
             val intent = Intent(this, NameAddressActivity::class.java)
             startActivity(intent)
+
         }
 
         binding.aboutTextView.setOnClickListener{
