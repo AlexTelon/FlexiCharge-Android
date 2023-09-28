@@ -72,12 +72,12 @@ interface ApiInterface {
     @GET("/auth/user-information")
     suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
 
-
     @POST("/transactions/session")
-    suspend fun initTransaction(@Body body : InitTransactionDetails) : Response<InitTransactionDetails>
+    suspend fun initTransaction2(@Body body : InitTransactionDetails) : Response<InitTransactionDetails>
+
 
     @POST("/transactions")
-    suspend fun initTransaction2(@Body body : InitTransactionDetailsV2) : Response<TransactionId>
+    suspend fun initTransaction(@Body body : TransactionSession) : Response<TransactionSessionResponse>
 
     @GET("/transactions/userTransactions/{userId}")
     suspend fun transactionsByUserID(@Path("userId") userId : String) :Response<List<Transaction>>

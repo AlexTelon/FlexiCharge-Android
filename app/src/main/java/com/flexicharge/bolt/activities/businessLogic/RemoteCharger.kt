@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.InitTransactionDetails
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
@@ -39,22 +40,22 @@ class RemoteCharger(private var id: Int = -1, private var userId : String ?= nul
         }
     }
 
-    fun reserve(lifecycleScope: LifecycleCoroutineScope): Job {
+    fun initTransaction(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch (Dispatchers.IO){
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
 
-
-                    val details = InitTransactionDetails(userId!!, value.chargerID.toString())
+                    val details = TransactionSession(
+                        userId!!,
+                        value.chargerID,
+                        true,
+                        333
+                    )
                     val response = RetrofitInstance.flexiChargeApi.initTransaction(details)
                     if (!response.isSuccessful) {
                         cancel(response.message())
                     }
-                    println("-----------------------------------------------------")
-
-                    println("-----------------------------------------------------")
                     status = "Accepted"
-
                 }
                 catch (e: Exception) {
                     cancel(CancellationException(e.message))

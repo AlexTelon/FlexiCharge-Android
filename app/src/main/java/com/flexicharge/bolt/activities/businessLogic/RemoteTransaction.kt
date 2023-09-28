@@ -10,24 +10,28 @@ import kotlinx.coroutines.*
 
 class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Transaction>() {
 
+    var status: String = ""
+        private set
+
     override var value =
         Transaction(-1, "invalid", 0,
             false, 0.0, 0, false,
             "", "", "", 0, transactionId, "")
 
-    override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
+     public override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
                     val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                    println("-----------------")
+                    println(response.body())
+                    println("-----------------")
                     if (!response.isSuccessful) {
                         cancel("Could not fetch transaction!")
                     }
                     else {
                         value = response.body() as Transaction
-                        println("-----------------------------------")
-                        println(value)
-                        println("-----------------------------------")
+
                     }
                 }
                 catch (e: Exception) {
@@ -41,13 +45,16 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.postTransactionSession(transactionSession)
+
+                    val response = RetrofitInstance.flexiChargeApi.initTransaction(transactionSession)
                     if(!response.isSuccessful) {
+
                         cancel(response.message())
                     }
                     else {
                         val transactionSessionResponse = response.body() as TransactionSessionResponse
                         transactionId = transactionSessionResponse.transactionID
+                        status = "Accepted"
                         try {
                             val refreshJob = refresh(lifecycleScope)
                             refreshJob.join()
@@ -68,6 +75,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
+                    println("----------------------------------------")
+                    println(value.transactionID)
+                    println("----------------------------------------")
                     val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
                     if (!response.isSuccessful) {
                         cancel(response.message())
@@ -84,6 +94,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
+                    println("--------------------------------------")
+                    println(value.transactionID)
+                    println("--------------------------------------")
                     val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
                     if(!response.isSuccessful) {
                         cancel(response.message())

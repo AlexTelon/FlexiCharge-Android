@@ -33,10 +33,22 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_klarna)
+
         chargerId = intent.getIntExtra("ChargerId", 0)
         clientToken = intent.getStringExtra("ClientToken").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
         Log.d("CLIENTTOKEN", clientToken)
+
+        println("--------------------------------------")
+        println(chargerId)
+        println(transactionId)
+
+        println("--------------------------------------")
+
+        if (clientToken == "null")
+            clientToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyMzA1ZWJjLWI4MTEtMzYzNy1hYTRjLTY2ZWNhMTg3NGYzZCJ9.eyJzZXNzaW9uX2lkIjoiNjRiY2VhZGEtODZmZC01ODkxLTg3ZTYtNDAxYWY2YWJhODNjIiwiYmFzZV91cmwiOiJodHRwczovL2pzLnBsYXlncm91bmQua2xhcm5hLmNvbS9ldS9rcCIsImRlc2lnbiI6ImtsYXJuYSIsImxhbmd1YWdlIjoic3YiLCJwdXJjaGFzZV9jb3VudHJ5IjoiU0UiLCJlbnZpcm9ubWVudCI6InBsYXlncm91bmQiLCJtZXJjaGFudF9uYW1lIjoiWW91ciBidXNpbmVzcyBuYW1lIiwic2Vzc2lvbl90eXBlIjoiUEFZTUVOVFMiLCJjbGllbnRfZXZlbnRfYmFzZV91cmwiOiJodHRwczovL2V1LnBsYXlncm91bmQua2xhcm5hZXZ0LmNvbSIsInNjaGVtZSI6dHJ1ZSwiZXhwZXJpbWVudHMiOlt7Im5hbWUiOiJrcGMtMWstc2VydmljZSIsInZhcmlhdGUiOiJ2YXJpYXRlLTEifSx7Im5hbWUiOiJrcC1jbGllbnQtdXRvcGlhLWZsb3ciLCJ2YXJpYXRlIjoidmFyaWF0ZS0xIn0seyJuYW1lIjoia3BjLVBTRUwtMzA5OSIsInZhcmlhdGUiOiJ2YXJpYXRlLTEifSx7Im5hbWUiOiJrcC1jbGllbnQtdXRvcGlhLXBvcHVwLXJldHJpYWJsZSIsInZhcmlhdGUiOiJ2YXJpYXRlLTEifSx7Im5hbWUiOiJrcC1jbGllbnQtdXRvcGlhLXN0YXRpYy13aWRnZXQiLCJ2YXJpYXRlIjoiaW5kZXgiLCJwYXJhbWV0ZXJzIjp7ImR5bmFtaWMiOiJ0cnVlIn19LHsibmFtZSI6ImtwLWNsaWVudC1vbmUtcHVyY2hhc2UtZmxvdyIsInZhcmlhdGUiOiJ2YXJpYXRlLTEifSx7Im5hbWUiOiJpbi1hcHAtc2RrLW5ldy1pbnRlcm5hbC1icm93c2VyIiwicGFyYW1ldGVycyI6eyJ2YXJpYXRlX2lkIjoibmV3LWludGVybmFsLWJyb3dzZXItZW5hYmxlIn19LHsibmFtZSI6ImtwLWNsaWVudC11dG9waWEtc2RrLWZsb3ciLCJ2YXJpYXRlIjoidmFyaWF0ZS0xIn0seyJuYW1lIjoia3AtY2xpZW50LXV0b3BpYS13ZWJ2aWV3LWZsb3ciLCJ2YXJpYXRlIjoidmFyaWF0ZS0xIn0seyJuYW1lIjoiaW4tYXBwLXNkay1jYXJkLXNjYW5uaW5nIiwicGFyYW1ldGVycyI6eyJ2YXJpYXRlX2lkIjoiY2FyZC1zY2FubmluZy1lbmFibGUifX1dLCJyZWdpb24iOiJldSIsIm9yZGVyX2Ftb3VudCI6NTAwMDAsIm9mZmVyaW5nX29wdHMiOjIsIm9vIjoiYmEiLCJ2ZXJzaW9uIjoidjEuMTAuMC0xNTkwLWczZWJjMzkwNyJ9.hXs1xp8yXOZNQnA9HTMYKuhGZXqsf4Vv9I5VRu-t6vQeJPxyVDBw-yqQ8cPq_lsDEMEZK5yuqRsm2CdttsM5iwF5Yea9IO5MevFUm-ryrr27zk1dJEaJfHAKQZ04VCsGp2ZeIqASsEr1mAUAOnaWuD-XZgy9D01DveMP1gS2lnYNlGfT7IpUs96RvG_PJyFfUn8EzSGQiIiIpeyjpZsC9fGxiY80ekoZgEML_Vsn1_jLWk-bHxi5KPlTblR_-5ys-_AUOeD9nPMT7bjrSUMZrXx3Md_EMOEMJwKZA7C25erPLr-P7k8iz9YNvtFE58bSwojDnUKBTMSsPD2CUGIk6Q"
+
+        println(clientToken)
         initialize()
 
         setupButtons()
@@ -113,15 +125,11 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 startTransactionJob.invokeOnCompletion {
                     if(!startTransactionJob.isCancelled) {
-                        println("----------------------------------------------------------------")
-                        println(transactionId)
-                        println("----------------------------------------------------------------")
                         sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
                     }
                     else {
 
-                        //sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
-                        sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
+                        sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                     }
 
                     lifecycleScope.launch(Dispatchers.Main) {

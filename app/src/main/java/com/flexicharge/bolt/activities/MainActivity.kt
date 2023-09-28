@@ -1,6 +1,5 @@
 package com.flexicharge.bolt.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -28,7 +27,6 @@ import com.flexicharge.bolt.SpacesItemDecoration
 import com.flexicharge.bolt.activities.businessLogic.*
 import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.adapters.ChargersListAdapter
-import com.flexicharge.bolt.api.flexicharge.ChargePoint
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
@@ -495,46 +493,51 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
 
     private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
-        // TODO: Implement actual price per kwh measure
-        val transactionSession = TransactionSession(userId, chargerId, true, 75)
-        val createSessionJob = currentRemoteTransaction.createSession(lifecycleScope, transactionSession)
-        try{
-            createSessionJob.invokeOnCompletion {
-                if(createSessionJob.isCancelled) {
-                    return@invokeOnCompletion
+                val retrieveJob = currentRemoteTransaction.retrieve(lifecycleScope)
+
+                try {
+                    retrieveJob.invokeOnCompletion {
+                        if(retrieveJob.isCancelled) {
+                            return@invokeOnCompletion
+                        }
+
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            val intent = Intent(this@MainActivity, KlarnaActivity::class.java)
+                            intent.putExtra("ChargerId", chargerId)
+                            intent.putExtra("ClientToken", currentRemoteTransaction.value.client_token)
+                            intent.putExtra("TransactionId", currentRemoteTransaction.value.transactionID)
+                            startActivity(intent)
+                        }
+                    }
+                }catch (e: Exception){
+                    println("Error when retreiving")
                 }
 
-                lifecycleScope.launch(Dispatchers.Main) {
-                    val intent = Intent(this@MainActivity, KlarnaActivity::class.java)
-                    intent.putExtra("ChargerId", chargerId)
-                    intent.putExtra("ClientToken", currentRemoteTransaction.value.client_token)
-                    intent.putExtra("TransactionId", currentRemoteTransaction.value.transactionID)
-                    startActivity(intent)
-                }
 
-            }
-        }
-        catch (e: CancellationException) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                Toast.makeText(applicationContext, "Couldn't start transaction: " + e.message, Toast.LENGTH_LONG).show()
-            }
-        }
     }
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
 
         val sharedPreferences   = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
-        val userId               = sharedPreferences.getString("userId", "")
+        val userId              = sharedPreferences.getString("userId", "")
+        val tempChargerId : Int = 100000
+        val transactionSession = TransactionSession(userId!!, chargerId, true, 75)
 
-        val remoteCharger = RemoteCharger(chargerId, userId!!)
+       // val transactionSession = TransactionSession(userId!!, tempChargerId, true, 75)
+        val createSessionJob = currentRemoteTransaction.createSession(lifecycleScope, transactionSession)
+
         try {
-            val reserveChargerJob = remoteCharger.reserve(lifecycleScope)
-            reserveChargerJob.invokeOnCompletion {
-                if(reserveChargerJob.isCancelled) {
+
+            createSessionJob.invokeOnCompletion {
+                if(createSessionJob.isCancelled) {
+
+                    println("--------------------------------------")
+                    println("HEJ ALLA BARN")
+                    println("--------------------------------------")
                     return@invokeOnCompletion
                 }
 
-                when (remoteCharger.status) {
+                when (currentRemoteTransaction.status) {
                     "Accepted" -> {
                         createKlarnaTransactionSession(userId, chargerId)
 
