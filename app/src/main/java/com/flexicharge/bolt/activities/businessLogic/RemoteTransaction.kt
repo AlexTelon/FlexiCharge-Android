@@ -30,7 +30,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                         cancel("Could not fetch transaction!")
                     }
                     else {
-                        value = response.body() as Transaction
+                       // value = response.body() as Transaction
+                        value.kwhTransfered = response.body()!!.kwhTransfered
+                        value.currentChargePercentage = response.body()!!.currentChargePercentage
 
                     }
                 }
@@ -40,6 +42,26 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
             }
         }
     }
+
+    fun retriveReopened(lifecycleScope: LifecycleCoroutineScope, transactionId: Int) : Job{
+        return lifecycleScope.launch(Dispatchers.IO) {
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                    if (!response.isSuccessful) {
+                        cancel("Could not fetch transaction!")
+                    }
+                    else {
+                        value = response.body()!!
+                    }
+                }
+                catch (e: Exception) {
+                    cancel(CancellationException(e.message))
+                }
+            }
+        }
+    }
+
 
     fun createSession(lifecycleScope: LifecycleCoroutineScope, transactionSession: TransactionSession): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
@@ -53,7 +75,7 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                     }
                     else {
                         val transactionSessionResponse = response.body() as Transaction
-
+                        value = transactionSessionResponse
                         transactionId = transactionSessionResponse.transactionID
                         status = "Accepted"
                         try {

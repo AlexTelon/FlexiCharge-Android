@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,10 +22,12 @@ import com.flexicharge.bolt.helpers.LoginChecker
 class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("LOGGIN","ON Create")
         setContentView(R.layout.activity_splashscreen)
 
 
         Handler(Looper.getMainLooper()).postDelayed({
+            Log.d("LOGGIN","requestPermissionLoop ")
             requestPermission()
         }, 1000)
     }
@@ -50,6 +53,7 @@ class SplashscreenActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, ps, permissionRequestCode)
             return
         } else {
+            Log.d("LOGGIN","Else check permission")
             checkPermission()
         }
 
@@ -66,6 +70,7 @@ class SplashscreenActivity : AppCompatActivity() {
 
     fun checkPermission() {
         if (!isLocationEnabled()) {
+            Log.d("LOGGIN","is located Enabled not")
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivityForResult(intent, REQUEST_LOCATION)
         } else {
@@ -73,6 +78,7 @@ class SplashscreenActivity : AppCompatActivity() {
             val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
             if(isLoggedIn == "true"){
                 LoginChecker.LOGGED_IN = true
+                Log.d("LOGGIN","Send to main activity")
                 startActivity(Intent(this, MainActivity::class.java))
             } else {
                 startActivity(Intent(this, RegisterActivity::class.java))

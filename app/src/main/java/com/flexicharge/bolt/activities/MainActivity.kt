@@ -32,6 +32,7 @@ import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import com.flexicharge.bolt.databinding.ActivityMainBinding
+import com.flexicharge.bolt.foregroundServices.ChargingService
 import com.flexicharge.bolt.helpers.LoginChecker
 import com.flexicharge.bolt.helpers.MapHelper
 import com.flexicharge.bolt.helpers.MapHelper.addNewMarkers
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var pinView: PinView
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
+    private var isBottomSheetVisible = false
 
     private companion object {
         const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 10000
@@ -73,11 +75,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private val remoteChargersRefresher = RemoteObjectRefresher(remoteChargers, REMOTE_CHARGERS_REFRESH_INTERVAL_MS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        //checkPendingTransaction()
 
+        Log.d("LOGGIN","main created")
+        super.onCreate(savedInstanceState)
+        Log.d("LOGGIN","super main created")
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        Log.d("RESTART", "IT WAS ON CREATE")
         remoteChargers.setOnRefreshedCallBack {
             lifecycleScope.launch(Dispatchers.Main) {
                 addNewMarkers(this@MainActivity, remoteChargers.value, fun (charger: Charger?) : Boolean {
@@ -142,7 +147,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()
-        //, for your activity to start interacting with the user.
+        Log.d("RESTART", "IT WAS ON RESUME")
         remoteChargersRefresher.run(lifecycleScope)
         val refreshChargers = remoteChargers.refresh(lifecycleScope)
         refreshChargers.invokeOnCompletion {
@@ -153,15 +158,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
             refreshChargePoints.invokeOnCompletion {
                 if(refreshChargePoints.isCancelled) {
-                    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                    println("REFRESH JOB CANCELLED")
-                    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
                     return@invokeOnCompletion
                 }
 
             }
         }
-        checkPendingTransaction()
+        if(!isBottomSheetVisible){
+            checkPendingTransaction()
+        }
+
+
         fetchLocation(this)
     }
 
@@ -205,26 +211,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
             stopRemoteTransactionJob.invokeOnCompletion {
                 if(stopRemoteTransactionJob.isCancelled) {
-                    println("----------------------------------------")
-                    println("RETURN")
-                    println("----------------------------------------")
                    return@invokeOnCompletion
-                    /*
-                    //THIS IS ONLY FOR DUMMY WHEN API ENDPOINT DOESNT WORK
-                    lifecycleScope.launch(Dispatchers.Main) {
-                    val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-                    sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
-                    bottomSheetDialog.dismiss()
-                    displayPaymentSummaryDialog(dateTime, initialPercentage)
-
-                    }
-
-                     */
                 }
                 lifecycleScope.launch(Dispatchers.Main) {
-                    println("----------------------------------------")
-                    println("KOMMER HIT")
-                    println("----------------------------------------")
+
+                    Intent(applicationContext, ChargingService::class.java).also {
+                        it.action = ChargingService.Actions.STOP.toString()
+                        startService(it)
+                    }
                     val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                     bottomSheetDialog.dismiss()
@@ -254,15 +248,40 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun setupChargingInProgressDialog() {
         if (this::chargerInputDialog.isInitialized) {
+            Log.d("CheckTransaction", "it is initizalized")
             chargerInputDialog.dismiss()
         }
 
         val charger = remoteChargers.value.filter { it.chargerID == currentRemoteTransaction.value.chargerID }.getOrNull(0)
         val chargePoint = remoteChargePoints.value.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
 
+        /*
         if(charger == null || chargePoint == null) {
+            Log.d("CheckTransaction", currentRemoteTransaction.value.transactionID.toString())
             throw Exception("Tried to display charging information for a charger that doesn't exist.")
         }
+
+         */
+
+        if(currentRemoteTransaction.value.transactionID == -1){
+            val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+            val transactionId = sharedPreferences.getInt("TransactionId", -1)
+            val retrieveJob = currentRemoteTransaction.retriveReopened(lifecycleScope, transactionId)
+
+            try {
+                retrieveJob.invokeOnCompletion {
+                    if(retrieveJob.isCancelled) {
+                        return@invokeOnCompletion
+                    }
+                }
+            }catch (e: Exception){
+                println("Error when retreiving")
+            }
+        }
+
+
+
+
 
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
         val bottomSheetView = LayoutInflater.from(applicationContext).inflate(
@@ -312,6 +331,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)
+        isBottomSheetVisible = true
         bottomSheetDialog.show()
     }
 
@@ -329,6 +349,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         crossButton.setOnClickListener {
             paymentSummaryDialog.dismiss()
+            isBottomSheetVisible = false
         }
 
         val refreshJob = currentRemoteTransaction.refresh(lifecycleScope);
@@ -666,31 +687,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
 
         if (transactionId == -1) {
-            println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            println("NO TRANSACTION YET")
-            println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-
-
+            Log.d("CheckTransaction", "No active transaction")
             return
         }
 
         val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId)
         refreshJob.invokeOnCompletion {
             if(refreshJob.isCancelled) {
-                println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                println("REFRESH JOB CANCELLED")
-                println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                Log.d("CheckTransaction", "refresh cancelled")
                 return@invokeOnCompletion
             }
 
             lifecycleScope.launch(Dispatchers.Main) {
                 try {
-                    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                    println("SET UP CHARGE IN PROGRESS")
-                    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                    Log.d("CheckTransaction", "Set up charging")
                     setupChargingInProgressDialog()
                 }
                 catch (e: Exception) {
+                    Log.d("CheckTransaction", "Found an errors")
                     Toast.makeText(applicationContext, e.message + " : " + e.cause, Toast.LENGTH_LONG).show()
                 }
             }

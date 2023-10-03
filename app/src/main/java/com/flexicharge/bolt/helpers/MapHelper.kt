@@ -66,10 +66,22 @@ object MapHelper {
         val locationCallback = object: LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 super.onLocationResult(result)
+
+                val fragment = activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map)
+                if (fragment is SupportMapFragment) {
+                    fragment.getMapAsync(activity)
+                    currentLocation = result.lastLocation
+                } else {
+                    // Handle the case when the fragment is not found or is not a SupportMapFragment.
+                }
+
+                /*
                 val supportMapFragment =
                     activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
                 supportMapFragment.getMapAsync(activity)
                 currentLocation = result.lastLocation
+
+                 */
 
             }
         }

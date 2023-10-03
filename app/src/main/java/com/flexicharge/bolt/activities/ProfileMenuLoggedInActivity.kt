@@ -36,34 +36,14 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
         }
 
         binding.nameAddressTextView.setOnClickListener {
-
-
-
-            /*
             val intent = Intent(this, NameAddressActivity::class.java)
             startActivity(intent)
-
-             */
-
         }
 
         binding.aboutTextView.setOnClickListener {
-            var test = 0
-            lifecycleScope.launch(Dispatchers.IO) {
-
-
-                Intent(applicationContext, ChargingService::class.java).also {
-                    it.action = ChargingService.Actions.STOP.toString()
-                    startService(it)
-                }
-
-
-                /*
             val intent = Intent(this, AboutActivity::class.java)
             startActivity(intent)
-
-             */
-            }
+        }
 
 
             binding.loginActivityButtonLogout.setOnClickListener {
@@ -76,6 +56,6 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
-        }
+
     }
 }

@@ -122,10 +122,13 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                         lifecycleScope.launch(Dispatchers.Main) {
                             sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
 
+
                             Intent(applicationContext, ChargingService::class.java).also {
                                 it.action = ChargingService.Actions.START.toString()
                                 startService(it)
                             }
+
+
 
                             finish()
                         }
