@@ -1,10 +1,13 @@
 package com.flexicharge.bolt.activities
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +22,8 @@ class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splashscreen)
+
+
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
         }, 1000)
@@ -31,9 +36,15 @@ class SplashscreenActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        val ps: Array<String> = arrayOf(
+        var ps: Array<String> = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION
         )
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            val extraPermission = Manifest.permission.POST_NOTIFICATIONS
+            ps += extraPermission
+        }
+
+
 
         if (!checkP(Manifest.permission.ACCESS_FINE_LOCATION)) {
             ActivityCompat.requestPermissions(this, ps, permissionRequestCode)
