@@ -30,7 +30,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                         cancel("Could not fetch transaction!")
                     }
                     else {
-                        value = response.body() as Transaction
+                       // value = response.body() as Transaction
+                        value.kwhTransfered = response.body()!!.kwhTransfered
+                        value.currentChargePercentage = response.body()!!.currentChargePercentage
 
                     }
                 }
@@ -53,8 +55,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                     }
                     else {
                         val transactionSessionResponse = response.body() as Transaction
-
+                        value = transactionSessionResponse
                         transactionId = transactionSessionResponse.transactionID
+                       // value.klarna_consumer_token = transactionSessionResponse.klarna_consumer_token
                         status = "Accepted"
                         try {
                             val refreshJob = refresh(lifecycleScope)

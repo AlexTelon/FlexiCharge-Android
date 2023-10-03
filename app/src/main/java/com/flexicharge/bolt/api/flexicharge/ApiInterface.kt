@@ -72,9 +72,6 @@ interface ApiInterface {
     @GET("/auth/user-information")
     suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
 
-    @POST("/transactions/session")
-    suspend fun initTransaction2(@Body body : InitTransactionDetails) : Response<Transaction>
-
 
     @POST("/transactions")
     suspend fun initTransaction(@Body body : TransactionSession) : Response<Transaction>
