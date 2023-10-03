@@ -41,7 +41,7 @@ class TransactionList : ArrayList<Transaction>()
 
 data class Transaction(
     val chargerID: Int,
-    val client_token: String,
+    val klarna_consumer_token: String,
     val currentChargePercentage: Int,
     val isKlarnaPayment: Boolean,
     val kwhTransfered: Double,
@@ -50,9 +50,10 @@ data class Transaction(
     val paymentID: String,
     val pricePerKwh: String,
     val session_id: String,
-    val timestamp: Int,
+    val timestamp: Long,
     val transactionID: Int,
-    val userID: String
+    val userID: String,
+    val startTimeStamp : Int ?= null
 )
 
 data class TransactionSession(
@@ -112,4 +113,25 @@ data class ResetRequestBody(
     val password: String,
     val confirmationCode: String
 )
+
+data class InitTransactionDetails(
+    val userID : String,
+    val chargerID : String
+)
+
+data class InitTransactionDetailsV2(
+    val userID : String,
+    val chargerID : Int,
+    val isKlarnaPayment: Boolean,
+    val pricePerKwh: Int
+)
+data class TransactionId(
+    val transactionID : Int
+)
+
+
+data class klarnaResponse (
+    val payment_method_type : String,
+    val status : String
+        )
 

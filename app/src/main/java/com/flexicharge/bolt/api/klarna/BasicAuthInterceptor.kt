@@ -16,4 +16,5 @@ class BasicAuthInterceptor(user: String, password: String) : Interceptor {
         return chain.proceed(authenticatedRequest)
     }
 
+
 }

@@ -22,7 +22,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }
     private val authorizeButton by lazy { findViewById<Button>(R.id.klarnaActivity_button_authorize) }
     private var chargerId : Int = 0
-    private var clientToken : String = ""
+    private var klarna_consumer_token : String = ""
     private var transactionId : Int = 0
     private var authTokenId : String = ""
 
@@ -33,10 +33,15 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_klarna)
+
         chargerId = intent.getIntExtra("ChargerId", 0)
-        clientToken = intent.getStringExtra("ClientToken").toString()
+        klarna_consumer_token = intent.getStringExtra("klarna_consumer_token").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
-        Log.d("CLIENTTOKEN", clientToken)
+        Log.d("CLIENTTOKEN", klarna_consumer_token)
+
+
+
+
         initialize()
 
         setupButtons()
@@ -44,12 +49,14 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     }
 
     private fun initialize() {
+
         if (OrderClient.hasSetCredentials()) {
             job = GlobalScope.launch {
             try {
                 runOnUiThread {
+
                     klarnaPaymentView.initialize(
-                        clientToken,
+                        klarna_consumer_token,
                         "${getString(R.string.return_url_scheme)}://${getString(R.string.return_url_host)}"
                     )
                 }
@@ -89,11 +96,11 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     override fun onInitialized(view: KlarnaPaymentView) {
 
         // load the payment view after its been initialized
+
         view.load(null)
     }
 
     override fun onLoaded(view: KlarnaPaymentView) {
-
         // enable the authorization after the payment view is loaded
         authorizeButton.isEnabled = true
     }
@@ -113,15 +120,24 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 startTransactionJob.invokeOnCompletion {
                     if(!startTransactionJob.isCancelled) {
-                        sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
+                            finish()
+                        }
+
+
                     }
                     else {
+
                         sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
+
+                        lifecycleScope.launch(Dispatchers.Main) {
+
+                            finish()
+                        }
                     }
 
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        finish()
-                    }
+
                 }
 
             }
@@ -141,7 +157,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     override fun onErrorOccurred(view: KlarnaPaymentView, error: KlarnaPaymentsSDKError) {
         println("An error occurred: ${error.name} - ${error.message}")
         if (error.isFatal) {
-            klarnaPaymentView.visibility = View.INVISIBLE
+            klarnaPaymentView.visibility = View.VISIBLE
         }
     }
 
