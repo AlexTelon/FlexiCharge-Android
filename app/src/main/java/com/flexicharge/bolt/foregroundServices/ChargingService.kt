@@ -1,7 +1,9 @@
 package com.flexicharge.bolt.foregroundServices
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -13,6 +15,8 @@ import android.widget.RemoteViews
 import android.widget.RemoteViews.RemoteView
 import androidx.core.app.NotificationCompat
 import com.flexicharge.bolt.R
+import com.flexicharge.bolt.activities.MainActivity
+import com.flexicharge.bolt.activities.SplashscreenActivity
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +40,8 @@ class ChargingService : Service() {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
         when(intent?.action){
-            Actions.START.toString() -> start(transactionId)
+          //  Actions.START.toString() -> start(transactionId)
+            Actions.START.toString() -> start(9999)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
                 stopSelf()
@@ -74,7 +79,6 @@ class ChargingService : Service() {
         }
     }
 
-
     private suspend fun getDataFromApi(firstTime : Boolean){
         try {
             val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
@@ -98,21 +102,30 @@ class ChargingService : Service() {
 
 
 
+
     private fun createNotification(percentage : String, timeElapsed : String) : Notification {
         val contentView = RemoteViews(packageName,R.layout.layout_custom_notification)
         contentView.setTextViewText(R.id.notifcation_title, "Charging In progress")
         contentView.setTextViewText(R.id.notifcation_content_time_elapsed, "Elapsed time: $timeElapsed")
         contentView.setTextViewText(R.id.notifcation_content_current_precantage, "Current percentage: $percentage")
+
+        val activityIntent = Intent(this, SplashscreenActivity::class.java)
+        val id = 0
+        val pendingIntent = PendingIntent.getActivity(this, id, activityIntent,
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
         if(isInitial){
             notificationBuilder
                 .setSmallIcon(R.drawable.ic_flexicharge_banner)
                 .setOnlyAlertOnce(true)
+
             isInitial = false
         }
         notificationBuilder
             .setOngoing(true)
             .setCustomContentView(contentView)
             .setCustomBigContentView(contentView)
+            .setContentIntent(pendingIntent)
 
 
 
