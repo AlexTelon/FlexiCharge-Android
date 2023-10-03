@@ -73,7 +73,7 @@ interface ApiInterface {
     suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
 
     @POST("/transactions/session")
-    suspend fun initTransaction2(@Body body : InitTransactionDetails) : Response<InitTransactionDetails>
+    suspend fun initTransaction2(@Body body : InitTransactionDetails) : Response<Transaction>
 
 
     @POST("/transactions")
@@ -87,4 +87,7 @@ interface ApiInterface {
 
     @PUT("/transactions/start/{id}")
     suspend fun startTransaction(@Path("id") id : Int) : Response<Transaction>
+
+
+
 }

@@ -120,3 +120,9 @@ data class TransactionId(
     val transactionID : Int
 )
 
+
+data class klarnaResponse (
+    val payment_method_type : String,
+    val status : String
+        )
+
