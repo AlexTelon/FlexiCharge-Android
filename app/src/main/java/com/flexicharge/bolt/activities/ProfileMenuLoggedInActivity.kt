@@ -37,10 +37,7 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
 
         binding.nameAddressTextView.setOnClickListener {
 
-            Intent(applicationContext, ChargingService::class.java).also {
-                it.action = ChargingService.Actions.START.toString()
-                startService(it)
-            }
+
 
             /*
             val intent = Intent(this, NameAddressActivity::class.java)

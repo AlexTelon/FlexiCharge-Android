@@ -1,6 +1,7 @@
 package com.flexicharge.bolt.activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
 import com.flexicharge.bolt.api.klarna.OrderClient
+import com.flexicharge.bolt.foregroundServices.ChargingService
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentCategory
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentView
 import com.klarna.mobile.sdk.api.payments.KlarnaPaymentViewCallback
@@ -38,11 +40,6 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         klarna_consumer_token = intent.getStringExtra("klarna_consumer_token").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
         Log.d("CLIENTTOKEN", klarna_consumer_token)
-
-        println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-        println(klarna_consumer_token)
-        println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-
 
         initialize()
 
@@ -124,6 +121,12 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                     if(!startTransactionJob.isCancelled) {
                         lifecycleScope.launch(Dispatchers.Main) {
                             sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
+
+                            Intent(applicationContext, ChargingService::class.java).also {
+                                it.action = ChargingService.Actions.START.toString()
+                                startService(it)
+                            }
+
                             finish()
                         }
 

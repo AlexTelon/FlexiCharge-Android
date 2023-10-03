@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 class ChargingService : Service() {
 
     private var shouldUpdate : Boolean = true
+    private var transactionId : Int = -1
     private var elapsedTimeInSeconds = 0
     private lateinit var notificationManager: NotificationManager
     private val updateHandler = Handler(Looper.getMainLooper())
@@ -32,8 +33,10 @@ class ChargingService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val transactionId = sharedPreferences.getInt("TransactionId", -1)
         when(intent?.action){
-            Actions.START.toString() -> start()
+            Actions.START.toString() -> start(transactionId)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
                 stopSelf()
@@ -45,9 +48,11 @@ class ChargingService : Service() {
     }
 
 
-    private fun start(){
+    private fun start(transaction : Int){
+
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         CoroutineScope(Dispatchers.IO).launch {
+            transactionId = transaction
             getDataFromApi(true)
         }
         updateHandler.postDelayed(updatedNotificationTask, 3000)
@@ -72,7 +77,7 @@ class ChargingService : Service() {
 
     private suspend fun getDataFromApi(firstTime : Boolean){
         try {
-            val response = RetrofitInstance.flexiChargeApi.getTransaction(9999)
+            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
 
             if (response.isSuccessful){
                 val responseData = response.body()
