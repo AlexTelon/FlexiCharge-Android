@@ -135,7 +135,7 @@
             android:layout_marginBottom="40dp"
             android:background="@drawable/update_button"
             android:text="Do it now"
-            app:layout_constraintBottom_toTopOf="@+id/loginActivity_deleteAccount"
+            app:layout_constraintBottom_toTopOf="@+id/loginActivityDeleteAccount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

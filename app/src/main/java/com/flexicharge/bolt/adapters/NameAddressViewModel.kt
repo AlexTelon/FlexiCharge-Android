@@ -1,4 +1,5 @@
 package com.flexicharge.bolt.adapters
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,6 +47,10 @@ class NameAddressViewModel : ViewModel() {
                 toggleInfoDone()
             }
 
+        }else{
+            withContext(Dispatchers.Main){
+
+            }
         }
     }
 
