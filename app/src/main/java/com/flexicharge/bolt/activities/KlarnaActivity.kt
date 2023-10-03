@@ -39,7 +39,9 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         transactionId = intent.getIntExtra("TransactionId", 0)
         Log.d("CLIENTTOKEN", klarna_consumer_token)
 
-
+        println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
+        println(klarna_consumer_token)
+        println("¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
 
 
         initialize()
