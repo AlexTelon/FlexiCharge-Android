@@ -97,8 +97,7 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
                     println("--------------------------------------")
-                    println(value.transactionID)
-                    println("--------------------------------------")
+                   
                     val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
                     if(!response.isSuccessful) {
                         cancel(response.message())
