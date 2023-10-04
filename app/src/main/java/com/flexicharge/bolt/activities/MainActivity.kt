@@ -682,9 +682,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
             lifecycleScope.launch(Dispatchers.Main) {
                 try {
-                    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                    println("SET UP CHARGE IN PROGRESS")
-                    println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                    
                     setupChargingInProgressDialog()
                 }
                 catch (e: Exception) {
