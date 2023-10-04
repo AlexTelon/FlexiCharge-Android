@@ -24,13 +24,13 @@ import kotlinx.coroutines.launch
 
 class ChargingService : Service() {
 
-    private var shouldUpdate : Boolean = true
-    private var transactionId : Int = -1
+    private var shouldUpdate: Boolean = true
+    private var transactionId: Int = -1
     private var elapsedTimeInSeconds = 0
     private lateinit var notificationManager: NotificationManager
     private val updateHandler = Handler(Looper.getMainLooper())
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
-    private var isInitial : Boolean = true
+    private var isInitial: Boolean = true
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -39,8 +39,8 @@ class ChargingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
-        when(intent?.action){
-          //  Actions.START.toString() -> start(transactionId)
+        when (intent?.action) {
+            //  Actions.START.toString() -> start(transactionId)
             Actions.START.toString() -> start(9999)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
@@ -53,7 +53,7 @@ class ChargingService : Service() {
     }
 
 
-    private fun start(transaction : Int){
+    private fun start(transaction: Int) {
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         CoroutineScope(Dispatchers.IO).launch {
@@ -67,54 +67,60 @@ class ChargingService : Service() {
 
     private val updatedNotificationTask = object : Runnable {
         override fun run() {
-            if(shouldUpdate){
+            if (shouldUpdate) {
                 CoroutineScope(Dispatchers.IO).launch {
                     getDataFromApi(false)
                 }
 
-                updateHandler.postDelayed(this,3000)
+                updateHandler.postDelayed(this, 3000)
             }
 
 
         }
     }
 
-    private suspend fun getDataFromApi(firstTime : Boolean){
+    private suspend fun getDataFromApi(firstTime: Boolean) {
         try {
             val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
 
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 val responseData = response.body()
                 val newPercentage = responseData?.currentChargePercentage.toString()
                 val newTime = elapsedTimeInSeconds.toString()
-                val updatedNotification = createNotification(newPercentage,newTime)
-                if(firstTime){
-                    startForeground(1,updatedNotification)
-                }else{
+                val updatedNotification = createNotification(newPercentage, newTime)
+                if (firstTime) {
+                    startForeground(1, updatedNotification)
+                } else {
                     notificationManager.notify(1, updatedNotification)
                 }
                 elapsedTimeInSeconds += 3
             }
-        } catch (e: java.lang.Exception){
+        } catch (e: java.lang.Exception) {
 
         }
     }
 
 
-
-
-    private fun createNotification(percentage : String, timeElapsed : String) : Notification {
-        val contentView = RemoteViews(packageName,R.layout.layout_custom_notification)
+    private fun createNotification(percentage: String, timeElapsed: String): Notification {
+        val contentView = RemoteViews(packageName, R.layout.layout_custom_notification)
         contentView.setTextViewText(R.id.notifcation_title, "Charging In progress")
-        contentView.setTextViewText(R.id.notifcation_content_time_elapsed, "Elapsed time: $timeElapsed")
-        contentView.setTextViewText(R.id.notifcation_content_current_precantage, "Current percentage: $percentage")
+        contentView.setTextViewText(
+            R.id.notifcation_content_time_elapsed,
+            "Elapsed time: $timeElapsed"
+        )
+        contentView.setTextViewText(
+            R.id.notifcation_content_current_precantage,
+            "Current percentage: $percentage"
+        )
 
         val activityIntent = Intent(this, SplashscreenActivity::class.java)
         val id = 0
-        val pendingIntent = PendingIntent.getActivity(this, id, activityIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this, id, activityIntent,
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-        if(isInitial){
+        if (isInitial) {
             notificationBuilder
                 .setSmallIcon(R.drawable.ic_flexicharge_banner)
                 .setOnlyAlertOnce(true)
@@ -133,7 +139,6 @@ class ChargingService : Service() {
 
         return notificationBuilder.build()
     }
-
 
 
     enum class Actions {
