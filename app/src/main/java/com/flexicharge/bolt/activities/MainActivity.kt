@@ -677,9 +677,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId)
         refreshJob.invokeOnCompletion {
             if(refreshJob.isCancelled) {
-                println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-                println("REFRESH JOB CANCELLED")
-                println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
                 return@invokeOnCompletion
             }
 
