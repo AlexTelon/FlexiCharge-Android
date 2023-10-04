@@ -81,10 +81,7 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                 try {
                     val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
                     if (!response.isSuccessful) {
-                        println("----------------------------------------")
-                        println(response)
-                        println("RESPONSE NOT SUCCESS")
-                        println("----------------------------------------")
+              
                         cancel(response.message())
                     }
                 }
