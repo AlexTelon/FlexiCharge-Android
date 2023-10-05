@@ -74,8 +74,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private val remoteChargersRefresher = RemoteObjectRefresher(remoteChargers, REMOTE_CHARGERS_REFRESH_INTERVAL_MS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //checkPendingTransaction()
-
+        
         Log.d("LOGIN","main created")
         super.onCreate(savedInstanceState)
         Log.d("LOGIN","super main created")
