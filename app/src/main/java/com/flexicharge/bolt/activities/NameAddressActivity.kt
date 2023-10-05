@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.adapters.NameAddressViewModel
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserFullDetails
+import com.flexicharge.bolt.databinding.ActivityAccountSettingsBinding
 import com.flexicharge.bolt.databinding.ActivityNameAndAddressBinding
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
@@ -23,6 +24,7 @@ import kotlinx.coroutines.withContext
 
 class NameAddressActivity : AppCompatActivity() {
     lateinit var binding            : ActivityNameAndAddressBinding
+    lateinit var bindingPhone       : ActivityAccountSettingsBinding
     private lateinit var viewModel  : NameAddressViewModel
     private val validateHelper      = Validator()
 
@@ -30,9 +32,11 @@ class NameAddressActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding                 = ActivityNameAndAddressBinding.inflate(layoutInflater)
+        bindingPhone            = ActivityAccountSettingsBinding.inflate(layoutInflater)
         viewModel               = ViewModelProvider(this).get(NameAddressViewModel::class.java)
         val firstname           = binding.nameAndAddressEditFirstName
         val lastName            = binding.nameAndAddressEditLastName
+        val phoneNumber         = bindingPhone.accountSettingsEditPhoneNumber
         val address             = binding.nameAndAddressEditAddress
         val postCode            = binding.nameAndAddressEditPostcode
         val town                = binding.nameAndAddressEditTown
@@ -51,7 +55,7 @@ class NameAddressActivity : AppCompatActivity() {
 
         viewModel.infoDone.observe(this) {
             if(it)
-                updateTextFields(firstname,lastName,address,postCode,town)
+                updateTextFields(firstname,lastName,phoneNumber,address,postCode,town)
         }
 
         viewModel.updateFailed.observe(this){
@@ -69,11 +73,12 @@ class NameAddressActivity : AppCompatActivity() {
 
 
         binding.nameAndAddressUpdate.setOnClickListener {
-            if(firstname.error == null && lastName.error == null && postCode.error == null && town.error == null && address.error == null){
+            if(firstname.error == null && lastName.error == null && phoneNumber.error == null && postCode.error == null && town.error == null && address.error == null){
                 lifecycleScope.launch(Dispatchers.IO){
                     viewModel.updateUser(token!!,
                         firstname.text.toString(),
                         lastName.text.toString(),
+                        phoneNumber.text.toString(),
                         address.text.toString(),
                         postCode.text.toString(),
                         town.text.toString()
@@ -83,14 +88,15 @@ class NameAddressActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateTextFields(firstName : EditText, lastName : EditText, address : EditText, postCode : EditText, town : EditText){
+    private fun updateTextFields(firstName : EditText, lastName : EditText, phoneNumber : EditText, address : EditText, postCode : EditText, town : EditText){
         val userInfo    = viewModel.currentUserInfo.value
 
-        firstName.text  = Editable.Factory.getInstance().newEditable(userInfo?.firstName)
-        lastName.text   = Editable.Factory.getInstance().newEditable(userInfo?.lastName)
-        address.text    = Editable.Factory.getInstance().newEditable(userInfo?.streetAddress)
-        postCode.text   = Editable.Factory.getInstance().newEditable(userInfo?.zipCode)
-        town.text       = Editable.Factory.getInstance().newEditable(userInfo?.city)
+        firstName.text      = Editable.Factory.getInstance().newEditable(userInfo?.firstName)
+        lastName.text       = Editable.Factory.getInstance().newEditable(userInfo?.lastName)
+        phoneNumber.text    = Editable.Factory.getInstance().newEditable(userInfo?.phoneNumber)
+        address.text        = Editable.Factory.getInstance().newEditable(userInfo?.streetAddress)
+        postCode.text       = Editable.Factory.getInstance().newEditable(userInfo?.zipCode)
+        town.text           = Editable.Factory.getInstance().newEditable(userInfo?.city)
         viewModel.toggleInfoDone()
     }
 

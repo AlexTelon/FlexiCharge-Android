@@ -12,6 +12,7 @@ class Validator {
         field.addTextChangedListener(object : TextWatcher {
             val letters = Regex("^[a-zA-ZåÅäÄöÖ]+$")
             val lettersAndNumbers = Regex("^[a-zA-ZåÅäÄöÖ1-9 ]+$")
+            val phoneNumber = Regex("^\\+[0-9]+\$")
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
                     if(s.isEmpty()) {
@@ -22,7 +23,6 @@ class Validator {
                             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(field.text)
                                     .matches()
                             ) {
-
                                 field.error = "Invalid email."
                             } else {
                                 field.error = null
@@ -112,6 +112,18 @@ class Validator {
                                 } else if (!letters.matches(s)) {
                                     field.error = "Town can only contain letters"
                                 } else {
+                                    field.error = null
+                                }
+                            }
+                        TextInputType.isPhoneNumber ->
+                            if (s.isEmpty()) {
+                                field.error = null
+                            } else {
+                                 if (s.length > 15 || s.length < 7){
+                                    field.error = "Phone number must contain between 7 and 15 numbers"
+                                } else if(!phoneNumber.matches(s)){
+                                     field.error = "Phone number can only include + and numbers"
+                                 }else{
                                     field.error = null
                                 }
                             }
