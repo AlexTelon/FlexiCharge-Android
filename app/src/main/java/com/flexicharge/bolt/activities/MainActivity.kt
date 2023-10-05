@@ -68,6 +68,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     private var isBottomSheetVisible = false
     private val timeCalculation = TimeCalculation()
 
+
+
     private companion object {
         const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 10000
     }
@@ -378,7 +380,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             val totalCost = (transaction.kwhTransfered.toString()
                 .toDouble() * transaction.pricePerKwh.toDouble() / 100).toFloat()
             val pricePerKwh = transaction.pricePerKwh
-            val duration = timeCalculation.checkDuration(transaction.timestamp, currentTime)
+            val duration = timeCalculation.checkDuration(currentRemoteTransaction.startTime, currentTime)
 
             lifecycleScope.launch(Dispatchers.Main) {
 

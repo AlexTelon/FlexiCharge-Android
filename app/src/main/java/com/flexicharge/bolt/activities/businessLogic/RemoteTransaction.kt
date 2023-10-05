@@ -13,6 +13,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
     var status: String = ""
         private set
 
+    var startTime: Long = 0
+        private set
+
     override var value =
         Transaction(-1, "invalid", 0,
             false, 0.0, 0, false,
@@ -74,6 +77,7 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                         val transactionSessionResponse = response.body() as Transaction
                         value = transactionSessionResponse
                         transactionId = transactionSessionResponse.transactionID
+                        startTime = transactionSessionResponse.timestamp
                         status = "Accepted"
                         try {
                             val refreshJob = refresh(lifecycleScope)
