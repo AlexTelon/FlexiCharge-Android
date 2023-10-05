@@ -85,12 +85,11 @@ class ChargingService : Service() {
             if (response.isSuccessful) {
                 val responseData = response.body()
                 val currentTime = System.currentTimeMillis()
-                //val startTime = responseData?.timestamp
+                val startTime = responseData?.startTimeStamp
                 val newPercentage = responseData?.currentChargePercentage.toString()
-                val newTime = timeCalculation.checkDuration(StartTime, currentTime)
+                val newTime = timeCalculation.checkDuration(startTime!!, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
                 if (firstTime) {
-                    StartTime = currentTime
                     startForeground(1, updatedNotification)
                 } else {
                     notificationManager.notify(1, updatedNotification)

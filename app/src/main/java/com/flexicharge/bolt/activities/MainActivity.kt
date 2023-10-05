@@ -31,7 +31,6 @@ import com.flexicharge.bolt.adapters.TimeCalculation
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.InitTransaction
-import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.foregroundServices.ChargingService
@@ -60,8 +59,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
     private lateinit var chargerInputDialog: BottomSheetDialog
     private lateinit var paymentSummaryDialog: BottomSheetDialog
-    private lateinit var hours: String
-    private lateinit var minutes: String
     private lateinit var pinView: PinView
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
@@ -124,7 +121,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val accessToken = loginSharedPref.getString("accessToken", Context.MODE_PRIVATE.toString())
         val userId = loginSharedPref.getString("userId", Context.MODE_PRIVATE.toString())
-        val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
+
 
         binding.mainActivityButtonUser.setOnClickListener {
             if (LoginChecker.LOGGED_IN) {
@@ -158,7 +155,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()
-        Log.d("RESTART", "IT WAS ON RESUME")
         remoteChargersRefresher.run(lifecycleScope)
         val refreshChargers = remoteChargers.refresh(lifecycleScope)
         refreshChargers.invokeOnCompletion {
@@ -207,7 +203,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
     private fun stopChargingProcess(
-        initialPercentage: Int,
         bottomSheetDialog: BottomSheetDialog,
     ) {
         currentRemoteTransaction.refresh(lifecycleScope)
@@ -230,7 +225,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                         getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                     bottomSheetDialog.dismiss()
-                    displayPaymentSummaryDialog(dateTime, initialPercentage)
+                    displayPaymentSummaryDialog(dateTime)
                 }
             }
         } catch (e: Exception) {
@@ -239,17 +234,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                 bottomSheetDialog.dismiss()
-                displayPaymentSummaryDialog(dateTime, initialPercentage)
+                displayPaymentSummaryDialog(dateTime)
             }
         }
     }
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private var isPolling = false
-
-    private fun startApiPolling() {
-
-    }
 
 
     private fun setupChargingInProgressDialog() {
@@ -258,29 +249,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             chargerInputDialog.dismiss()
         }
 
-        val charger =
-            remoteChargers.value.filter { it.chargerID == currentRemoteTransaction.value.chargerID }
-                .getOrNull(0)
-        val chargePoint =
-            remoteChargePoints.value.filter { it.chargePointID == charger?.chargePointID }
-                .getOrNull(0)
+        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val transactionId = sharedPreferences.getInt("TransactionId", -1)
+        val retrieveJob =
+            currentRemoteTransaction.retriveReopened(lifecycleScope, transactionId)
 
-
-            val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-            val transactionId = sharedPreferences.getInt("TransactionId", -1)
-            val retrieveJob =
-                currentRemoteTransaction.retriveReopened(lifecycleScope, transactionId)
-
-            try {
-                retrieveJob.invokeOnCompletion {
-                    if (retrieveJob.isCancelled) {
-                        return@invokeOnCompletion
-                    }
+        try {
+            retrieveJob.invokeOnCompletion {
+                if (retrieveJob.isCancelled) {
+                    return@invokeOnCompletion
                 }
-            } catch (e: Exception) {
-                println("Error when retreiving")
             }
-
+        } catch (e: Exception) {
+            println("Error when retreiving")
+        }
 
 
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
@@ -299,15 +281,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val location =
             bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.behavior.isDraggable = false;
+        bottomSheetDialog.behavior.isDraggable = false
         bottomSheetDialog.setCancelable(false)
 
-        val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
-        val dateTime =
-            timeCalculation.unixToDateTime(currentRemoteTransaction.value.endTimeStamp.toString())
+        val currentPercentage = currentRemoteTransaction.value.currentChargePercentage
 
-
-        progressbar.progress = initialPercentage!!
+        progressbar.progress = currentPercentage!!
 
         isPolling = true
         val foundCharger =
@@ -328,8 +307,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                         currentRemoteTransaction.value.currentChargePercentage.toString()
                     chargeSpeed.text = currentRemoteTransaction.value.kwhTransferred.toString()
 
-                    if(currentRemoteTransaction.value.endTimeStamp != null){
+                    if (currentRemoteTransaction.value.endTimeStamp != null) {
                         isPolling = false
+                        stopChargingProcess(bottomSheetDialog)
                     }
 
                 }
@@ -340,7 +320,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging)
             .setOnClickListener {
                 isPolling = false
-                stopChargingProcess(initialPercentage!!, bottomSheetDialog)
+                stopChargingProcess(bottomSheetDialog)
             }
 
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -348,7 +328,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         bottomSheetDialog.show()
     }
 
-    private fun displayPaymentSummaryDialog(dateTime: String, initialPercentage: Int) {
+    private fun displayPaymentSummaryDialog(dateTime: String) {
+        if (this::paymentSummaryDialog.isInitialized) {
+            paymentSummaryDialog.dismiss()
+        }
+
 
         // TODO Look over values before final commit
 
@@ -373,22 +357,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             isBottomSheetVisible = false
         }
 
-        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope);
+        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope)
         refreshJob.invokeOnCompletion {
-            val currentTime = System.currentTimeMillis()
             val transaction = currentRemoteTransaction.value
             val kwhTransferred = transaction.kwhTransferred
             val totalCost = transaction.price
             val pricePerKwh = transaction.pricePerKwh
-            val duration = timeCalculation.checkDuration(transaction.startTimeStamp!!, transaction.endTimeStamp!!)
+            val duration = timeCalculation.checkDuration(
+                transaction.startTimeStamp!!,
+                transaction.endTimeStamp!!
+            )
 
             lifecycleScope.launch(Dispatchers.Main) {
 
-                energyUsedTextView.text =
-                    kwhTransferred.toString() + " kWh @" + pricePerKwh + "kr kWh"
+                val energyUsedText = "$kwhTransferred  kWh @ $pricePerKwh + kr kWh"
+                val chargingStopTimeText = "Charging stopped at $dateTime"
+                val totalCostText = "$totalCost kr"
+
+                energyUsedTextView.text = energyUsedText
+
                 durationTextView.text = duration
-                chargingStopTimeTextView.text = "Charging stopped at " + dateTime
-                totalCostTextView.text = totalCost.toString() + "kr"
+                chargingStopTimeTextView.text = chargingStopTimeText
+                totalCostTextView.text = totalCostText
 
                 paymentSummaryDialog.setContentView(bottomSheetView)
                 paymentSummaryDialog.show()
@@ -460,7 +450,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int) {
         val chargerId = pinView.text.toString()
-        val refreshJob = remoteChargers.refresh(lifecycleScope);
+        val refreshJob = remoteChargers.refresh(lifecycleScope)
         refreshJob.invokeOnCompletion {
             if (refreshJob.isCancelled) {
                 return@invokeOnCompletion
@@ -503,11 +493,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
         if (listOfChargePointsRecyclerView.visibility == View.GONE) {
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse))
             listOfChargePointsRecyclerView.visibility = View.VISIBLE
             chargePointsNearMe.visibility = View.GONE
         } else {
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate))
             listOfChargePointsRecyclerView.visibility = View.GONE
             chargePointsNearMe.visibility = View.VISIBLE
         }
@@ -534,13 +524,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 } catch (e: UninitializedPropertyAccessException) {
                     dist[0] = 0f
                 }
-
-                val df = DecimalFormat("#.##")
                 val distanceFloat = (dist[0] / 1000)
                 val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
 
                 val count =
-                    remoteChargers.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                    remoteChargers.value.count { it.chargePointID == chargePoint.chargePointID }
                 distanceToChargePoint.add(roundedDistance)
                 chargerCount.add(count)
             }
@@ -577,7 +565,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    private fun createKlarnaTransactionSession(userId: String, chargerId: Int, initTransaction: InitTransaction) {
+    private fun createKlarnaTransactionSession(
+        userId: String,
+        chargerId: Int,
+        initTransactionResponse: InitTransaction
+    ) {
         val retrieveJob = currentRemoteTransaction.retrieve(lifecycleScope)
 
         try {
@@ -591,9 +583,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                     intent.putExtra("ChargerId", chargerId)
                     intent.putExtra(
                         "klarna_consumer_token",
-                        initTransaction.klarnaConsumerToken
+                        initTransactionResponse.klarnaConsumerToken
                     )
-                    intent.putExtra("TransactionId", initTransaction.transactionId)
+                    intent.putExtra("TransactionId", initTransactionResponse.transactionId)
                     startActivity(intent)
                 }
             }
@@ -608,7 +600,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val userId = sharedPreferences.getString("userId", "")
-        val tempChargerId: Int = 100000
         val transactionSession = TransactionSession(userId!!, chargerId, true, 75)
 
 
@@ -624,11 +615,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 when (currentRemoteTransaction.status) {
                     "Accepted" -> {
-                        Log.d("CurrentTest", " klarna ${currentRemoteTransaction.klarnaConsumerToken}")
-                        Log.d("CurrentTest", " transaction ${currentRemoteTransaction.transactionId}")
-                        val initTransaction = InitTransaction(
-                            currentRemoteTransaction.klarnaConsumerToken,currentRemoteTransaction.transactionId.toString())
-                        createKlarnaTransactionSession(userId, chargerId, initTransaction)
+                        Log.d(
+                            "CurrentTest",
+                            " klarna ${currentRemoteTransaction.klarnaConsumerToken}"
+                        )
+                        Log.d(
+                            "CurrentTest",
+                            " transaction ${currentRemoteTransaction.transactionId}"
+                        )
+                        val initTransactionResponse = InitTransaction(
+                            currentRemoteTransaction.klarnaConsumerToken,
+                            currentRemoteTransaction.transactionId.toString()
+                        )
+                        createKlarnaTransactionSession(userId, chargerId, initTransactionResponse)
 
                     }
 
@@ -675,7 +674,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
         val remoteCharger = RemoteCharger(chargerId)
         try {
-            val refreshJob = remoteCharger.refresh(lifecycleScope);
+            val refreshJob = remoteCharger.refresh(lifecycleScope)
             refreshJob.invokeOnCompletion {
                 if (refreshJob.isCancelled) {
                     return@invokeOnCompletion
