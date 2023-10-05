@@ -6,9 +6,10 @@ data class Credentials(
     val username: String,
     val password: String
 )
+
 data class LoginResponseBody(
     val accessToken: String,
-    val email : String,
+    val email: String,
     val username: String,
     val user_id: String
 )
@@ -39,21 +40,23 @@ data class ChargePoint(
 
 class TransactionList : ArrayList<Transaction>()
 
+
+data class InitTransaction(
+    val klarnaConsumerToken : String,
+    val transactionId : String
+)
+
+
 data class Transaction(
-    val chargerID: Int,
-    var klarna_consumer_token: String,
-    var currentChargePercentage: Int,
-    val isKlarnaPayment: Boolean,
-    var kwhTransfered: Double,
-    val meterStart: Int,
-    val paymentConfirmed: Boolean,
-    val paymentID: String,
-    val pricePerKwh: String,
-    val session_id: String,
-    val timestamp: Long,
-    val transactionID: Int,
-    val userID: String,
-    val startTimeStamp : Long ?= null
+    var chargerID: Int ?= null,
+    var currentChargePercentage: Int ?= null,
+    var kwhTransferred: Double ?= null,
+    val pricePerKwh: String ?= null,
+    val price: Int? = null,
+    val discount : String ?= null,
+    val startTimeStamp: Long? = null,
+    val endTimeStamp: Long? = null,
+    val totalEnergy : Int ?= null
 )
 
 data class TransactionSession(
@@ -70,40 +73,41 @@ data class TransactionSessionResponse(
 data class TransactionOrder(
     val authorization_token: String
 )
+
 // Every user has his own email, password
 class UserDetails(
-    val username : String,
-    val password : String
+    val username: String,
+    val password: String
 )
 
 class UserFullDetails(
-    val firstName : String ?= null,
-    val lastName : String ?= null,
-    val phoneNumber : String ?= null,
-    val streetAddress : String ?= null,
-    val zipCode : String ?= null,
-    val city : String ?= null,
-    val country : String ?= null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val phoneNumber: String? = null,
+    val streetAddress: String? = null,
+    val zipCode: String? = null,
+    val city: String? = null,
+    val country: String? = null,
 )
 
 class ChargingHistoryObject(
-    val location : String,
-    val totalSum : String,
-    val startTime : String,
-    val chargeTime : String,
-    val transferedKwh : String,
-    val priceKwh : String
+    val location: String,
+    val totalSum: String,
+    val startTime: String,
+    val chargeTime: String,
+    val transferedKwh: String,
+    val priceKwh: String
 )
 
-class VerificationDetails (
-    val username : String,
-    val code : String
+class VerificationDetails(
+    val username: String,
+    val code: String
 )
 
 class UserDetailsGotten(
-    val message : String,
-    val code : String,
-    val statusCode : Int
+    val message: String,
+    val code: String,
+    val statusCode: Int
 )
 
 data class ResetResponseBody(val status: String)
@@ -115,23 +119,8 @@ data class ResetRequestBody(
 )
 
 data class InitTransactionDetails(
-    val userID : String,
-    val chargerID : String
+    val userID: String,
+    val chargerID: String
 )
 
-data class InitTransactionDetailsV2(
-    val userID : String,
-    val chargerID : Int,
-    val isKlarnaPayment: Boolean,
-    val pricePerKwh: Int
-)
-data class TransactionId(
-    val transactionID : Int
-)
-
-
-data class klarnaResponse (
-    val payment_method_type : String,
-    val status : String
-        )
 

@@ -30,6 +30,7 @@ import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.adapters.TimeCalculation
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
+import com.flexicharge.bolt.api.flexicharge.InitTransaction
 import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import com.flexicharge.bolt.databinding.ActivityMainBinding
@@ -49,7 +50,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     ) {
         currentRemoteTransaction.refresh(lifecycleScope)
         val dateTime =
-            timeCalculation.unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
+            timeCalculation.unixToDateTime(currentRemoteTransaction.value.endTimeStamp.toString())
 
         try {
             val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
@@ -266,7 +266,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 .getOrNull(0)
 
 
-        if (currentRemoteTransaction.value.transactionID == -1) {
             val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
             val transactionId = sharedPreferences.getInt("TransactionId", -1)
             val retrieveJob =
@@ -281,7 +280,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             } catch (e: Exception) {
                 println("Error when retreiving")
             }
-        }
+
 
 
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
@@ -305,10 +304,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
         val dateTime =
-            timeCalculation.unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
+            timeCalculation.unixToDateTime(currentRemoteTransaction.value.endTimeStamp.toString())
 
 
-        progressbar.progress = initialPercentage
+        progressbar.progress = initialPercentage!!
 
         isPolling = true
         val foundCharger =
@@ -324,10 +323,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 currentRemoteTransaction.retrieve(lifecycleScope)
 
                 withContext(Dispatchers.Main) {
-                    progressbar.progress = currentRemoteTransaction.value.currentChargePercentage
+                    progressbar.progress = currentRemoteTransaction.value.currentChargePercentage!!
                     progressbarPercent.text =
                         currentRemoteTransaction.value.currentChargePercentage.toString()
-                    chargeSpeed.text = currentRemoteTransaction.value.kwhTransfered.toString()
+                    chargeSpeed.text = currentRemoteTransaction.value.kwhTransferred.toString()
+
+                    if(currentRemoteTransaction.value.endTimeStamp != null){
+                        isPolling = false
+                    }
 
                 }
                 delay(3000)
@@ -337,7 +340,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         bottomSheetView.findViewById<MaterialButton>(R.id.chargeInProgressLayout_button_stopCharging)
             .setOnClickListener {
                 isPolling = false
-                stopChargingProcess(initialPercentage, bottomSheetDialog)
+                stopChargingProcess(initialPercentage!!, bottomSheetDialog)
             }
 
         bottomSheetDialog.setContentView(bottomSheetView)
@@ -374,11 +377,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         refreshJob.invokeOnCompletion {
             val currentTime = System.currentTimeMillis()
             val transaction = currentRemoteTransaction.value
-            val kwhTransferred = transaction.kwhTransfered
-            val totalCost = (transaction.kwhTransfered.toString()
-                .toDouble() * transaction.pricePerKwh.toDouble() / 100).toFloat()
+            val kwhTransferred = transaction.kwhTransferred
+            val totalCost = transaction.price
             val pricePerKwh = transaction.pricePerKwh
-            val duration = timeCalculation.checkDuration(transaction.timestamp, currentTime)
+            val duration = timeCalculation.checkDuration(transaction.startTimeStamp!!, transaction.endTimeStamp!!)
 
             lifecycleScope.launch(Dispatchers.Main) {
 
@@ -575,7 +577,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
+    private fun createKlarnaTransactionSession(userId: String, chargerId: Int, initTransaction: InitTransaction) {
         val retrieveJob = currentRemoteTransaction.retrieve(lifecycleScope)
 
         try {
@@ -589,9 +591,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                     intent.putExtra("ChargerId", chargerId)
                     intent.putExtra(
                         "klarna_consumer_token",
-                        currentRemoteTransaction.value.klarna_consumer_token
+                        initTransaction.klarnaConsumerToken
                     )
-                    intent.putExtra("TransactionId", currentRemoteTransaction.value.transactionID)
+                    intent.putExtra("TransactionId", initTransaction.transactionId)
                     startActivity(intent)
                 }
             }
@@ -609,7 +611,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val tempChargerId: Int = 100000
         val transactionSession = TransactionSession(userId!!, chargerId, true, 75)
 
-        // val transactionSession = TransactionSession(userId!!, tempChargerId, true, 75)
+
         val createSessionJob =
             currentRemoteTransaction.createSession(lifecycleScope, transactionSession)
 
@@ -622,7 +624,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 when (currentRemoteTransaction.status) {
                     "Accepted" -> {
-                        createKlarnaTransactionSession(userId, chargerId)
+                        Log.d("CurrentTest", " klarna ${currentRemoteTransaction.klarnaConsumerToken}")
+                        Log.d("CurrentTest", " transaction ${currentRemoteTransaction.transactionId}")
+                        val initTransaction = InitTransaction(
+                            currentRemoteTransaction.klarnaConsumerToken,currentRemoteTransaction.transactionId.toString())
+                        createKlarnaTransactionSession(userId, chargerId, initTransaction)
 
                     }
 

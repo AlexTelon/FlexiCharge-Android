@@ -1,22 +1,24 @@
 package com.flexicharge.bolt.activities.businessLogic
 
-import android.widget.Toast
+import android.util.Log
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.flexicharge.bolt.api.flexicharge.InitTransaction
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
-import com.flexicharge.bolt.api.flexicharge.TransactionSessionResponse
 import kotlinx.coroutines.*
 
-class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Transaction>() {
+class RemoteTransaction( var transactionId : Int = -1) : RemoteObject<Transaction>() {
 
     var status: String = ""
         private set
+    var klarnaConsumerToken: String = ""
+        private set
 
     override var value =
-        Transaction(-1, "invalid", 0,
-            false, 0.0, 0, false,
-            "", "", "", 0, transactionId, "")
+        Transaction(null,null,
+            null,null,null,null,
+            null,null,null)
 
      public override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
@@ -27,9 +29,9 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                         cancel("Could not fetch transaction!")
                     }
                     else {
-                       // value = response.body() as Transaction
-                        value.kwhTransfered = response.body()!!.kwhTransfered
-                        value.currentChargePercentage = response.body()!!.currentChargePercentage
+                        value = response.body() as Transaction
+                      //  value.kwhTransferred = response.body()!!.kwhTransferred
+                       // value.currentChargePercentage = response.body()!!.currentChargePercentage
 
                     }
                 }
@@ -67,13 +69,14 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
 
                     val response = RetrofitInstance.flexiChargeApi.initTransaction(transactionSession)
                     if(!response.isSuccessful) {
-
+                        Log.d("CurrentTest", " response init fail")
                         cancel(response.message())
                     }
                     else {
-                        val transactionSessionResponse = response.body() as Transaction
-                        value = transactionSessionResponse
-                        transactionId = transactionSessionResponse.transactionID
+                        val transactionSessionResponse = response.body() as InitTransaction
+                        Log.d("CurrentTest", "${response.body()}")
+                        transactionId = transactionSessionResponse.transactionId.toInt()
+                        klarnaConsumerToken = transactionSessionResponse.klarnaConsumerToken
                         status = "Accepted"
                         try {
                             val refreshJob = refresh(lifecycleScope)
@@ -92,10 +95,11 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
     }
 
     fun stop(lifecycleScope: LifecycleCoroutineScope): Job {
+
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.transactionStop(value.transactionID)
+                    val response = RetrofitInstance.flexiChargeApi.transactionStop(transactionId)
                     if (!response.isSuccessful) {
               
                         cancel(response.message())
@@ -112,7 +116,7 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
+                    val response = RetrofitInstance.flexiChargeApi.transactionStart(transactionId)
                     if(!response.isSuccessful) {
                         cancel(response.message())
                     }

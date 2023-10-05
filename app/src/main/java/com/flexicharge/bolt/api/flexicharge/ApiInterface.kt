@@ -74,7 +74,7 @@ interface ApiInterface {
 
 
     @POST("/transactions")
-    suspend fun initTransaction(@Body body : TransactionSession) : Response<Transaction>
+    suspend fun initTransaction(@Body body : TransactionSession) : Response<InitTransaction>
 
     @GET("/transactions/userTransactions/{userId}")
     suspend fun transactionsByUserID(@Path("userId") userId : String) :Response<List<Transaction>>
