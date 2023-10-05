@@ -74,15 +74,6 @@ object MapHelper {
                 } else {
                     // Handle the case when the fragment is not found or is not a SupportMapFragment.
                 }
-
-                /*
-                val supportMapFragment =
-                    activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
-                supportMapFragment.getMapAsync(activity)
-                currentLocation = result.lastLocation
-
-                 */
-
             }
         }
 
