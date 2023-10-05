@@ -24,7 +24,7 @@ class ChargingService : Service() {
 
     private var shouldUpdate: Boolean = true
     private var transactionId: Int = -1
-    private var StartTime : Long = 0
+    private var StartTime: Long = 0
     private lateinit var notificationManager: NotificationManager
     private val updateHandler = Handler(Looper.getMainLooper())
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
@@ -86,10 +86,8 @@ class ChargingService : Service() {
                 val responseData = response.body()
                 val currentTime = System.currentTimeMillis()
                 //val startTime = responseData?.timestamp
-                timeCalculation.checkDuration(StartTime,currentTime)
-                Log.d("TestTime", "duration : ${timeCalculation.duration}")
                 val newPercentage = responseData?.currentChargePercentage.toString()
-                val newTime = timeCalculation.duration
+                val newTime = timeCalculation.checkDuration(StartTime, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
                 if (firstTime) {
                     StartTime = currentTime

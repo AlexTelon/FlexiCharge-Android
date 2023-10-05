@@ -37,33 +37,55 @@ class VerifyActivity : AppCompatActivity() {
         var userFirstName = intent.getStringExtra("userFirstName")
         var userLastName = intent.getStringExtra("userLastName")
 
-        if(userFirstName == null)
-            userFirstName =""
-        if(userLastName == null)
+        if (userFirstName == null)
+            userFirstName = ""
+        if (userLastName == null)
             userLastName = ""
 
-        confirmVerification(userEmail = userEmail!!, userPass = userPass!!, userFirstName, userLastName)
+        confirmVerification(
+            userEmail = userEmail!!,
+            userPass = userPass!!,
+            userFirstName,
+            userLastName
+        )
     }
 
-    private lateinit var verificationCode : EditText
+    private lateinit var verificationCode: EditText
 
 
-    private fun confirmVerification(userEmail: String, userPass : String, userFirstName : String, userLastName : String){
+    private fun confirmVerification(
+        userEmail: String,
+        userPass: String,
+        userFirstName: String,
+        userLastName: String
+    ) {
         val verifyBtn = findViewById<Button>(R.id.buttonVerify)
 
         verifyBtn.setOnClickListener {
-            verifyUser( verificationCode.text.toString(), userEmail, userPass, userFirstName, userLastName)
+            verifyUser(
+                verificationCode.text.toString(),
+                userEmail,
+                userPass,
+                userFirstName,
+                userLastName
+            )
         }
     }
 
 
-    private fun verifyUser ( userCode : String, userEmail: String,userPass : String, userFirstName : String, userLastName : String) {
+    private fun verifyUser(
+        userCode: String,
+        userEmail: String,
+        userPass: String,
+        userFirstName: String,
+        userLastName: String
+    ) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestBody = VerificationDetails(userEmail, userCode)
                 val response = RetrofitInstance.flexiChargeApi.verifyEmail(requestBody)
                 if (response.code() == StatusCode.ok) {
-                    lifecycleScope.launch( Dispatchers.Main) {
+                    lifecycleScope.launch(Dispatchers.Main) {
                         val userInfo: Map<String, String> = mapOf(
                             "email" to userEmail,
                             "pass" to userPass,
@@ -72,27 +94,34 @@ class VerifyActivity : AppCompatActivity() {
                         )
                         signIn(userInfo)
                     }
-                }
-                else {
+                } else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        Toast.makeText(this@VerifyActivity, "Code Invalid, Try Again", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@VerifyActivity,
+                            "Code Invalid, Try Again",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             } catch (e: HttpException) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG).show()
                 }
-            } catch (e: IOException) {lifecycleScope.launch(Dispatchers.Main) {
-                Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG).show()
+            } catch (e: IOException) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    Toast.makeText(this@VerifyActivity, e.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
 
-    fun signIn(userData : Map<String, String>){
+    fun signIn(userData: Map<String, String>) {
         lifecycleScope.launch(Dispatchers.IO) {
-            entryManager.singIn(userData["email"]!!, userData["pass"]!!) { responseBody, message, isOK ->
+            entryManager.singIn(
+                userData["email"]!!,
+                userData["pass"]!!
+            ) { responseBody, message, isOK ->
                 if (isOK) {
                     LoginChecker.LOGGED_IN = true
                     val loggedInData = mapOf(
@@ -102,16 +131,15 @@ class VerifyActivity : AppCompatActivity() {
                     )
                     val collectedData = loggedInData + userData
                     sendToMain(collectedData)
-                }
-                else {
-                    lifecycleScope.launch (Dispatchers.Main) {
+                } else {
+                    lifecycleScope.launch(Dispatchers.Main) {
                     }
                 }
             }
         }
     }
 
-    private fun sendToMain(userData : Map<String,String>){
+    private fun sendToMain(userData: Map<String, String>) {
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.apply {
@@ -132,9 +160,9 @@ class VerifyActivity : AppCompatActivity() {
         )
         lifecycleScope.launch(Dispatchers.IO) {
             val token = userData["accessToken"]
-           val test = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token", userInfo)
-            if(test.isSuccessful){
-                withContext(Dispatchers.Main){
+            val test = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token", userInfo)
+            if (test.isSuccessful) {
+                withContext(Dispatchers.Main) {
                     startActivity(Intent(this@VerifyActivity, MainActivity::class.java))
                     finish()
                 }

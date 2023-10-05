@@ -33,20 +33,20 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        registerBtn              = binding.buttonRegisterConfirm
-        registerUserEmail        = binding.loginActivityEditTextEmail
-        registerUserFirstName    = binding.loginActivityEditTextFirstName
-        registerUserLastName     = binding.loginActivityEditTextLastName
-        registerUserPass         = binding.loginActivityEditTextPassword
-        registerUserRepeatPass   = binding.editTextPasswordRepeat
-        agreeCheckBox            = binding.checkBoxTosAgreement
+        registerBtn = binding.buttonRegisterConfirm
+        registerUserEmail = binding.loginActivityEditTextEmail
+        registerUserFirstName = binding.loginActivityEditTextFirstName
+        registerUserLastName = binding.loginActivityEditTextLastName
+        registerUserPass = binding.loginActivityEditTextPassword
+        registerUserRepeatPass = binding.editTextPasswordRepeat
+        agreeCheckBox = binding.checkBoxTosAgreement
 
         confirmRegistration()
     }
 
     // first take the input from user
-    lateinit var agreeCheckBox : CheckBox
-    lateinit var registerBtn : Button
+    lateinit var agreeCheckBox: CheckBox
+    lateinit var registerBtn: Button
     lateinit var registerUserEmail: EditText
     lateinit var registerUserFirstName: EditText
     lateinit var registerUserLastName: EditText
@@ -66,15 +66,14 @@ class RegisterActivity : AppCompatActivity() {
         registerBtn.setOnClickListener {
 
 
-            if(agreeCheckBox.isChecked && registerUserLastName.error == null && registerUserFirstName.error == null){
+            if (agreeCheckBox.isChecked && registerUserLastName.error == null && registerUserFirstName.error == null) {
                 sendDataToBackend()
-            }
-            else {
-                if(!agreeCheckBox.isChecked){
+            } else {
+                if (!agreeCheckBox.isChecked) {
                     AlertDialog.Builder(this@RegisterActivity)
                         .setTitle("Oops!")
                         .setMessage("you have to agree to term and conditions")
-                        .setNegativeButton("Ok") { _,_  ->
+                        .setNegativeButton("Ok") { _, _ ->
                         }.show()
                 }
             }
@@ -82,7 +81,12 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     //function to send users' data to backend
-    private fun sendUserData(userEmail: String,userFirstName: String, userLastName : String ,userPass: String) {
+    private fun sendUserData(
+        userEmail: String,
+        userFirstName: String,
+        userLastName: String,
+        userPass: String
+    ) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val requestBody = UserDetails(userEmail, userPass)
@@ -91,10 +95,10 @@ class RegisterActivity : AppCompatActivity() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         val intent =
                             Intent(this@RegisterActivity, VerifyActivity::class.java)
-                        intent.putExtra("userEmail",userEmail)
+                        intent.putExtra("userEmail", userEmail)
                         intent.putExtra("userPass", userPass)
                         intent.putExtra("userFirstName", userFirstName)
-                        intent.putExtra("userLastName",userLastName)
+                        intent.putExtra("userLastName", userLastName)
                         startActivity(intent)
 
                     }
@@ -140,7 +144,7 @@ class RegisterActivity : AppCompatActivity() {
         })
     }
 
-    fun sendDataToBackend () {
+    fun sendDataToBackend() {
         if (agreeCheckBox.isChecked()) {
             if (registerUserRepeatPass.error == null) {
                 if (registerUserEmail.error == null) {
@@ -154,18 +158,21 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-        else {
-            Toast.makeText(applicationContext, "You have to agree to terms and conditions", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(
+                applicationContext,
+                "You have to agree to terms and conditions",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
-
 
 
     fun goToSignIn(view: View) {
         //Go to sign in activity
         startActivity(Intent(this, LoginActivity::class.java))
     }
+
     fun continueAsGuest(view: View) {
         //Continue to MainActivity
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
