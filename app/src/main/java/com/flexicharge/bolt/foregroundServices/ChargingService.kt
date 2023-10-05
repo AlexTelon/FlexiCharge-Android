@@ -1,6 +1,5 @@
 package com.flexicharge.bolt.foregroundServices
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,13 +9,13 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.text.format.DateUtils.formatElapsedTime
+import android.util.Log
 import android.widget.RemoteViews
-import android.widget.RemoteViews.RemoteView
 import androidx.core.app.NotificationCompat
 import com.flexicharge.bolt.R
-import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.activities.SplashscreenActivity
+import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
+import com.flexicharge.bolt.adapters.TimeCalculation
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,11 +25,13 @@ class ChargingService : Service() {
 
     private var shouldUpdate: Boolean = true
     private var transactionId: Int = -1
-    private var elapsedTimeInSeconds = 0
+    private var startTime: Long = 0
     private lateinit var notificationManager: NotificationManager
     private val updateHandler = Handler(Looper.getMainLooper())
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
     private var isInitial: Boolean = true
+    private var timeCalculation = TimeCalculation()
+    private val currentRemoteTransaction = RemoteTransaction()
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -39,6 +40,8 @@ class ChargingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
+        startTime = intent?.getLongExtra("startTime", -1)!!
+        Log.d("TIME", startTime.toString())
         when (intent?.action) {
             //  Actions.START.toString() -> start(transactionId)
             Actions.START.toString() -> start(9999)
@@ -85,15 +88,18 @@ class ChargingService : Service() {
 
             if (response.isSuccessful) {
                 val responseData = response.body()
+                val currentTime = System.currentTimeMillis()
+                //val startTime = responseData?.timestamp
                 val newPercentage = responseData?.currentChargePercentage.toString()
-                val newTime = elapsedTimeInSeconds.toString()
+                val newTime = timeCalculation.checkDuration(startTime, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
                 if (firstTime) {
+                    //StartTime = currentTime
                     startForeground(1, updatedNotification)
                 } else {
                     notificationManager.notify(1, updatedNotification)
                 }
-                elapsedTimeInSeconds += 3
+
             }
         } catch (e: java.lang.Exception) {
 
