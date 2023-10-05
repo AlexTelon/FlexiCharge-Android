@@ -23,9 +23,6 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
                     val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
-                    println("-----------------")
-                    println(response.body())
-                    println("-----------------")
                     if (!response.isSuccessful) {
                         cancel("Could not fetch transaction!")
                     }
@@ -43,6 +40,26 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         }
     }
 
+    fun retriveReopened(lifecycleScope: LifecycleCoroutineScope, transactionId: Int) : Job{
+        return lifecycleScope.launch(Dispatchers.IO) {
+            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
+                try {
+                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                    if (!response.isSuccessful) {
+                        cancel("Could not fetch transaction!")
+                    }
+                    else {
+                        value = response.body()!!
+                    }
+                }
+                catch (e: Exception) {
+                    cancel(CancellationException(e.message))
+                }
+            }
+        }
+    }
+
+
     fun createSession(lifecycleScope: LifecycleCoroutineScope, transactionSession: TransactionSession): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
@@ -57,7 +74,6 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
                         val transactionSessionResponse = response.body() as Transaction
                         value = transactionSessionResponse
                         transactionId = transactionSessionResponse.transactionID
-                       // value.klarna_consumer_token = transactionSessionResponse.klarna_consumer_token
                         status = "Accepted"
                         try {
                             val refreshJob = refresh(lifecycleScope)
@@ -96,8 +112,6 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    println("--------------------------------------")
-                   
                     val response = RetrofitInstance.flexiChargeApi.transactionStart(value.transactionID)
                     if(!response.isSuccessful) {
                         cancel(response.message())

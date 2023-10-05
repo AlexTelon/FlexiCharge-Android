@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp">
+
+
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        >
+
+
+        <TextView android:id="@+id/notifcation_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="xxx"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            />
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/notifcation_content_time_elapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="xxx"
+                android:textColor="@color/black"
+                android:textSize="10sp" />
+
+
+            <TextView
+                android:id="@+id/notifcation_content_current_precantage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="xxx"
+                android:textColor="@color/black"
+                android:textSize="10sp" />
+
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+</RelativeLayout>
