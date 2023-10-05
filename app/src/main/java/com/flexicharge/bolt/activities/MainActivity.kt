@@ -29,7 +29,6 @@ import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
-import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import com.flexicharge.bolt.databinding.ActivityMainBinding
 import com.flexicharge.bolt.foregroundServices.ChargingService
@@ -58,8 +57,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var binding: ActivityMainBinding       // the bindings in the Main Activity (camera, user, charger, position).
     private lateinit var chargerInputDialog: BottomSheetDialog
     private lateinit var paymentSummaryDialog: BottomSheetDialog
-    private lateinit var hours : String
-    private lateinit var minutes : String
     private lateinit var pinView: PinView
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
@@ -117,7 +114,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val accessToken = loginSharedPref.getString("accessToken", Context.MODE_PRIVATE.toString())
         val userId = loginSharedPref.getString("userId", Context.MODE_PRIVATE.toString())
-        val isLoggedIn = loginSharedPref.getString("loggedIn", Context.MODE_PRIVATE.toString())
 
         binding.mainActivityButtonUser.setOnClickListener {
             if (LoginChecker.LOGGED_IN) {
@@ -193,7 +189,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    public fun unixToDateTime(unixTime: String) : String {
+     fun unixToDateTime(unixTime: String) : String {
         val locale = Locale("sv","SE")
         val sdf = SimpleDateFormat("MM/dd/HH:mm", locale)
         val netDate = Date(unixTime.toLong())
@@ -240,28 +236,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private  val scope = CoroutineScope(Dispatchers.IO)
     private var isPolling = false
 
-    private fun startApiPolling(){
-
-    }
-
-
 
     private fun setupChargingInProgressDialog() {
         if (this::chargerInputDialog.isInitialized) {
             Log.d("CheckTransaction", "it is initizalized")
             chargerInputDialog.dismiss()
         }
-
-        val charger = remoteChargers.value.filter { it.chargerID == currentRemoteTransaction.value.chargerID }.getOrNull(0)
-        val chargePoint = remoteChargePoints.value.filter { it.chargePointID == charger?.chargePointID }.getOrNull(0)
-
-        /*
-        if(charger == null || chargePoint == null) {
-            Log.d("CheckTransaction", currentRemoteTransaction.value.transactionID.toString())
-            throw Exception("Tried to display charging information for a charger that doesn't exist.")
-        }
-
-         */
 
         if(currentRemoteTransaction.value.transactionID == -1){
             val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
@@ -294,11 +274,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
         val location = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.behavior.isDraggable = false;
+        bottomSheetDialog.behavior.isDraggable = false
         bottomSheetDialog.setCancelable(false)
 
         val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
-        val dateTime = unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
+
 
 
         progressbar.progress = initialPercentage
@@ -352,7 +332,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             isBottomSheetVisible = false
         }
 
-        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope);
+        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope)
         refreshJob.invokeOnCompletion {
             val transaction = currentRemoteTransaction.value
             val kwhTransferred = transaction.kwhTransfered
@@ -361,6 +341,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             val duration = transaction.currentChargePercentage - initialPercentage
 
             lifecycleScope.launch(Dispatchers.Main) {
+
+              val  energyUsedText = "${kwhTransferred} kWh @ $"
 
                 energyUsedTextView.text = kwhTransferred.toString() + " kWh @" + pricePerKwh + "kr kWh"
                 durationTextView.text = duration.toString() + " Seconds"
