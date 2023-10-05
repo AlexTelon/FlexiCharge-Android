@@ -1,11 +1,17 @@
 package com.flexicharge.bolt.activities
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.databinding.ActivityProfileMenuLoggedInBinding
+import com.flexicharge.bolt.foregroundServices.ChargingService
 import com.flexicharge.bolt.helpers.LoginChecker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProfileMenuLoggedInActivity : AppCompatActivity() {
     lateinit var binding: ActivityProfileMenuLoggedInBinding
@@ -14,42 +20,42 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
         binding = ActivityProfileMenuLoggedInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.accountSettingsTextView.setOnClickListener{
+        binding.accountSettingsTextView.setOnClickListener {
             val intent = Intent(this, AccountSettingsActivity::class.java)
             startActivity(intent)
         }
 
-        binding.chargingHistoryTextView.setOnClickListener{
+        binding.chargingHistoryTextView.setOnClickListener {
             val intent = Intent(this, ChargingHistoryActivity::class.java)
             startActivity(intent)
         }
 
-        binding.invoicesTextView.setOnClickListener{
+        binding.invoicesTextView.setOnClickListener {
             val intent = Intent(this, InvoiceActivity::class.java)
             startActivity(intent)
         }
 
-        binding.nameAddressTextView.setOnClickListener{
+        binding.nameAddressTextView.setOnClickListener {
             val intent = Intent(this, NameAddressActivity::class.java)
             startActivity(intent)
-
         }
 
-        binding.aboutTextView.setOnClickListener{
+        binding.aboutTextView.setOnClickListener {
             val intent = Intent(this, AboutActivity::class.java)
             startActivity(intent)
         }
 
 
-        binding.loginActivityButtonLogout.setOnClickListener {
-            LoginChecker.LOGGED_IN = false
-            getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
-                clear()
-            }.apply()
+            binding.loginActivityButtonLogout.setOnClickListener {
+                LoginChecker.LOGGED_IN = false
+                getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
+                    clear()
+                }.apply()
 
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+                val intent = Intent(this, RegisterActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+
     }
 }

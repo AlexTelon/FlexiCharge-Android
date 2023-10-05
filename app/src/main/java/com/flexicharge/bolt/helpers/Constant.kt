@@ -17,6 +17,7 @@ object TextInputType {
     const val isPostCode            = "is postcode"
     const val isAddress             = "is address"
     const val isTown                = "is Town"
+    const val isPhoneNumber         = "is phone number"
 
 }
 

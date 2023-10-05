@@ -183,10 +183,13 @@
         android:id="@+id/nameAndAddress_townInputBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_postcodeInputBox">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -199,14 +202,13 @@
                 android:id="@+id/nameAndAddress_editTown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ems="10"
                 android:minHeight="48dp"
                 android:paddingLeft="10dp"
                 android:textColor="@color/black"
-                android:ems="10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent" />
 
         </LinearLayout>
 
@@ -216,10 +218,10 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:background="@color/white"
-            android:text="Town"
             android:paddingHorizontal="10dp"
+            android:text="Town"
             android:textColor="@color/black"
-            android:textSize="17sp"/>
+            android:textSize="17sp" />
     </RelativeLayout>
 
 
@@ -260,13 +262,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="30dp"
         android:background="@drawable/update_button"
         android:text="Update"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameAndAddress_townInputBox" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
