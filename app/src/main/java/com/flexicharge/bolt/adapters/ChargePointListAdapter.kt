@@ -50,7 +50,7 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val distanceText = "${distance[position]} + km"
+        val distanceText = "${distance[position]} km"
         val numberOfChargersText = "${chargerCount[position]} chargers"
 
         holder.itemDistance.text = distanceText

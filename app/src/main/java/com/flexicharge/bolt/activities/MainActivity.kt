@@ -504,6 +504,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             val distanceToChargePoint = mutableListOf<Float>()
             val chargerCount = mutableListOf<Int>()
 
+            Log.d("Distance", "${remoteChargePoints.value}")
+
             remoteChargePoints.value.forEachIndexed { _, chargePoint ->
                 val dist = FloatArray(1)
                 try {
@@ -520,8 +522,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 val distanceFloat = (dist[0] / 1000)
                 val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
-
-
+                if(chargePoint.name == "JU") {
+                    Log.d("Distance", chargePoint.location[0].toString())
+                    Log.d("Distance", chargePoint.location[1].toString())
+                    Log.d("Distance", currentLocation.latitude.toString())
+                    Log.d("Distance", currentLocation.longitude.toString())
+                    Log.d("Distance", chargePoint.chargePointID.toString())
+                }
                 val count =
                     remoteChargers.value.count { it.chargePointID == chargePoint.chargePointID }
 
