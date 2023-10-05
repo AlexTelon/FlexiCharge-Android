@@ -116,12 +116,12 @@ class VerifyActivity : AppCompatActivity() {
     }
 
 
-    fun signIn(userData: Map<String, String>) {
+    private fun signIn(userData: Map<String, String>) {
         lifecycleScope.launch(Dispatchers.IO) {
             entryManager.singIn(
                 userData["email"]!!,
                 userData["pass"]!!
-            ) { responseBody, message, isOK ->
+            ) { responseBody, _, isOK ->
                 if (isOK) {
                     LoginChecker.LOGGED_IN = true
                     val loggedInData = mapOf(

@@ -9,8 +9,8 @@ class KlarnaOrderCompletedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_klarna_order_completed)
-        var message = intent.getStringExtra("message")
-        var textView = findViewById<TextView>(R.id.klarnaOrderCompletedActivity_textView_message)
+        val message = intent.getStringExtra("message")
+        val textView = findViewById<TextView>(R.id.klarnaOrderCompletedActivity_textView_message)
         textView.text = message
     }
     @Deprecated("Deprecated in Java")

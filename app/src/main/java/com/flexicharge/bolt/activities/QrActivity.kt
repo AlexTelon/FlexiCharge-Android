@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -14,12 +15,12 @@ import com.flexicharge.bolt.R
 import java.io.Serializable
 
 
-class QrActivity() : AppCompatActivity() {
+class QrActivity : AppCompatActivity() {
 
     private lateinit var codeScanner: CodeScanner
 
-    private val NOT_VALID_QR_STRING = "NOT_VALID_QR_STRING"
-    private val VALID_QR_STRING_LENGTH = "['1', '2', '3', '4', '5', '6']".length
+    private val notValidQrString = "NOT_VALID_QR_STRING"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +58,7 @@ class QrActivity() : AppCompatActivity() {
             it.isDigit()
         }
         if(formattedString.length != 6) {
-            return NOT_VALID_QR_STRING
+            return notValidQrString
         }
         return formattedString
     }
@@ -82,14 +83,14 @@ class QrActivity() : AppCompatActivity() {
 
                 try {
                     val validatedQRString = validateChargerId(it.text)
-                    if (validatedQRString != NOT_VALID_QR_STRING) {
+                    if (validatedQRString != notValidQrString) {
                         setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", validatedQRString))
                         finish()
                     } else {
                         Toast.makeText(this, "QR INVALID", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
-
+                    Log.d("catch-error", "validate qr-string error")
                 }
             }
         }

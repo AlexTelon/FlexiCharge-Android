@@ -26,7 +26,6 @@ class ForgotPasswordActivity : AppCompatActivity() {
         binding = ActivityForgotPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val emailEdittext :EditText = binding.resetActivityEditTextEmail
-        val error = binding.resetPassActivityErrorMessage
         validator.validateUserInput(emailEdittext, TextInputType.isEmail)
         binding.buttonConfirmRecoverPassword.setOnClickListener {
             emailAddress = emailEdittext.text.toString()

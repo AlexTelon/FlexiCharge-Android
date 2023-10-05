@@ -17,14 +17,9 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(){
             startActivity(Intent(this, LoginActivity::class.java))
         }
 
-//        binding.l.setOnClickListener {
-//            startActivity(Intent(this, LoginActivity::class.java))
-//        }
+
 
     }
 
-    fun loginClick(view: android.view.View) {}
-    fun aboutClick(view: android.view.View) {
-        startActivity(Intent(this, AboutActivity::class.java))
-    }
+
 }

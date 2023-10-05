@@ -24,7 +24,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }
     private val authorizeButton by lazy { findViewById<Button>(R.id.klarnaActivity_button_authorize) }
     private var chargerId : Int = 0
-    private var klarna_consumer_token : String = ""
+    private var klarnaConsumerToken : String = ""
     private var transactionId : Int = 0
     private var authTokenId : String = ""
 
@@ -37,15 +37,16 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         setContentView(R.layout.activity_klarna)
 
         chargerId = intent.getIntExtra("ChargerId", 0)
-        klarna_consumer_token = intent.getStringExtra("klarna_consumer_token").toString()
+        klarnaConsumerToken = intent.getStringExtra("klarna_consumer_token").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
-        Log.d("CLIENTTOKEN", klarna_consumer_token)
+        Log.d("CLIENT_TOKEN", klarnaConsumerToken)
 
         initialize()
 
         setupButtons()
         klarnaPaymentView.category = paymentCategory
     }
+
 
     private fun initialize() {
 
@@ -55,7 +56,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                 runOnUiThread {
 
                     klarnaPaymentView.initialize(
-                        klarna_consumer_token,
+                        klarnaConsumerToken,
                         "${getString(R.string.return_url_scheme)}://${getString(R.string.return_url_host)}"
                     )
                 }

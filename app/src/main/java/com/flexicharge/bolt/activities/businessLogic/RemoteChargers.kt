@@ -8,7 +8,7 @@ import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 
-class RemoteChargers() : RemoteObject<Chargers>() {
+class RemoteChargers : RemoteObject<Chargers>() {
 
     override var value = Chargers()
 
@@ -17,7 +17,7 @@ class RemoteChargers() : RemoteObject<Chargers>() {
         val refreshJob = lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.getChargerList() // Retrofit is a REST Client, Retrieve and upoad JSON
+                    val response = RetrofitInstance.flexiChargeApi.getChargerList()
                     if (!response.isSuccessful) {
                         cancel("Failed retrieving chargers")
                     }

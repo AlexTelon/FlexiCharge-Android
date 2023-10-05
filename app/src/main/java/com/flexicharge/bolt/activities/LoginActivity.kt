@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
         val emailEditText = binding.loginActivityEditTextEmail
         val passwordEditText = binding.loginActivityEditTextPassword
-        val error = binding.loginActivityErrorMessage
+
 
         validator.validateUserInput(emailEditText, TextInputType.isEmail)
         validator.validateUserInput(passwordEditText, TextInputType.isPassword)

@@ -21,23 +21,10 @@ interface ApiInterface {
     @GET("chargers/{chargerPointId}")
     suspend fun getChargePoint(@Path("chargerPointId") chargerPointId: Int): Response<ChargePoint>
 
-    @PUT("chargers/{chargerId}")
-    suspend fun setChargerStatus(
-        @Path("chargerId") chargerId: Int,
-        @Body body: MutableMap<String, String>
-    ): Response<Charger>
-
-    @PUT("reservations/{chargerId}")
-    suspend fun reserveCharger(
-        @Path("chargerId") chargerId: Int,
-        @Body body: MutableMap<String, String>
-    ): Response<String>
 
     @GET("transactions/{transactionId}")
     suspend fun getTransaction(@Path("transactionId") transactionId: Int): Response<Transaction>
 
-    @POST("transactions/session")
-    suspend fun postTransactionSession(@Body body: TransactionSession): Response<TransactionSessionResponse>
 
     @PUT("transactions/start/{transactionId}")
     suspend fun transactionStart(
@@ -78,9 +65,6 @@ interface ApiInterface {
 
     @GET("/transactions/userTransactions/{userId}")
     suspend fun transactionsByUserID(@Path("userId") userId : String) :Response<List<Transaction>>
-
-    @PUT("/transactions/stop/{id}")
-    suspend fun stopTransaction(@Path("id") id : Int) : Response<Transaction>
 
     @PUT("/transactions/start/{id}")
     suspend fun startTransaction(@Path("id") id : Int) : Response<Transaction>

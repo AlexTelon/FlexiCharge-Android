@@ -1,11 +1,10 @@
 package com.flexicharge.bolt.activities.businessLogic
 
-import android.widget.Toast
+
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
-import com.flexicharge.bolt.api.flexicharge.TransactionSessionResponse
 import kotlinx.coroutines.*
 
 class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Transaction>() {
@@ -43,7 +42,7 @@ class RemoteTransaction(private var transactionId : Int = -1) : RemoteObject<Tra
         }
     }
 
-    fun retriveReopened(lifecycleScope: LifecycleCoroutineScope, transactionId: Int) : Job{
+    fun retrieveReopened(lifecycleScope: LifecycleCoroutineScope, transactionId: Int) : Job{
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {

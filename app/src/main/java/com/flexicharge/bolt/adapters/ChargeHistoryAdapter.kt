@@ -36,7 +36,7 @@ class ChargeHistoryAdapter(private val data: List<ChargingHistoryObject>) : Recy
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val text = createTextStrings(holder,position)
+        val text = createTextStrings(position)
         holder.priceTextCollapsed.text  = text["priceCollapsed"]
         holder.textView.text            = text["location"]
         holder.chargeTime.text          = text["chargeTime"]
@@ -52,7 +52,7 @@ class ChargeHistoryAdapter(private val data: List<ChargingHistoryObject>) : Recy
         }
     }
 
-    private fun createTextStrings(holder: ViewHolder, position: Int): Map<String, String> {
+    private fun createTextStrings(position: Int): Map<String, String> {
         val item = data[position]
         return mapOf(
             "priceCollapsed"    to "total: ${item.totalSum} kr ",
