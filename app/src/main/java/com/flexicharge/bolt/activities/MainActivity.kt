@@ -694,13 +694,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val refreshJob = currentRemoteTransaction.refresh(lifecycleScope, transactionId)
         refreshJob.invokeOnCompletion {
             if(refreshJob.isCancelled) {
-                Log.d("CheckTransaction", "refresh cancelled")
                 return@invokeOnCompletion
             }
 
             lifecycleScope.launch(Dispatchers.Main) {
                 try {
-                    Log.d("CheckTransaction", "Set up charging")
                     setupChargingInProgressDialog()
                 }
                 catch (e: Exception) {
