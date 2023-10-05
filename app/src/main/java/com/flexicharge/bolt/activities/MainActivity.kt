@@ -1,5 +1,6 @@
 package com.flexicharge.bolt.activities
 
+
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -15,7 +16,9 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
@@ -46,7 +49,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -74,9 +76,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     override fun onCreate(savedInstanceState: Bundle?) {
         //checkPendingTransaction()
 
-        Log.d("LOGGIN","main created")
+        Log.d("LOGIN","main created")
         super.onCreate(savedInstanceState)
-        Log.d("LOGGIN","super main created")
+        Log.d("LOGIN","super main created")
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Log.d("RESTART", "IT WAS ON CREATE")
@@ -98,10 +100,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             currLocation(this)
         }
 
-        binding.mainActivityButtonCamera.setOnClickListener {
-            val intent = Intent(this, QrActivity::class.java)
-            startActivityForResult(intent, 12345)
+        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+            if(it.resultCode == Activity.RESULT_OK){
+                val data : Intent? = it.data
+                try {
+                    setupChargerInputDialog()
+                    changeInput(data?.getStringExtra("QR_SCAN_RESULT").toString())
+                }catch (e: Exception){
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()  //exception handling
+                }
+            }
         }
+
+        binding.mainActivityButtonCamera.setOnClickListener {
+
+
+            val intent = Intent(this, QrActivity::class.java)
+            resultLauncher.launch(intent)
+        }
+
+
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
@@ -127,38 +145,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {   //results of trying to connect to charger.
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == 12345){
-            if (resultCode == Activity.RESULT_OK){                                      // its ok
-                try {
-                    setupChargerInputDialog()
-                    changeInput(data?.getStringExtra("QR_SCAN_RESULT").toString())
-                }catch (e: Exception){
-                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()  //exception handling
-                }
-            }
-        }
-    }
+
+
 
     override fun onResume() { //Called after onRestoreInstanceState, onRestart, or onPause
         super.onResume()
-        Log.d("RESTART", "IT WAS ON RESUME")
         remoteChargersRefresher.run(lifecycleScope)
         val refreshChargers = remoteChargers.refresh(lifecycleScope)
         refreshChargers.invokeOnCompletion {
             if(refreshChargers.isCancelled) {
                 return@invokeOnCompletion
             }
+        }
             val refreshChargePoints = remoteChargePoints.refresh(lifecycleScope)
 
             refreshChargePoints.invokeOnCompletion {
                 if(refreshChargePoints.isCancelled) {
                     return@invokeOnCompletion
                 }
-
             }
-        }
+
         if(!isBottomSheetVisible){
             checkPendingTransaction()
         }
@@ -239,7 +245,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun setupChargingInProgressDialog() {
         if (this::chargerInputDialog.isInitialized) {
-            Log.d("CheckTransaction", "it is initizalized")
+            Log.d("CheckTransaction", "it is initialized")
             chargerInputDialog.dismiss()
         }
 
@@ -255,7 +261,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     }
                 }
             }catch (e: Exception){
-                println("Error when retreiving")
+                println("Error when retrieving")
             }
         }
 
@@ -270,7 +276,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         )
         val progressbarPercent = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
         val progressbar = bottomSheetView.findViewById<ProgressBar>(R.id.chargeInProgressLayout_progressBar)
-        val chargingTimeStatus = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textview_chargingTimeStatus)
         val chargeSpeed = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
         val location = bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -342,12 +347,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
             lifecycleScope.launch(Dispatchers.Main) {
 
-              val  energyUsedText = "${kwhTransferred} kWh @ $"
+                val  energyUsedText = "$kwhTransferred kWh @ $pricePerKwh kr kWh"
+                val durationText = "$duration seconds"
+                val chargingStoppedText = "Charging stopped at $dateTime"
+                val totalCostText = "$totalCost kr"
 
-                energyUsedTextView.text = kwhTransferred.toString() + " kWh @" + pricePerKwh + "kr kWh"
-                durationTextView.text = duration.toString() + " Seconds"
-                chargingStopTimeTextView.text = "Charging stopped at " + dateTime
-                totalCostTextView.text = totalCost.toString() + "kr"
+                energyUsedTextView.text = energyUsedText
+                durationTextView.text = durationText
+                chargingStopTimeTextView.text = chargingStoppedText
+                totalCostTextView.text = totalCostText
 
                 paymentSummaryDialog.setContentView(bottomSheetView)
                 paymentSummaryDialog.show()
@@ -385,8 +393,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private fun setupChargerInput(bottomSheetView: View, chargerId: Int? = null) {
         Log.d("displayChargerList", "displayChargerList")
 
-        pinView = bottomSheetView.findViewById<PinView>(R.id.chargerInputLayout_pinView_chargerInput)
-        chargerInputStatus = bottomSheetView.findViewById<MaterialButton>(R.id.chargerInputLayout_textView_chargerStatus)
+        pinView = bottomSheetView.findViewById(R.id.chargerInputLayout_pinView_chargerInput)
+        chargerInputStatus = bottomSheetView.findViewById(R.id.chargerInputLayout_textView_chargerStatus)
 
         if(chargerId != null) {
             if(validateChargerId(chargerId.toString())) {
@@ -395,11 +403,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             }
         }
 
-        pinView.doOnTextChanged { text, start, before, count ->
+        pinView.doOnTextChanged { text, _, _, _ ->
             if (text?.length == 6) {
-                val chargerId = text.toString().toUInt().toInt()
+                val newChargerId = text.toString().toUInt().toInt()
                 if (validateChargerId(text.toString())) {
-                    displayChargerStatus(chargerId,chargerInputStatus)
+                    displayChargerStatus(newChargerId,chargerInputStatus)
                     hideKeyboard(bottomSheetView)
                 } else {
                     setChargerButtonStatus(chargerInputStatus, false, "ChargerId has to consist of 6 digits", 0)
@@ -411,11 +419,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     private fun displayChargerList(bottomSheetView: View, chargePointId: Int){
         val chargerId = pinView.text.toString()
-        val refreshJob = remoteChargers.refresh(lifecycleScope);
+        val refreshJob = remoteChargers.refresh(lifecycleScope)
         refreshJob.invokeOnCompletion {
             if(refreshJob.isCancelled) {
                 return@invokeOnCompletion
             }
+        }
             val refreshRemoteChargePointsJob = remoteChargePoints.refresh(lifecycleScope)
             refreshRemoteChargePointsJob.invokeOnCompletion {
                 if(refreshRemoteChargePointsJob.isCancelled) {
@@ -436,7 +445,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 }
             }
 
-        }
+
     }
 
     private fun displayChargePointList(bottomSheetView: View, arrow: ImageView) {    
@@ -444,11 +453,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         val chargePointsNearMe = bottomSheetView.findViewById<TextView>(R.id.chargePointsNearMeLayout_textView_nearMe)
         TransitionManager.beginDelayedTransition(bottomSheetView as ViewGroup?, Fade())
         if (listOfChargePointsRecyclerView.visibility == View.GONE) {
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse));
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_reverse))
             listOfChargePointsRecyclerView.visibility = View.VISIBLE
             chargePointsNearMe.visibility = View.GONE
         } else {
-            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
+            arrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate))
             listOfChargePointsRecyclerView.visibility = View.GONE
             chargePointsNearMe.visibility = View.VISIBLE
         }
@@ -462,7 +471,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             val distanceToChargePoint = mutableListOf<Float>()
             val chargerCount = mutableListOf<Int>()
 
-            remoteChargePoints.value.forEachIndexed { index, chargePoint ->
+            remoteChargePoints.value.forEachIndexed { _, chargePoint ->
                 val dist = FloatArray(1)
                 try {
                     Location.distanceBetween(chargePoint.location[0], chargePoint.location[1], currentLocation.latitude, currentLocation.longitude, dist)
@@ -471,11 +480,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                     dist[0] = 0f
                 }
 
-                val df = DecimalFormat("#.##")
                 val distanceFloat = (dist[0] / 1000)
                 val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
 
-                val count = remoteChargers.value.count { it.chargePointID.equals(chargePoint.chargePointID) }
+                val count = remoteChargers.value.count { it.chargePointID == chargePoint.chargePointID }
                 distanceToChargePoint.add(roundedDistance)
                 chargerCount.add(count)
             }
@@ -508,7 +516,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     }
 
 
-    private fun createKlarnaTransactionSession(userId: String, chargerId: Int) {
+    private fun createKlarnaTransactionSession(chargerId: Int) {
                 val retrieveJob = currentRemoteTransaction.retrieve(lifecycleScope)
 
                 try {
@@ -526,7 +534,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                         }
                     }
                 }catch (e: Exception){
-                    println("Error when retreiving")
+                    println("Error when retrieving")
                 }
 
 
@@ -536,10 +544,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
         val sharedPreferences   = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val userId              = sharedPreferences.getString("userId", "")
-        val tempChargerId : Int = 100000
         val transactionSession = TransactionSession(userId!!, chargerId, true, 75)
-
-       // val transactionSession = TransactionSession(userId!!, tempChargerId, true, 75)
         val createSessionJob = currentRemoteTransaction.createSession(lifecycleScope, transactionSession)
 
         try {
@@ -551,7 +556,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
                 when (currentRemoteTransaction.status) {
                     "Accepted" -> {
-                        createKlarnaTransactionSession(userId, chargerId)
+                        createKlarnaTransactionSession(chargerId)
 
                     }
                     "Faulted" -> {
@@ -585,7 +590,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private fun displayChargerStatus(chargerId: Int, chargerInputStatus: MaterialButton) {
         val remoteCharger = RemoteCharger(chargerId)
         try {
-            val refreshJob = remoteCharger.refresh(lifecycleScope);
+            val refreshJob = remoteCharger.refresh(lifecycleScope)
             refreshJob.invokeOnCompletion {
                 if(refreshJob.isCancelled) {
                     return@invokeOnCompletion
@@ -653,7 +658,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         }
     }
 
-    public fun validateChargerId(chargerId: String): Boolean {
+     fun validateChargerId(chargerId: String): Boolean {
         if (chargerId.length != 6) {
             return false
         }
@@ -692,6 +697,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
 
     }
 
+
     private fun showCheckout(bool: Boolean, chargePointId: Int, showPayment: Boolean, chargerId: Int){
         val checkoutLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.charger_checkout_layout)
         val chargersNearMeLayout = chargerInputDialog.findViewById<ConstraintLayout>(R.id.chargePoints_near_me_layout)
@@ -707,14 +713,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
             chargersNearMeLayout?.visibility = View.GONE
             checkoutLayout?.visibility =View.VISIBLE
             if (showPayment) {
-                klarnaButton?.background = getDrawable(R.drawable.rounded_background)
+                klarnaButton?.background = AppCompatResources.getDrawable(this, R.drawable.rounded_background)
                 klarnaButton?.visibility = View.VISIBLE
                 paymentText?.visibility = View.VISIBLE
                 chargerInput?.isEnabled = false
                 chargerInputStatus?.isEnabled = false
 
                 klarnaButton?.setOnClickListener {
-                    klarnaButton?.background = getDrawable(R.drawable.rounded_background_selected)
+                    klarnaButton.background = AppCompatResources.getDrawable(this, R.drawable.rounded_background_selected)
                     chargerInputStatus?.isEnabled = true
                     if (chargerInputStatus != null) {
                         setChargerButtonStatus(chargerInputStatus, true, "Continue", 1)
@@ -723,7 +729,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 }
 
                 chargerInputStatus?.setOnClickListener{
-                    reserveCharger(chargerId, chargerInputStatus!!)
+                    reserveCharger(chargerId, chargerInputStatus)
                 }
 
             }
@@ -737,7 +743,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
                 chargerLocationText?.text = chargerWithChargePointId.name
             }
             catch (e: NoSuchElementException) {
-                Log.d("remoteChargePoints", "couldn't find a charger with chargePointID " + chargePointId)
+                Log.d("remoteChargePoints",
+                    "couldn't find a charger with chargePointID $chargePointId"
+                )
             }
 
             if (chargerInputView != null) {
