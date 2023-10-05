@@ -115,6 +115,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         if (authToken != null) {
             val remoteTransaction = RemoteTransaction(transactionId)
             try{
+                val startTime = System.currentTimeMillis()
                 val startTransactionJob = remoteTransaction.start(lifecycleScope)
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 startTransactionJob.invokeOnCompletion {
@@ -125,6 +126,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
 
                             Intent(applicationContext, ChargingService::class.java).also {
                                 it.action = ChargingService.Actions.START.toString()
+                                it.putExtra("startTime", startTime )
                                 startService(it)
                             }
 
