@@ -27,6 +27,7 @@ import com.flexicharge.bolt.SpacesItemDecoration
 import com.flexicharge.bolt.activities.businessLogic.*
 import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.adapters.ChargersListAdapter
+import com.flexicharge.bolt.adapters.TimeCalculation
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.Transaction
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
     private lateinit var chargerInputStatus: MaterialButton
     private lateinit var listOfChargersRecyclerView: RecyclerView
     private var isBottomSheetVisible = false
+    private val timeCalculation = TimeCalculation()
 
     private companion object {
         const val REMOTE_CHARGERS_REFRESH_INTERVAL_MS: Long = 10000
@@ -193,19 +195,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    public fun unixToDateTime(unixTime: String) : String {
-        val locale = Locale("sv","SE")
-        val sdf = SimpleDateFormat("MM/dd/HH:mm", locale)
-        val netDate = Date(unixTime.toLong())
-        return sdf.format(netDate)
-    }
+
 
     private fun stopChargingProcess(
         initialPercentage: Int,
         bottomSheetDialog: BottomSheetDialog,
     ) {
         currentRemoteTransaction.refresh(lifecycleScope)
-        val dateTime = unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
+        val dateTime = timeCalculation.unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
 
         try {
             val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
@@ -298,13 +295,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, ChargePointListAda
         bottomSheetDialog.setCancelable(false)
 
         val initialPercentage = currentRemoteTransaction.value.currentChargePercentage
-        val dateTime = unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
+        val dateTime = timeCalculation.unixToDateTime(currentRemoteTransaction.value.timestamp.toString())
 
 
         progressbar.progress = initialPercentage
 
         isPolling = true
-        //startApiPolling()
         val foundCharger = remoteChargers.value.find { it.chargerID == currentRemoteTransaction.value.chargerID }
         val currentChargePoint= remoteChargePoints.value.find { it.chargePointID == foundCharger?.chargePointID  }
 

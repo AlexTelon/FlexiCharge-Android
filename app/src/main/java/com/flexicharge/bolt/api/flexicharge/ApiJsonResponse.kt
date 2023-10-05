@@ -53,7 +53,7 @@ data class Transaction(
     val timestamp: Long,
     val transactionID: Int,
     val userID: String,
-    val startTimeStamp : Int ?= null
+    val startTimeStamp : Long ?= null
 )
 
 data class TransactionSession(
