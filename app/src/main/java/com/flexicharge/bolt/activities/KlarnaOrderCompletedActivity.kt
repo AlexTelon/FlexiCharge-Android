@@ -2,6 +2,7 @@ package com.flexicharge.bolt.activities
 
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.flexicharge.bolt.R
 
@@ -12,10 +13,12 @@ class KlarnaOrderCompletedActivity : AppCompatActivity() {
         val message = intent.getStringExtra("message")
         val textView = findViewById<TextView>(R.id.klarnaOrderCompletedActivity_textView_message)
         textView.text = message
-    }
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
+
+        val callback = object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 }

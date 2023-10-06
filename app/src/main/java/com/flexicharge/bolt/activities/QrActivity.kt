@@ -12,7 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.*
 import com.flexicharge.bolt.R
-import java.io.Serializable
+
 
 
 class QrActivity : AppCompatActivity() {
@@ -40,7 +40,7 @@ class QrActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         if (requestCode == 123) {
-            if (!mutableListOf(grantResults).contains<Serializable>(PackageManager.PERMISSION_DENIED)) {
+            if (!grantResults.contains(PackageManager.PERMISSION_DENIED)) {
                 scanQR()
             }
         }
