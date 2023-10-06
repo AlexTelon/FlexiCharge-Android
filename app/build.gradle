@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jlleitschuh.gradle.ktlint' version '11.3.1'
 }
 
 configurations.implementation {
@@ -41,6 +42,23 @@ android {
         viewBinding true
     }
     namespace 'com.flexicharge.bolt'
+}
+
+tasks.getByPath('preBuild').dependsOn('ktlintFormat')
+
+ktlint {
+    android = true
+    ignoreFailures = false
+    disabledRules = [
+            'final-newline',
+            'no-wildcard-imports',
+            'max-line-length'
+    ]
+    reporters {
+        reporter 'plain'
+        reporter 'checkstyle'
+        reporter 'sarif'
+    }
 }
 
 dependencies {

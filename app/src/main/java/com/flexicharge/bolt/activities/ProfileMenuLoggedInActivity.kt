@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.flexicharge.bolt.databinding.ActivityProfileMenuLoggedInBinding
 import com.flexicharge.bolt.helpers.LoginChecker
 
-
 class ProfileMenuLoggedInActivity : AppCompatActivity() {
     lateinit var binding: ActivityProfileMenuLoggedInBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,17 +39,15 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.loginActivityButtonLogout.setOnClickListener {
+            LoginChecker.LOGGED_IN = false
+            getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
+                clear()
+            }.apply()
 
-            binding.loginActivityButtonLogout.setOnClickListener {
-                LoginChecker.LOGGED_IN = false
-                getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
-                    clear()
-                }.apply()
-
-                val intent = Intent(this, RegisterActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

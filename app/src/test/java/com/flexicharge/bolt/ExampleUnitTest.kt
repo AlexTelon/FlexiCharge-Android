@@ -1,19 +1,16 @@
 package com.flexicharge.bolt
 
-
 import com.flexicharge.bolt.api.flexicharge.Credentials
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.UserFullDetails
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-
 
 class ExampleUnitTest {
     @Test
@@ -50,7 +47,7 @@ class ExampleUnitTest {
     fun testLogin() = runBlocking {
         val email = "didiwa6692@searpen.com"
         val pass = "Test1234!"
-        val credentials = Credentials(email,pass)
+        val credentials = Credentials(email, pass)
         val response = RetrofitInstance.flexiChargeApi.signIn(credentials)
 
         assert(response.isSuccessful)
@@ -60,7 +57,7 @@ class ExampleUnitTest {
     fun getUserInfo() = runBlocking {
         val email = "donene8581@vip4e.com"
         val pass = "Test123!"
-        val credentials = Credentials(email,pass)
+        val credentials = Credentials(email, pass)
         val response = RetrofitInstance.flexiChargeApi.signIn(credentials)
         val token = response.body()?.accessToken
         assert(response.isSuccessful)
@@ -68,14 +65,13 @@ class ExampleUnitTest {
         val info = RetrofitInstance.flexiChargeApi.getUserInfo("Bearer $token")
         println(info)
         assert(info.isSuccessful)
-
     }
 
     @Test
     fun updateUserInfo() = runBlocking {
         val email = "powamat696@vip4e.com"
         val pass = "Test123!"
-        val credentials = Credentials(email,pass)
+        val credentials = Credentials(email, pass)
         val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
         val token = login.body()?.accessToken
         assert(login.isSuccessful)
@@ -89,9 +85,7 @@ class ExampleUnitTest {
             "",
             ""
         )
-        val update = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token",userInfo)
+        val update = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token", userInfo)
         assert(update.isSuccessful)
     }
-
-
 }

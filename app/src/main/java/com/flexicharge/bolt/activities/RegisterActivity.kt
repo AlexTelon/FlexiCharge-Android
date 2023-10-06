@@ -18,15 +18,15 @@ import com.flexicharge.bolt.api.flexicharge.UserDetails
 import com.flexicharge.bolt.databinding.ActivityRegisterBinding
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import java.io.IOException
-
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private val validateHelper = Validator()
+
     // first take the input from user
     private lateinit var agreeCheckBox: CheckBox
     private lateinit var registerBtn: Button
@@ -35,8 +35,8 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var registerUserLastName: EditText
     lateinit var registerUserPass: EditText
     lateinit var registerUserRepeatPass: EditText
-    private lateinit var logInText : TextView
-    private lateinit var guestText : TextView
+    private lateinit var logInText: TextView
+    private lateinit var guestText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +53,7 @@ class RegisterActivity : AppCompatActivity() {
         logInText = binding.textViewLogIn
         guestText = binding.loginActivityTextViewContinueAsGuest
 
-
         confirmRegistration()
-
 
         logInText.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -68,14 +66,7 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
-
-
-
-
     }
-
-
-
 
     private fun confirmRegistration() {
         validateHelper.validateUserInput(registerUserEmail, TextInputType.isEmail)
@@ -85,10 +76,7 @@ class RegisterActivity : AppCompatActivity() {
 
         checkRepeatPass()
 
-
         registerBtn.setOnClickListener {
-
-
             if (agreeCheckBox.isChecked && registerUserLastName.error == null && registerUserFirstName.error == null) {
                 sendDataToBackend()
             } else {
@@ -103,7 +91,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    //function to send users' data to backend
+    // function to send users' data to backend
     private fun sendUserData(
         userEmail: String,
         userFirstName: String,
@@ -123,7 +111,6 @@ class RegisterActivity : AppCompatActivity() {
                         intent.putExtra("userFirstName", userFirstName)
                         intent.putExtra("userLastName", userLastName)
                         startActivity(intent)
-
                     }
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
@@ -189,5 +176,4 @@ class RegisterActivity : AppCompatActivity() {
             ).show()
         }
     }
-
 }

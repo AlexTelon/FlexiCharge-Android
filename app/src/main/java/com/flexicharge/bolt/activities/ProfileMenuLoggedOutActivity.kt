@@ -5,8 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.flexicharge.bolt.databinding.ActivityProfileMenuLoggedOutBinding
 
-
-class ProfileMenuLoggedOutActivity : AppCompatActivity(){
+class ProfileMenuLoggedOutActivity : AppCompatActivity() {
     lateinit var binding: ActivityProfileMenuLoggedOutBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,10 +15,5 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity(){
         binding.loginActivityButtonLogout.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
-
-
-
     }
-
-
 }

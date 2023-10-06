@@ -40,7 +40,7 @@ class TestMainActivity {
             )
         }
         activityScenario.onActivity { activity ->
-            for(i in 0 .. 999999) {
+            for (i in 0..999999) {
                 val idString = getIdString(i)
                 assert(activity.validateChargerId(idString))
             }
@@ -53,10 +53,6 @@ class TestMainActivity {
             assert(!activity.validateChargerId("000"))
             assert(!activity.validateChargerId("00"))
             assert(!activity.validateChargerId("0"))
-
         }
-
     }
-
-
 }

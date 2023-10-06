@@ -16,13 +16,19 @@ class ChargePointListAdapter(
     private var distance: MutableList<String>,
     private var chargerCount: MutableList<Int>
 ) :
-RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
+    RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemAddress: TextView = itemView.findViewById(R.id.chargePointListItem_textView_address)
-        val itemDistance: TextView = itemView.findViewById(R.id.chargePointListItem_textView_distance)
-        val itemImage : ImageView = itemView.findViewById(R.id.chargePointListItem_imageView_chargerIcon)
-        val itemNumberOfChargers: TextView = itemView.findViewById(R.id.chargePointListItem_textView_no_of_chargers)
+        val itemDistance: TextView = itemView.findViewById(
+            R.id.chargePointListItem_textView_distance
+        )
+        val itemImage: ImageView = itemView.findViewById(
+            R.id.chargePointListItem_imageView_chargerIcon
+        )
+        val itemNumberOfChargers: TextView = itemView.findViewById(
+            R.id.chargePointListItem_textView_no_of_chargers
+        )
 
         init {
             itemView.setOnClickListener { _: View ->
@@ -30,13 +36,14 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
                 act.showChargePoint(
                     chargePoints[position].location[0],
                     chargePoints[position].location[1],
-                    chargePoints[position].chargePointID)
+                    chargePoints[position].chargePointID
+                )
             }
         }
     }
 
     interface ShowChargePointInterface {
-        fun showChargePoint (
+        fun showChargePoint(
             latitude: Double,
             longitude: Double,
             chargePointID: Int
@@ -44,22 +51,29 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.chargepoint_list_item, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(
+            R.layout.chargepoint_list_item,
+            parent,
+            false
+        )
         return ViewHolder(v)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val distanceText = "${distance[position]} km"
         val numberOfChargersText = "${chargerCount[position]} chargers"
 
         holder.itemDistance.text = distanceText
         holder.itemAddress.text = chargePoints[position].name
-        if(chargerCount[position] > 0 ){
-            holder.itemNumberOfChargers.text =  numberOfChargersText
+        if (chargerCount[position] > 0) {
+            holder.itemNumberOfChargers.text = numberOfChargersText
         } else {
-            holder.itemNumberOfChargers.text = holder.itemView.context.getString(R.string.no_chargers_available)
-            holder.itemNumberOfChargers.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))
+            holder.itemNumberOfChargers.text = holder.itemView.context.getString(
+                R.string.no_chargers_available
+            )
+            holder.itemNumberOfChargers.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.red)
+            )
             holder.itemImage.visibility = View.GONE
         }
     }
@@ -67,5 +81,4 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
     override fun getItemCount(): Int {
         return chargePoints.size
     }
-
 }

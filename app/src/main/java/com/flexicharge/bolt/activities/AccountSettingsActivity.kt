@@ -23,25 +23,24 @@ import kotlinx.coroutines.launch
 
 class AccountSettingsActivity : AppCompatActivity() {
     lateinit var binding: ActivityAccountSettingsBinding
-    private val validateHelper      = Validator()
-    private lateinit var viewModel  : NameAddressViewModel
+    private val validateHelper = Validator()
+    private lateinit var viewModel: NameAddressViewModel
     private lateinit var bindingAccount: ActivityNameAndAddressBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding                 = ActivityAccountSettingsBinding.inflate(layoutInflater)
-        bindingAccount          = ActivityNameAndAddressBinding.inflate(layoutInflater)
-        viewModel               = ViewModelProvider(this)[NameAddressViewModel::class.java]
-        val firstname           = bindingAccount.nameAndAddressEditFirstName
-        val lastName            = bindingAccount.nameAndAddressEditLastName
-        val phoneNumber         = binding.accountSettingsEditPhoneNumber
-        val address             = bindingAccount.nameAndAddressEditAddress
-        val postCode            = bindingAccount.nameAndAddressEditPostcode
-        val town                = bindingAccount.nameAndAddressEditTown
-        val sharedPreferences   = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
-        val token               = sharedPreferences.getString("accessToken", "")
-
+        binding = ActivityAccountSettingsBinding.inflate(layoutInflater)
+        bindingAccount = ActivityNameAndAddressBinding.inflate(layoutInflater)
+        viewModel = ViewModelProvider(this)[NameAddressViewModel::class.java]
+        val firstname = bindingAccount.nameAndAddressEditFirstName
+        val lastName = bindingAccount.nameAndAddressEditLastName
+        val phoneNumber = binding.accountSettingsEditPhoneNumber
+        val address = bindingAccount.nameAndAddressEditAddress
+        val postCode = bindingAccount.nameAndAddressEditPostcode
+        val town = bindingAccount.nameAndAddressEditTown
+        val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("accessToken", "")
 
         validateHelper.validateUserInput(phoneNumber, TextInputType.isPhoneNumber)
 
@@ -50,13 +49,15 @@ class AccountSettingsActivity : AppCompatActivity() {
         }
 
         viewModel.infoDone.observe(this) {
-            if(it)
-                updateTextFields(firstname,lastName,phoneNumber,address,postCode,town)
+            if (it) {
+                updateTextFields(firstname, lastName, phoneNumber, address, postCode, town)
+            }
         }
 
-        viewModel.updateFailed.observe(this){
-            if (it)
+        viewModel.updateFailed.observe(this) {
+            if (it) {
                 Toast.makeText(this, "Update phone number failed", Toast.LENGTH_LONG).show()
+            }
         }
 
         viewModel.updated.observe(this) {
@@ -65,22 +66,21 @@ class AccountSettingsActivity : AppCompatActivity() {
             }
         }
 
-
         setContentView(binding.root)
 
-
-        binding.buttonUpdateUserInfo.setOnClickListener{
-        if(phoneNumber.error == null){
-            lifecycleScope.launch(Dispatchers.IO){
-                viewModel.updateUser(token!!,
-                    firstname.text.toString(),
-                    lastName.text.toString(),
-                    phoneNumber.text.toString(),
-                    address.text.toString(),
-                    postCode.text.toString(),
-                    town.text.toString()
-                )
-            }
+        binding.buttonUpdateUserInfo.setOnClickListener {
+            if (phoneNumber.error == null) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.updateUser(
+                        token!!,
+                        firstname.text.toString(),
+                        lastName.text.toString(),
+                        phoneNumber.text.toString(),
+                        address.text.toString(),
+                        postCode.text.toString(),
+                        town.text.toString()
+                    )
+                }
             }
         }
 
@@ -91,17 +91,23 @@ class AccountSettingsActivity : AppCompatActivity() {
         binding.loginActivityDeleteAccount.setOnClickListener {
             showDeleteConfirmationDialog()
         }
-
     }
 
-    private fun updateTextFields(firstName : EditText, lastName : EditText, phoneNumber : EditText, address : EditText, postCode : EditText, town : EditText){
-        val userInfo    = viewModel.currentUserInfo.value
-        firstName.text      = Editable.Factory.getInstance().newEditable(userInfo?.firstName)
-        lastName.text       = Editable.Factory.getInstance().newEditable(userInfo?.lastName)
-        phoneNumber.text    = Editable.Factory.getInstance().newEditable(userInfo?.phoneNumber)
-        address.text        = Editable.Factory.getInstance().newEditable(userInfo?.streetAddress)
-        postCode.text       = Editable.Factory.getInstance().newEditable(userInfo?.zipCode)
-        town.text           = Editable.Factory.getInstance().newEditable(userInfo?.city)
+    private fun updateTextFields(
+        firstName: EditText,
+        lastName: EditText,
+        phoneNumber: EditText,
+        address: EditText,
+        postCode: EditText,
+        town: EditText
+    ) {
+        val userInfo = viewModel.currentUserInfo.value
+        firstName.text = Editable.Factory.getInstance().newEditable(userInfo?.firstName)
+        lastName.text = Editable.Factory.getInstance().newEditable(userInfo?.lastName)
+        phoneNumber.text = Editable.Factory.getInstance().newEditable(userInfo?.phoneNumber)
+        address.text = Editable.Factory.getInstance().newEditable(userInfo?.streetAddress)
+        postCode.text = Editable.Factory.getInstance().newEditable(userInfo?.zipCode)
+        town.text = Editable.Factory.getInstance().newEditable(userInfo?.city)
         viewModel.toggleInfoDone()
     }
 
@@ -130,7 +136,5 @@ class AccountSettingsActivity : AppCompatActivity() {
         negativeButton.setOnClickListener {
             alertDialog.dismiss()
         }
-
     }
-
 }

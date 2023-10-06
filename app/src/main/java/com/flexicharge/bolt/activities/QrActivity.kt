@@ -13,14 +13,11 @@ import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.*
 import com.flexicharge.bolt.R
 
-
-
 class QrActivity : AppCompatActivity() {
 
     private lateinit var codeScanner: CodeScanner
 
     private val notValidQrString = "NOT_VALID_QR_STRING"
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,15 +54,13 @@ class QrActivity : AppCompatActivity() {
         val formattedString = chargerId.filter {
             it.isDigit()
         }
-        if(formattedString.length != 6) {
+        if (formattedString.length != 6) {
             return notValidQrString
         }
         return formattedString
     }
 
-
     private fun scanQR() {
-
         val scannerView: CodeScannerView = findViewById(R.id.qrActivity_codeScannerView)
         codeScanner = CodeScanner(this, scannerView)
         codeScanner.camera = CodeScanner.CAMERA_BACK
@@ -80,11 +75,13 @@ class QrActivity : AppCompatActivity() {
 
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
-
                 try {
                     val validatedQRString = validateChargerId(it.text)
                     if (validatedQRString != notValidQrString) {
-                        setResult(Activity.RESULT_OK, Intent().putExtra("QR_SCAN_RESULT", validatedQRString))
+                        setResult(
+                            Activity.RESULT_OK,
+                            Intent().putExtra("QR_SCAN_RESULT", validatedQRString)
+                        )
                         finish()
                     } else {
                         Toast.makeText(this, "QR INVALID", Toast.LENGTH_SHORT).show()
@@ -107,16 +104,15 @@ class QrActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(::codeScanner.isInitialized){
+        if (::codeScanner.isInitialized) {
             codeScanner.startPreview()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if(::codeScanner.isInitialized){
+        if (::codeScanner.isInitialized) {
             codeScanner.releaseResources()
         }
     }
-
 }
