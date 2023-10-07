@@ -15,5 +15,9 @@ class ProfileMenuLoggedOutActivity : AppCompatActivity() {
         binding.loginActivityButtonLogout.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
+
+        binding.aboutTextView.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
     }
 }
