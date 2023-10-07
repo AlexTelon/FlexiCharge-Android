@@ -31,6 +31,7 @@ import com.flexicharge.bolt.activities.businessLogic.*
 import com.flexicharge.bolt.adapters.ChargePointListAdapter
 import com.flexicharge.bolt.adapters.ChargersListAdapter
 import com.flexicharge.bolt.adapters.TimeCalculation
+import com.flexicharge.bolt.api.flexicharge.ChargePoint
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
@@ -83,16 +84,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        remoteChargers.setOnRefreshedCallBack {
+        remoteChargePoints.setOnRefreshedCallBack {
             lifecycleScope.launch(Dispatchers.Main) {
                 addNewMarkers(this@MainActivity,
-                    remoteChargers.value,
-                    fun(charger: Charger?): Boolean {
-                        if (charger != null && validateChargerId(charger.chargerID.toString())) {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                setupChargerInputDialog(charger.chargerID)
+                    remoteChargePoints.value,remoteChargers.value,
+                    fun(chargePoint: ChargePoint?): Boolean {
+                        val chargePointId = chargePoint?.chargePointID
+
+                        val chargers = remoteChargers.value.filter { it.chargePointID == chargePointId }
+
+                        chargers.forEach{ charger ->
+                            if (validateChargerId(charger.chargerID.toString())) {
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    setupChargerInputDialog(charger.chargerID)
+                                }
                             }
                         }
+
+
+
                         return false
                     })
             }
@@ -522,13 +532,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 val distanceFloat = (dist[0] / 1000)
                 val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
-                if(chargePoint.name == "JU") {
-                    Log.d("Distance", chargePoint.location[0].toString())
-                    Log.d("Distance", chargePoint.location[1].toString())
-                    Log.d("Distance", currentLocation.latitude.toString())
-                    Log.d("Distance", currentLocation.longitude.toString())
-                    Log.d("Distance", chargePoint.chargePointID.toString())
-                }
                 val count =
                     remoteChargers.value.count { it.chargePointID == chargePoint.chargePointID }
 
