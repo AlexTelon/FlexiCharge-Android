@@ -17,7 +17,7 @@ abstract class RemoteObject<T> {
     protected abstract fun retrieve(lifecycleScope: LifecycleCoroutineScope) : Job
 
     fun setOnRefreshedCallBack(callback: (value: T) -> Unit) {
-        onRefreshed = callback;
+        onRefreshed = callback
     }
 
     fun refresh(lifecycleScope: LifecycleCoroutineScope) : Job {

@@ -5,10 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +27,16 @@ import java.io.IOException
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private val validateHelper = Validator()
+    // first take the input from user
+    private lateinit var agreeCheckBox: CheckBox
+    private lateinit var registerBtn: Button
+    private lateinit var registerUserEmail: EditText
+    lateinit var registerUserFirstName: EditText
+    lateinit var registerUserLastName: EditText
+    lateinit var registerUserPass: EditText
+    lateinit var registerUserRepeatPass: EditText
+    private lateinit var logInText : TextView
+    private lateinit var guestText : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,18 +50,31 @@ class RegisterActivity : AppCompatActivity() {
         registerUserPass = binding.loginActivityEditTextPassword
         registerUserRepeatPass = binding.editTextPasswordRepeat
         agreeCheckBox = binding.checkBoxTosAgreement
+        logInText = binding.textViewLogIn
+        guestText = binding.loginActivityTextViewContinueAsGuest
+
 
         confirmRegistration()
+
+
+        logInText.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
+
+        guestText.setOnClickListener {
+            val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.apply { putBoolean("isGuest", true) }.apply()
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+
+
+
+
     }
 
-    // first take the input from user
-    lateinit var agreeCheckBox: CheckBox
-    lateinit var registerBtn: Button
-    lateinit var registerUserEmail: EditText
-    lateinit var registerUserFirstName: EditText
-    lateinit var registerUserLastName: EditText
-    lateinit var registerUserPass: EditText
-    lateinit var registerUserRepeatPass: EditText
+
 
 
     private fun confirmRegistration() {
@@ -108,7 +131,7 @@ class RegisterActivity : AppCompatActivity() {
                             this@RegisterActivity,
                             "Something went wrong",
                             Toast.LENGTH_LONG
-                        )
+                        ).show()
                     }
                 }
             } catch (e: HttpException) {
@@ -117,17 +140,17 @@ class RegisterActivity : AppCompatActivity() {
                         this@RegisterActivity,
                         e.message,
                         Toast.LENGTH_LONG
-                    )
+                    ).show()
                 }
             } catch (e: IOException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    Toast.makeText(this@RegisterActivity, e.message, Toast.LENGTH_LONG)
+                    Toast.makeText(this@RegisterActivity, e.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-    fun checkRepeatPass() {
+    private fun checkRepeatPass() {
         registerUserRepeatPass.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
@@ -144,8 +167,8 @@ class RegisterActivity : AppCompatActivity() {
         })
     }
 
-    fun sendDataToBackend() {
-        if (agreeCheckBox.isChecked()) {
+    private fun sendDataToBackend() {
+        if (agreeCheckBox.isChecked) {
             if (registerUserRepeatPass.error == null) {
                 if (registerUserEmail.error == null) {
                     if (registerUserPass.error == null) {
@@ -167,18 +190,4 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-
-    fun goToSignIn(view: View) {
-        //Go to sign in activity
-        startActivity(Intent(this, LoginActivity::class.java))
-    }
-
-    fun continueAsGuest(view: View) {
-        //Continue to MainActivity
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.apply { putBoolean("isGuest", true) }.apply()
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
 }

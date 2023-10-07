@@ -8,7 +8,7 @@ import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 
-class RemoteChargePoints() : RemoteObject<ChargePoints>() {
+class RemoteChargePoints : RemoteObject<ChargePoints>() {
     override var value = ChargePoints()
 
     override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {

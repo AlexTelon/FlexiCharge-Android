@@ -14,7 +14,6 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.SplashscreenActivity
-import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
 import com.flexicharge.bolt.adapters.TimeCalculation
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +30,7 @@ class ChargingService : Service() {
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
     private var isInitial: Boolean = true
     private var timeCalculation = TimeCalculation()
-    private val currentRemoteTransaction = RemoteTransaction()
+
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -42,9 +41,8 @@ class ChargingService : Service() {
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
         startTime = intent?.getLongExtra("startTime", -1)!!
         Log.d("TIME", startTime.toString())
-        when (intent?.action) {
-            //  Actions.START.toString() -> start(transactionId)
-            Actions.START.toString() -> start(9999)
+        when (intent.action) {
+            Actions.START.toString() -> start(transactionId)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
                 stopSelf()
@@ -102,7 +100,7 @@ class ChargingService : Service() {
 
             }
         } catch (e: java.lang.Exception) {
-
+            Log.d("ChargingServiceError", "Ge transaction api error")
         }
     }
 

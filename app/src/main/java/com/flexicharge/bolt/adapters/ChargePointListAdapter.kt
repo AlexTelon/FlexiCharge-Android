@@ -12,7 +12,7 @@ import com.flexicharge.bolt.api.flexicharge.ChargePoints
 
 class ChargePointListAdapter(
     private var chargePoints: ChargePoints,
-    private var act: showChargePointInterface,
+    private var act: ShowChargePointInterface,
     private var distance: MutableList<String>,
     private var chargerCount: MutableList<Int>
 ) :
@@ -25,7 +25,7 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
         val itemNumberOfChargers: TextView = itemView.findViewById(R.id.chargePointListItem_textView_no_of_chargers)
 
         init {
-            itemView.setOnClickListener { v: View ->
+            itemView.setOnClickListener { _: View ->
                 val position: Int = adapterPosition
                 act.showChargePoint(
                     chargePoints[position].location[0],
@@ -35,7 +35,7 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
         }
     }
 
-    interface showChargePointInterface {
+    interface ShowChargePointInterface {
         fun showChargePoint (
             latitude: Double,
             longitude: Double,
@@ -50,10 +50,13 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.itemDistance.text = distance[position] + "km"
+        val distanceText = "${distance[position]} km"
+        val numberOfChargersText = "${chargerCount[position]} chargers"
+
+        holder.itemDistance.text = distanceText
         holder.itemAddress.text = chargePoints[position].name
         if(chargerCount[position] > 0 ){
-            holder.itemNumberOfChargers.text = chargerCount[position].toString() + " chargers"
+            holder.itemNumberOfChargers.text =  numberOfChargersText
         } else {
             holder.itemNumberOfChargers.text = holder.itemView.context.getString(R.string.no_chargers_available)
             holder.itemNumberOfChargers.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.red))

@@ -1,30 +1,25 @@
 package com.flexicharge.bolt.activities
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.adapters.NameAddressViewModel
-import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
-import com.flexicharge.bolt.api.flexicharge.UserFullDetails
 import com.flexicharge.bolt.databinding.ActivityAccountSettingsBinding
 import com.flexicharge.bolt.databinding.ActivityNameAndAddressBinding
 import com.flexicharge.bolt.helpers.TextInputType
 import com.flexicharge.bolt.helpers.Validator
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 class NameAddressActivity : AppCompatActivity() {
     lateinit var binding            : ActivityNameAndAddressBinding
-    lateinit var bindingPhone       : ActivityAccountSettingsBinding
+    private lateinit var bindingPhone       : ActivityAccountSettingsBinding
     private lateinit var viewModel  : NameAddressViewModel
     private val validateHelper      = Validator()
 
@@ -33,7 +28,7 @@ class NameAddressActivity : AppCompatActivity() {
 
         binding                 = ActivityNameAndAddressBinding.inflate(layoutInflater)
         bindingPhone            = ActivityAccountSettingsBinding.inflate(layoutInflater)
-        viewModel               = ViewModelProvider(this).get(NameAddressViewModel::class.java)
+        viewModel               = ViewModelProvider(this)[NameAddressViewModel::class.java]
         val firstname           = binding.nameAndAddressEditFirstName
         val lastName            = binding.nameAndAddressEditLastName
         val phoneNumber         = bindingPhone.accountSettingsEditPhoneNumber

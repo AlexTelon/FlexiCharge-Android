@@ -16,7 +16,7 @@ class ChangePasswordActivity : AppCompatActivity() {
         binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val currentPassword = binding.changePasswordEditCurrent
+
         val newPassword = binding.changePasswordEditNew
 
         validateHelper.validateUserInput(newPassword,TextInputType.isPassword)

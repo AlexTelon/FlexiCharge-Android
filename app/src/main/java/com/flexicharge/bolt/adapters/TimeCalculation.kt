@@ -15,8 +15,6 @@ class TimeCalculation {
     }
 
     fun checkDuration(firstTime: Long, currentTime: Long): String {
-        val locale = Locale("sv", "SE")
-        val sdf = SimpleDateFormat("HH 'hours' mm 'minutes'", locale)
         val durationMillis = currentTime - firstTime
         val hours = durationMillis / (60 * 60 * 1000)
         val minutes = (durationMillis % (60 * 60 * 1000)) / (60 * 1000)

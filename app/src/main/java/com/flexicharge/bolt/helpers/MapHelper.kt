@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -24,11 +25,11 @@ import com.google.android.gms.maps.model.*
 
 object MapHelper {
     lateinit var currentLocation: Location
-    lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
 
     private var markerToChargerMap = mutableMapOf<Marker, Charger>()
-    const val LOCATION_PERMISSION_REQUEST_CODE = 1
-    const val PERMISSION_CODE = 101
+    private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    private const val PERMISSION_CODE = 101
     private const val LOCATION_UPDATE_INTERVAL_MS = 5000L
 
     fun currLocation(activity: MainActivity){
@@ -92,23 +93,7 @@ object MapHelper {
         }*/
     }
 
-    fun onRequestPermissionsResult(activity: MainActivity, requestCode: Int, grantResults: IntArray) {
-        when (requestCode) {
-            PERMISSION_CODE ->
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocationAccess(activity)
-                }
-        }
-    }
 
-    private fun setCurrentLocation(activity: MainActivity) {
-        try {
-            val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
-        } catch (e: Exception) {
-            Toast.makeText(activity,"Location permissions are required for MyLocation.",Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun getLocationAccess(activity: MainActivity) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -121,9 +106,10 @@ object MapHelper {
     }
 
     fun addNewMarkers(activity: MainActivity, chargers: Chargers, onTapMarker: (Charger?) -> Boolean){
-        val blackIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
-        val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
-        val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
+        val blackIcon = BitmapDescriptorFactory.fromBitmap(AppCompatResources.getDrawable(activity,R.drawable.ic_black_marker)?.toBitmap())
+        val greenIcon = BitmapDescriptorFactory.fromBitmap(AppCompatResources.getDrawable(activity,R.drawable.ic_green_marker)?.toBitmap())
+        val redIcon = BitmapDescriptorFactory.fromBitmap(AppCompatResources.getDrawable(activity,R.drawable.ic_red_marker)?.toBitmap())
+
 
         markerToChargerMap.keys.forEach{
             it.remove()

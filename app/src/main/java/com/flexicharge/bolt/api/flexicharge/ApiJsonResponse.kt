@@ -67,9 +67,6 @@ data class TransactionSessionResponse(
     val transactionID: Int
 )
 
-data class TransactionOrder(
-    val authorization_token: String
-)
 // Every user has his own email, password
 class UserDetails(
     val username : String,
