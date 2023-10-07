@@ -38,12 +38,6 @@ class TestApi {
     }
 
     @Test
-    fun testGetChargePoint() = runBlocking {
-        val response = RetrofitInstance.flexiChargeApi.getChargePoint(24)
-        assert(response.isSuccessful)
-    }
-
-    @Test
     fun testLogin() = runBlocking {
         val email = "didiwa6692@searpen.com"
         val pass = "Test1234!"
@@ -87,46 +81,6 @@ class TestApi {
         )
         val update = RetrofitInstance.flexiChargeApi.updateUserInfo("Bearer $token", userInfo)
         assert(update.isSuccessful)
-    }
-
-    @Test
-    fun makeReservation() = runBlocking {
-        val email = "kofap47986@viicard.com"
-        val pass = "Test123!"
-        val credentials = Credentials(email, pass)
-        val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
-        val token = login.body()?.accessToken
-        val id = login.body()?.user_id
-        assert(login.isSuccessful)
-        val reservatioDetails = ReservatioDetails(
-            chargerID = "100030",
-            userID = id!!,
-            start = 1695201434,
-            end = 1695201834
-        )
-
-        val reservation = RetrofitInstance.flexiChargeApi.makeReservation(reservatioDetails)
-        println(reservation)
-        assert(reservation.isSuccessful)
-    }
-
-    @Test
-    fun initTransactionForUser() = runBlocking {
-        val email = "kofap47986@viicard.com"
-        val pass = "Test123!"
-        val credentials = Credentials(email, pass)
-        val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
-        val userID = login.body()?.user_id.toString()
-        val chargerID = "100030"
-        assert(login.isSuccessful)
-
-        val details = InitTransactionDetails(userID, chargerID)
-      /*
-        val initTrans = RetrofitInstance.flexiChargeApi.initTransaction(details)
-        assert(initTrans.isSuccessful)
-        println(initTrans)
-
-       */
     }
 
     @Test

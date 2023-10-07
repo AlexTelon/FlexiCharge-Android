@@ -8,7 +8,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TestRegisterActivity {
-
     @Test
     fun testFirstNameAndLastNameIncluded() {
         val activityScenario = ActivityScenario.launch(RegisterActivity::class.java)
