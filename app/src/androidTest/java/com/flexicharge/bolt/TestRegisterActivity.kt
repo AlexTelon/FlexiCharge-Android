@@ -8,13 +8,12 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TestRegisterActivity {
-
     @Test
     fun testFirstNameAndLastNameIncluded() {
         val activityScenario = ActivityScenario.launch(RegisterActivity::class.java)
         activityScenario.onActivity { activity ->
-           activity.registerUserFirstName.setText("Bob")
-           activity.registerUserLastName.setText("TheBuilder")
+            activity.registerUserFirstName.setText("Bob")
+            activity.registerUserLastName.setText("TheBuilder")
 
             assert(activity.registerUserFirstName.text.toString() == "Bob")
             assert(activity.registerUserLastName.text.toString() == "TheBuilder")

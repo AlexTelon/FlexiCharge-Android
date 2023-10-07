@@ -6,7 +6,6 @@ import java.util.Locale
 
 class TimeCalculation {
 
-
     fun unixToDateTime(unixTime: String): String {
         val locale = Locale("sv", "SE")
         val sdf = SimpleDateFormat("MM/dd/HH:mm", locale)
@@ -26,6 +25,5 @@ class TimeCalculation {
         } else {
             "$seconds seconds"
         }
-
     }
 }

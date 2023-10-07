@@ -14,18 +14,17 @@ abstract class RemoteObject<T> {
 
     private var onRefreshed: ((value: T) -> Unit)? = null
 
-    protected abstract fun retrieve(lifecycleScope: LifecycleCoroutineScope) : Job
+    protected abstract fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job
 
     fun setOnRefreshedCallBack(callback: (value: T) -> Unit) {
         onRefreshed = callback
     }
 
-    fun refresh(lifecycleScope: LifecycleCoroutineScope) : Job {
-
+    fun refresh(lifecycleScope: LifecycleCoroutineScope): Job {
         val remoteObjectJob = retrieve(lifecycleScope)
 
         remoteObjectJob.invokeOnCompletion {
-            if(remoteObjectJob.isCancelled) {
+            if (remoteObjectJob.isCancelled) {
                 return@invokeOnCompletion
             }
 

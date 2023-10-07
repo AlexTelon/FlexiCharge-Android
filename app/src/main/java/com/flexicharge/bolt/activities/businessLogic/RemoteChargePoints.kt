@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
+import java.io.IOException
 import kotlinx.coroutines.*
 import retrofit2.HttpException
-import java.io.IOException
 
 class RemoteChargePoints : RemoteObject<ChargePoints>() {
     override var value = ChargePoints()
@@ -17,16 +17,17 @@ class RemoteChargePoints : RemoteObject<ChargePoints>() {
                 try {
                     val response = RetrofitInstance.flexiChargeApi.getChargePointList()
                     value = response.body() as ChargePoints
-
                 } catch (e: HttpException) {
                     Log.d("validateConnection", "Http Error")
                     cancel(e.message())
                 } catch (e: IOException) {
-                    Log.d("validateConnection", "No Internet Error - ChargePointList will not be initialized")
+                    Log.d(
+                        "validateConnection",
+                        "No Internet Error - ChargePointList will not be initialized"
+                    )
                     cancel(e.toString())
                 }
             }
         }
     }
-
 }
