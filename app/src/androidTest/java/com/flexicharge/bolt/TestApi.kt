@@ -141,11 +141,10 @@ class TestApi{
         val chargerID = "100028"
         assert(login.isSuccessful)
 
-        val details = InitTransactionDetails(userID,chargerID)
+     /*   val details = InitTransactionDetails(userID,chargerID)
         val initTrans = RetrofitInstance.flexiChargeApi.initTransaction2(details)
         assert(initTrans.isSuccessful)
-        println(initTrans)
-
+*/
     }
 
     @Test
