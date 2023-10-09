@@ -14,7 +14,6 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.SplashscreenActivity
-import com.flexicharge.bolt.activities.businessLogic.RemoteTransaction
 import com.flexicharge.bolt.adapters.TimeCalculation
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +30,6 @@ class ChargingService : Service() {
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
     private var isInitial: Boolean = true
     private var timeCalculation = TimeCalculation()
-    private val currentRemoteTransaction = RemoteTransaction()
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -42,30 +40,24 @@ class ChargingService : Service() {
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
         startTime = intent?.getLongExtra("startTime", -1)!!
         Log.d("TIME", startTime.toString())
-        when (intent?.action) {
-            //  Actions.START.toString() -> start(transactionId)
-            Actions.START.toString() -> start(9999)
+        when (intent.action) {
+            Actions.START.toString() -> start(transactionId)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
                 stopSelf()
             }
         }
 
-
         return super.onStartCommand(intent, flags, startId)
     }
 
-
     private fun start(transaction: Int) {
-
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         CoroutineScope(Dispatchers.IO).launch {
             transactionId = transaction
             getDataFromApi(true)
         }
         updateHandler.postDelayed(updatedNotificationTask, 3000)
-
-
     }
 
     private val updatedNotificationTask = object : Runnable {
@@ -77,8 +69,6 @@ class ChargingService : Service() {
 
                 updateHandler.postDelayed(this, 3000)
             }
-
-
         }
     }
 
@@ -89,23 +79,21 @@ class ChargingService : Service() {
             if (response.isSuccessful) {
                 val responseData = response.body()
                 val currentTime = System.currentTimeMillis()
-                //val startTime = responseData?.timestamp
+                // val startTime = responseData?.timestamp
                 val newPercentage = responseData?.currentChargePercentage.toString()
                 val newTime = timeCalculation.checkDuration(startTime, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
                 if (firstTime) {
-                    //StartTime = currentTime
+                    // StartTime = currentTime
                     startForeground(1, updatedNotification)
                 } else {
                     notificationManager.notify(1, updatedNotification)
                 }
-
             }
         } catch (e: java.lang.Exception) {
-
+            Log.d("ChargingServiceError", "Ge transaction api error")
         }
     }
-
 
     private fun createNotification(percentage: String, timeElapsed: String): Notification {
         val contentView = RemoteViews(packageName, R.layout.layout_custom_notification)
@@ -122,7 +110,9 @@ class ChargingService : Service() {
         val activityIntent = Intent(this, SplashscreenActivity::class.java)
         val id = 0
         val pendingIntent = PendingIntent.getActivity(
-            this, id, activityIntent,
+            this,
+            id,
+            activityIntent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -139,16 +129,10 @@ class ChargingService : Service() {
             .setCustomBigContentView(contentView)
             .setContentIntent(pendingIntent)
 
-
-
-
-
         return notificationBuilder.build()
     }
-
 
     enum class Actions {
         START, STOP
     }
-
 }

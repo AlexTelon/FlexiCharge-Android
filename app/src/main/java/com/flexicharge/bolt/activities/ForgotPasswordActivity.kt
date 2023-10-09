@@ -1,6 +1,5 @@
 package com.flexicharge.bolt.activities
 
-
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
@@ -15,7 +14,6 @@ import com.flexicharge.bolt.helpers.Validator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class ForgotPasswordActivity : AppCompatActivity() {
     private lateinit var binding: ActivityForgotPasswordBinding
     private val validator = Validator()
@@ -25,8 +23,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         setContentView(R.layout.activity_forgot_password)
         binding = ActivityForgotPasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val emailEdittext :EditText = binding.resetActivityEditTextEmail
-        val error = binding.resetPassActivityErrorMessage
+        val emailEdittext: EditText = binding.resetActivityEditTextEmail
         validator.validateUserInput(emailEdittext, TextInputType.isEmail)
         binding.buttonConfirmRecoverPassword.setOnClickListener {
             emailAddress = emailEdittext.text.toString()
@@ -35,12 +32,11 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     if (isOK) {
                         navigateToConfirmEmail(emailAddress)
                     } else {
-                        lifecycleScope.launch (Dispatchers.Main) {
+                        lifecycleScope.launch(Dispatchers.Main) {
                             AlertDialog.Builder(this@ForgotPasswordActivity)
                                 .setTitle("Oops!")
                                 .setMessage(message)
                                 .setNegativeButton("Ok") { _, _ ->
-
                                 }.show()
                         }
                     }
@@ -48,7 +44,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
             }
         }
     }
-    private fun navigateToConfirmEmail(emailAdd : String){
+    private fun navigateToConfirmEmail(emailAdd: String) {
         val intent = Intent(this, ConfirmEmailActivity::class.java)
         intent.putExtra("emailAddress", emailAdd)
         startActivity(intent)
