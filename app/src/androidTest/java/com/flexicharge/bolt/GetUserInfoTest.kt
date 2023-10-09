@@ -19,7 +19,7 @@ class GetUserInfoTest {
     private lateinit var apiService: ApiInterface
     private val email = "kofap47986@viicard.com"
     private val pass = "Test123!"
-    private val credentials = Credentials(email,pass)
+    private val credentials = Credentials(email, pass)
     private val token = getToekn()
 
     private fun getToekn() {
@@ -38,7 +38,6 @@ class GetUserInfoTest {
             .baseUrl(mockWebServer.url("/"))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
 
         apiService = retrofit.create(ApiInterface::class.java)
     }
@@ -63,7 +62,7 @@ class GetUserInfoTest {
             "firstName": "John",
             "lastName": "Doe"
         }
-    """.trimIndent()
+        """.trimIndent()
         val mockSignInResponse = createMockResponse(200, responseBody)
         mockWebServer.enqueue(mockSignInResponse)
 
@@ -86,7 +85,7 @@ class GetUserInfoTest {
         {
             "firstName": "John"
         }
-    """.trimIndent()
+        """.trimIndent()
         val mockSignInResponse = createMockResponse(200, responseBody)
         mockWebServer.enqueue(mockSignInResponse)
 
@@ -114,14 +113,12 @@ class GetUserInfoTest {
 
         val userFullDetails = response.body()
 
-
         // Assert: Check that the response status code is 401 Unauthorized
         assertNull(userFullDetails)
     }
 
     @Test
     fun testServerErrorResponse() = runTest {
-
         val mockErrorResponse = MockResponse().setResponseCode(500)
 
         mockWebServer.enqueue(mockErrorResponse)
@@ -130,5 +127,4 @@ class GetUserInfoTest {
 
         assertEquals(500, response.code())
     }
-
 }

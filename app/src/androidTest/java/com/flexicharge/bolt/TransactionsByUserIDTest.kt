@@ -16,7 +16,6 @@ class TransactionsByUserIDTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var apiService: ApiInterface
 
-
     @Before
     fun setUp() {
         mockWebServer = MockWebServer()
@@ -31,7 +30,6 @@ class TransactionsByUserIDTest {
     fun tearDown() {
         mockWebServer.shutdown()
     }
-
 
     private fun createMockResponse(responseCode: Int, responseBody: String): MockResponse {
         return MockResponse()
@@ -94,7 +92,6 @@ class TransactionsByUserIDTest {
         assertEquals(2, transactions?.size)
         assertEquals(1, transactions?.get(0)?.transactionID)
         assertEquals(true, transactions?.get(0)?.isKlarnaPayment)
-
     }
 
     @Test
@@ -118,7 +115,6 @@ class TransactionsByUserIDTest {
         assertTrue(transactions?.isEmpty() == true)
     }
 
-
     @Test
     fun testTransactionsByUserIDNotFound() = runBlocking {
         // Arrange:
@@ -135,7 +131,4 @@ class TransactionsByUserIDTest {
         assertEquals(404, response.code())
         assertNull(response.body()) // Since the user was not found, expect null for the response body
     }
-
-
 }
-

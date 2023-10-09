@@ -10,11 +10,10 @@ import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class StartTransactionTest  {
+class StartTransactionTest {
 
     private lateinit var mockWebServer: MockWebServer
     private lateinit var apiService: ApiInterface
-
 
     @Before
     fun setUp() {
@@ -30,7 +29,6 @@ class StartTransactionTest  {
     fun tearDown() {
         mockWebServer.shutdown()
     }
-
 
     private fun createMockResponse(responseCode: Int, responseBody: String): MockResponse {
         return MockResponse()

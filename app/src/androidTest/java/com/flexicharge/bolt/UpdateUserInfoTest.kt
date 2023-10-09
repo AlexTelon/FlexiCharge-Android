@@ -16,7 +16,7 @@ class UpdateUserInfoTest {
 
     private val email = "kofap47986@viicard.com"
     private val pass = "Test123!"
-    private val credentials = Credentials(email,pass)
+    private val credentials = Credentials(email, pass)
     private val token = getToekn()
 
     private fun getToekn() {
@@ -42,13 +42,11 @@ class UpdateUserInfoTest {
         mockWebServer.shutdown()
     }
 
-
     private fun createMockResponse(responseCode: Int, responseBody: String): MockResponse {
         return MockResponse()
             .setResponseCode(responseCode)
             .setBody(responseBody)
     }
-
 
     @Test
     fun testUpdateUserInfoSuccess() = runBlocking {
@@ -133,7 +131,7 @@ class UpdateUserInfoTest {
         {
             "firstName": "UpdatedFirstName"
         }
-    """.trimIndent()
+        """.trimIndent()
 
         val mockResponse = createMockResponse(200, responseBody)
         mockWebServer.enqueue(mockResponse)
@@ -150,8 +148,4 @@ class UpdateUserInfoTest {
         assertEquals("UpdatedFirstName", updatedUserDetails?.firstName)
         assertNull(updatedUserDetails?.city)
     }
-
-
-
 }
-

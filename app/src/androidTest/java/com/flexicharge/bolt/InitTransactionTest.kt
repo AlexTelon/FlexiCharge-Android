@@ -15,7 +15,6 @@ class InitTransactionTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var apiService: ApiInterface
 
-
     @Before
     fun setUp() {
         mockWebServer = MockWebServer()
@@ -31,21 +30,16 @@ class InitTransactionTest {
         mockWebServer.shutdown()
     }
 
-
     private fun createMockResponse(responseCode: Int, responseBody: String): MockResponse {
         return MockResponse()
             .setResponseCode(responseCode)
             .setBody(responseBody)
     }
 
-
-
-
     @Test
     fun testInitTransactionSuccess() = runBlocking {
         // Arrange:
         val transactionSession = TransactionSession("123", 100000, true, 412)
-
 
         val responseBody = """
             {
@@ -68,14 +62,12 @@ class InitTransactionTest {
         assertNotNull(transactionDetails)
         assertEquals("123456", transactionDetails?.userID)
         assertEquals(true, transactionDetails?.isKlarnaPayment)
-
     }
 
     @Test
     fun testInitTransactionFailure() = runBlocking {
         // Arrange:
         val transactionSession = TransactionSession("123", 4, true, 412)
-
 
         val errorMessage = "Transaction initialization failed due to invalid data"
         val mockResponse = createMockResponse(400, errorMessage)
@@ -99,7 +91,6 @@ class InitTransactionTest {
         // Arrange:
         val transactionSession = TransactionSession("123", 4, true, 412)
 
-
         val responseBody = """
             {
                 "userID": "123456"
@@ -119,14 +110,15 @@ class InitTransactionTest {
         val transactionDetails = response.body()
         assertNotNull(transactionDetails)
         assertEquals("123456", transactionDetails?.userID)
-        assertTrue(transactionDetails?.isKlarnaPayment == true || transactionDetails?.isKlarnaPayment == false || transactionDetails?.isKlarnaPayment == null)
+        assertTrue(
+            transactionDetails?.isKlarnaPayment == true || transactionDetails?.isKlarnaPayment == false || transactionDetails?.isKlarnaPayment == null
+        )
     }
 
     @Test
     fun testUnauthorizedInitTransaction() = runBlocking {
         // Arrange:
         val transactionSession = TransactionSession("123", 4, true, 412)
-
 
         val mockResponse = createMockResponse(401, "")
         mockWebServer.enqueue(mockResponse)
@@ -153,10 +145,8 @@ class InitTransactionTest {
         val response = apiService.initTransaction(transactionSession)
         val transaction = response.body()
 
-
         // Assert: Ensure that the response is handled gracefully (e.g., return null or handle as needed)
         assertNotNull(response)
         assertTrue(response.isSuccessful)
     }
-
 }
