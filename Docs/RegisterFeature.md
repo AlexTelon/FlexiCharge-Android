@@ -5,4 +5,4 @@
 
 3. If the request is successful, the backend sends a confirmation code to the user's email and the app switces to the [VerifyActivity](../app/src/main/java/com/flexicharge/bolt/activities/VerifyActivity.kt)
 
-4. When the user enters their verification code the registration is complete and the user gets transported to the [LoginActivity](..app/src/main/java/com/flexicharge/bolt/activities/LoginActivity.kt) where their login information should already be filled in.
+4. When the user enters their verification code the registration is complete and the user gets transported to the [LoginActivity](../app/src/main/java/com/flexicharge/bolt/activities/LoginActivity.kt) where their login information should already be filled in.
