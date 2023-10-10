@@ -8,46 +8,43 @@ import androidx.core.text.isDigitsOnly
 class Validator {
 
     fun validateUserInput(field: EditText, isWhat: String) {
-
         field.addTextChangedListener(object : TextWatcher {
             val letters = Regex("^[a-zA-ZåÅäÄöÖ]+$")
             val lettersAndNumbers = Regex("^[a-zA-ZåÅäÄöÖ1-9 ]+$")
             val phoneNumber = Regex("^\\+[0-9]+\$")
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
-                    if(s.isEmpty()) {
+                    if (s.isEmpty()) {
                         field.error = "Can not be empty"
                     }
                     when (isWhat) {
                         TextInputType.isEmail ->
                             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(field.text)
-                                    .matches()
+                                .matches()
                             ) {
                                 field.error = "Invalid email."
                             } else {
                                 field.error = null
-
                             }
 
                         TextInputType.isPassword ->
                             if (
-                                s.length < 8
-                                || s.firstOrNull { it.isDigit() } == null
-                                || s.filter { it.isLetter() }
-                                    .firstOrNull { it.isUpperCase() } == null
-                                || s.filter { it.isLetter() }
-                                    .firstOrNull { it.isLowerCase() } == null
-                                || s.firstOrNull { !it.isLetterOrDigit() } == null
+                                s.length < 8 ||
+                                s.firstOrNull { it.isDigit() } == null ||
+                                s.filter { it.isLetter() }
+                                    .firstOrNull { it.isUpperCase() } == null ||
+                                s.filter { it.isLetter() }
+                                    .firstOrNull { it.isLowerCase() } == null ||
+                                s.firstOrNull { !it.isLetterOrDigit() } == null
                             ) {
                                 field.error =
                                     "Password must have 8 chars containing upper- and lower case characters, digits and symbols"
                             } else {
                                 field.error = null
-
                             }
                         TextInputType.isConfirmationCode ->
-                            if (s.length != 6
-                                || !s.isDigitsOnly()
+                            if (s.length != 6 ||
+                                !s.isDigitsOnly()
                             ) {
                                 field.error = "Conformation code must have 6 digits."
                             } else {
@@ -74,16 +71,14 @@ class Validator {
                                 }
                             }
                         TextInputType.isPostCode ->
-                            if (s.isEmpty()){
+                            if (s.isEmpty()) {
                                 field.error = null
-                            }else {
-                                if (!s.isDigitsOnly()){
+                            } else {
+                                if (!s.isDigitsOnly()) {
                                     field.error = "Post code can only be digits"
-                                }
-                                else if (s.length != 5){
+                                } else if (s.length != 5) {
                                     field.error = "Post code should be 5 digits"
-                                }
-                                else{
+                                } else {
                                     field.error = null
                                 }
                             }
@@ -119,22 +114,19 @@ class Validator {
                             if (s.isEmpty()) {
                                 field.error = null
                             } else {
-                                 if (s.length > 15 || s.length < 7){
+                                if (s.length > 15 || s.length < 7) {
                                     field.error = "Phone number must contain between 7 and 15 numbers"
-                                } else if(!phoneNumber.matches(s)){
-                                     field.error = "Phone number can only include + and numbers"
-                                 }else{
+                                } else if (!phoneNumber.matches(s)) {
+                                    field.error = "Phone number can only include + and numbers"
+                                } else {
                                     field.error = null
                                 }
                             }
                     }
-
                 }
             }
-            override fun afterTextChanged(s: Editable?) {   }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {  }
-
+            override fun afterTextChanged(s: Editable?) { }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
         })
-
     }
 }

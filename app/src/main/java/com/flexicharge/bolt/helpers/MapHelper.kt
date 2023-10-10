@@ -2,11 +2,7 @@ package com.flexicharge.bolt.helpers
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+
 import android.location.Location
 import android.os.Looper
 import android.util.Log
@@ -19,7 +15,6 @@ import com.flexicharge.bolt.R
 import com.flexicharge.bolt.activities.MainActivity
 import com.flexicharge.bolt.api.flexicharge.ChargePoint
 import com.flexicharge.bolt.api.flexicharge.ChargePoints
-import com.flexicharge.bolt.api.flexicharge.Charger
 import com.flexicharge.bolt.api.flexicharge.Chargers
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -44,10 +39,12 @@ object MapHelper {
             fetchLocation(activity)
             mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
+
                     LatLng(
                         currentLocation.latitude,
                         currentLocation.longitude
                     ), 13f
+
                 )
             )
         } else {
@@ -62,16 +59,20 @@ object MapHelper {
     fun fetchLocation(activity: MainActivity) {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
         if (ActivityCompat.checkSelfPermission(
+
                 activity, Manifest.permission.ACCESS_FINE_LOCATION
             ) !=
             PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 activity, Manifest.permission.ACCESS_COARSE_LOCATION
             ) !=
+
             PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
                 activity,
+
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE
+
             )
             return
         }
@@ -90,8 +91,10 @@ object MapHelper {
             override fun onLocationResult(result: LocationResult) {
                 super.onLocationResult(result)
 
+
                 val fragment =
                     activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map)
+
                 if (fragment is SupportMapFragment) {
                     fragment.getMapAsync(activity)
                     currentLocation = result.lastLocation
@@ -106,18 +109,20 @@ object MapHelper {
             locationCallback,
             Looper.getMainLooper()
         )
+
         /* val task = fusedLocationProviderClient.lastLocation
 
-         task.addOnSuccessListener { location ->
-             if (location != null) {
-                 currentLocation = location
-                 val supportMapFragment =
-                     activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
-                 supportMapFragment.getMapAsync(activity)
-                 getLocationAccess(activity)
-                 setCurrentLocation(activity)
-             }
-         }*/
+
+          task.addOnSuccessListener { location ->
+              if (location != null) {
+                  currentLocation = location
+                  val supportMapFragment =
+                      activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
+                  supportMapFragment.getMapAsync(activity)
+                  getLocationAccess(activity)
+                  setCurrentLocation(activity)
+              }
+          }*/
     }
 
 
@@ -128,6 +133,7 @@ object MapHelper {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             mMap.isMyLocationEnabled = true
+
         } else
             ActivityCompat.requestPermissions(
                 activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -135,12 +141,14 @@ object MapHelper {
             )
     }
 
+
     fun addNewMarkers(
         activity: MainActivity,
         chargersPoints: ChargePoints,
         chargers: Chargers,
         onTapMarker: (ChargePoint?) -> Boolean
     ) {
+
         val blackIcon = BitmapDescriptorFactory.fromBitmap(
             AppCompatResources.getDrawable(
                 activity,
@@ -172,32 +180,31 @@ object MapHelper {
             val available = currentChargers.filter { it.status == "Available" }
 
 
-
             val marker = mMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(chargerPoint.location[0], chargerPoint.location[1]))
                     .title(chargerPoint.name)
             )
             markerToChargerMap[marker] = chargerPoint
-            if (available.isNotEmpty()){
+            if (available.isNotEmpty()) {
                 marker.setIcon(greenIcon)
-            }else{
+            } else {
                 marker.setIcon(redIcon)
+
             }
-
-
 
 
         }
 
+
         /*
-  when (chargerPoint.status) {
+    when (chargerPoint.status) {
       "Available" -> marker.setIcon(greenIcon)
       "Faulted" -> marker.setIcon(blackIcon)
       else -> marker.setIcon(redIcon)
-  }
+    }
 
-   */
+    */
 
         mMap.setOnMarkerClickListener {
             Log.d("mapHelper", "Marker clicked: " + it.id)
@@ -206,12 +213,9 @@ object MapHelper {
     }
 
 
-
-
-
     fun panToPos(
         latitude: Double,
-        longitude: Double,
+        longitude: Double
     ) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
     }
@@ -220,12 +224,11 @@ object MapHelper {
         mMap = googleMap
         mMap.uiSettings.isMyLocationButtonEnabled = false
         mMap.setMapStyle(
-            MapStyleOptions.loadRawResourceStyle(
-                activity,
-                R.raw.flexicharge_map_style
-            )
+
+            MapStyleOptions.loadRawResourceStyle(activity, R.raw.flexicharge_map_style)
+
         )
         getLocationAccess(activity)
-
     }
 }
+

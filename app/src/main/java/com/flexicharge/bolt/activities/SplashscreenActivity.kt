@@ -19,18 +19,15 @@ import androidx.core.content.ContextCompat
 import com.flexicharge.bolt.R
 import com.flexicharge.bolt.helpers.LoginChecker
 
-
 class SplashscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splashscreen)
 
-
         Handler(Looper.getMainLooper()).postDelayed({
             requestPermission()
         }, 1000)
     }
-
 
     private val permissionRequestCode = 521
     private fun checkP(p: String): Boolean {
@@ -46,20 +43,15 @@ class SplashscreenActivity : AppCompatActivity() {
             ps += extraPermission
         }
 
-
-
         if (!checkP(Manifest.permission.ACCESS_FINE_LOCATION)) {
             ActivityCompat.requestPermissions(this, ps, permissionRequestCode)
             return
-        }
-        else if(!checkP(Manifest.permission.POST_NOTIFICATIONS)){
+        } else if (!checkP(Manifest.permission.POST_NOTIFICATIONS)) {
             ActivityCompat.requestPermissions(this, ps, permissionRequestCode)
             return
-        }
-        else {
+        } else {
             checkPermission()
         }
-
     }
 
     override fun onRequestPermissionsResult(
@@ -78,11 +70,10 @@ class SplashscreenActivity : AppCompatActivity() {
             }
         }
 
-
     private fun checkPermission() {
         if (!isLocationEnabled()) {
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-           // startActivityForResult(intent, requestLocation)
+            // startActivityForResult(intent, requestLocation)
             resultLauncher.launch(intent)
         } else {
             val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
@@ -98,7 +89,6 @@ class SplashscreenActivity : AppCompatActivity() {
         }
     }
 
-
     private fun isLocationEnabled(): Boolean {
         val lm = getSystemService(LOCATION_SERVICE) as LocationManager
         var gpsEnabled = false
@@ -106,19 +96,18 @@ class SplashscreenActivity : AppCompatActivity() {
 
         try {
             gpsEnabled = ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         } catch (ex: Exception) {
-            Log.d("splashScreenError","try gps enabled error")
+            Log.d("splashScreenError", "try gps enabled error")
         }
 
         try {
             networkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         } catch (ex: Exception) {
-            Log.d("splashScreenError","try network enabled error")
+            Log.d("splashScreenError", "try network enabled error")
         }
         return (gpsEnabled && networkEnabled)
     }
-
-
 }

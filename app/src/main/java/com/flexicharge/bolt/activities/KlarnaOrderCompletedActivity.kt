@@ -14,7 +14,7 @@ class KlarnaOrderCompletedActivity : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.klarnaOrderCompletedActivity_textView_message)
         textView.text = message
 
-        val callback = object : OnBackPressedCallback(true){
+        val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }

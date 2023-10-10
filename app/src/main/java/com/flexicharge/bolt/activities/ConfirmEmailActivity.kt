@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ConfirmEmailActivity : AppCompatActivity() {
-    private lateinit var binding:ActivityConfirmEmailBinding
+    private lateinit var binding: ActivityConfirmEmailBinding
     private val validator = Validator()
     private var _emailAddress = " "
     private var _newPassword = " "
@@ -31,7 +31,7 @@ class ConfirmEmailActivity : AppCompatActivity() {
 
         val intent = intent
         val getEmailAddress = intent.getStringExtra("emailAddress")
-        val emailAdd= binding.textViewEmailRecover
+        val emailAdd = binding.textViewEmailRecover
         val newPassword = binding.newPassword
         emailAdd.text = getEmailAddress
         val confirmCode = binding.confirmCode
@@ -47,7 +47,7 @@ class ConfirmEmailActivity : AppCompatActivity() {
             _confirmCode = confirmCode.text.toString()
             _confirmPassword = confirmPassword.text.toString()
             lifecycleScope.launch(Dispatchers.Main) {
-                EntryManager().confirmResetPass(_emailAddress, _newPassword, _confirmCode){ message, isOk ->
+                EntryManager().confirmResetPass(_emailAddress, _newPassword, _confirmCode) { message, isOk ->
                     if (isOk) {
                         navigateToLogIn()
                     } else {
@@ -68,7 +68,7 @@ class ConfirmEmailActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        lifecycleScope.launch (Dispatchers.Main) {
+                        lifecycleScope.launch(Dispatchers.Main) {
                             buildAlertDialog(message)
                         }
                     }
@@ -82,7 +82,6 @@ class ConfirmEmailActivity : AppCompatActivity() {
         val newPasswordEditText = binding.newPassword
         confirmPassEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -96,7 +95,6 @@ class ConfirmEmailActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
             }
         })
     }
@@ -106,7 +104,6 @@ class ConfirmEmailActivity : AppCompatActivity() {
             .setTitle("Oops!")
             .setMessage(message)
             .setNegativeButton("Ok") { _, _ ->
-
             }.show()
     }
 

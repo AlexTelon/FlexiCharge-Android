@@ -9,20 +9,18 @@ import com.flexicharge.bolt.helpers.Validator
 
 class ChangePasswordActivity : AppCompatActivity() {
     lateinit var binding: ActivityChangePasswordBinding
-    private val validateHelper      = Validator()
+    private val validateHelper = Validator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         val newPassword = binding.changePasswordEditNew
 
-        validateHelper.validateUserInput(newPassword,TextInputType.isPassword)
+        validateHelper.validateUserInput(newPassword, TextInputType.isPassword)
 
-        binding.buttonUpdatePassword.setOnClickListener{
-
+        binding.buttonUpdatePassword.setOnClickListener {
         }
         binding.buttonForgotPassword.setOnClickListener {
             val intent = Intent(this, ForgotPasswordActivity::class.java)
