@@ -2,7 +2,7 @@
 ## Reset Password Functionality
 This documentation provides basic knowledge on how the user can reset their password.
 
-##Implementation Details
+## Implementation Details
 1. To find the reset/recover password screen the user must go to acount settings -> change password -> i forgot my password.
 
 2. The first step is similar to the [RegisterActivity](../app/src/main/java/com/flexicharge/bolt/activities/RegisterActivity.kt) and [VerifyActivity](../app/src/main/java/com/flexicharge/bolt/activities/VerifyActivity.kt) where the user enters their email and recives a confirmation code.
