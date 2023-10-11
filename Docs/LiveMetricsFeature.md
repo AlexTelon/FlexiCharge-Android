@@ -1,7 +1,12 @@
-# Live charging metrics
-Live charging metrics are implemented throught the use of WebSockets. The implementation can be found in the class [LiveChargingMetricsListener](../app/src/main/java/com/flexicharge/bolt/activities/businessLogic/LiveChargingMetricsListener.kt). To use it, create an instance of the class using the user's ID as the first argument to its constructor, and a callback function which is called when metrics have been received as its second argument. The callback passes a [WebSocketJsonMessage.LiveMetricsMessage](../app/src/main/java/com/flexicharge/bolt/api/flexicharge/WebSocketJsonMessage.kt) which contains all the metrics sent by the server. The ```LiveChargingMetricsListener``` instance will begin listening as soon as it's created.
-## ```stopWhen()```
-To make the listener stop listening on receiving a certain message, you can define a predicate and set it using the ```stopWhen()``` method.
+## Live charging metrics
+Live charging metrics are currently implemented throught the use of a continuously polling GET request /transactions/{transactionId} that fetches live data every few seconds. The use of the endpoint can be found in the class [RemoteTransaction](../app/src/main/java/com/flexicharge/bolt/activities/businessLogic/RemoteTransaction.kt) as a function named retrive(). 
 
-## ```stop()```
-The listener also implements the method ```stop()``` which simply closes its connection.
+In [MainActivity](../app/src/main/java/com/flexicharge/bolt/activities/MainActivity.kt), retrive() is then being called from the function setupChargingInProgressDialog()
+
+
+
+## ```stopChargingProcess()```
+To stop the current transaction we call on the stop() function from [RemoteTransaction](../app/src/main/java/com/flexicharge/bolt/activities/businessLogic/RemoteTransaction.kt) which uses the PUT endpoint transactions/stop/{transactionId}. stop() is then being called from our stopChargingProcess() in [MainActivity](../app/src/main/java/com/flexicharge/bolt/activities/MainActivity.kt) 
+
+## Future implementations
+The live charging metrics was originally retrived with the use of WebSockets which should be the case for future implementations since it is a more optimal way of handling data. 
