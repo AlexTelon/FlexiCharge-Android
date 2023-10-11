@@ -39,7 +39,7 @@ class RemoteCharger(private var id: Int = -1, private var userId : String ?= nul
             }
         }
     }
-
+    /*
     fun initTransaction(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch (Dispatchers.IO){
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
@@ -47,7 +47,7 @@ class RemoteCharger(private var id: Int = -1, private var userId : String ?= nul
 
                     val details = TransactionSession(
                         userId!!,
-                        value.chargerID,
+                        value.connectorID,
                         true,
                         333
                     )
@@ -64,6 +64,8 @@ class RemoteCharger(private var id: Int = -1, private var userId : String ?= nul
             }
         }
     }
+
+     */
 
     fun refresh(lifecycleScope: LifecycleCoroutineScope, id: Int): Job {
         this.id = id

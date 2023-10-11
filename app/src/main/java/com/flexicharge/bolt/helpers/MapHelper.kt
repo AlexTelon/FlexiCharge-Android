@@ -137,9 +137,9 @@ object MapHelper {
         markerToChargerMap.keys.forEach{
             it.remove()
         }
-
+        Log.d("chargers","$chargers")
         chargers.forEach { charger ->
-            val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.chargerID.toString()))
+            val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.connectorID.toString()))
             markerToChargerMap[marker] = charger
             when (charger.status) {
                 "Available" -> marker.setIcon(greenIcon)

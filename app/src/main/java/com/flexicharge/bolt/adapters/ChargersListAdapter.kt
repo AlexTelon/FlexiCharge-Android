@@ -28,9 +28,11 @@ class ChargersListAdapter(private val chargers: List<Charger>, private val enter
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.chargerId.text = chargers[position].chargerID.toString()
+        holder.chargerId.text = chargers[position].connectorID.toString()
         holder.chargerStatus.text = chargers[position].status
-        holder.chargerCost.text = (chargePoint.price.toFloat()/100).toString() + "kr/kWh"
+
+        // FIX DAVID
+       // holder.chargerCost.text = (chargePoint.price.toFloat()/100).toString() + "kr/kWh"
 
         if(holder.chargerId.text == enteredChargerId){
             holder.itemView.setBackgroundResource(R.drawable.rounded_background_selected)

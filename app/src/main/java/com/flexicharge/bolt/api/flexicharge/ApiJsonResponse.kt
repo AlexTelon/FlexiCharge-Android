@@ -16,7 +16,7 @@ data class LoginResponseBody(
 
 data class Charger(
     val chargePointID: Int,
-    val chargerID: Int,
+    val connectorID: Int,
     val location: List<Double>,
     val serialNumber: String,
     val status: String
@@ -32,23 +32,23 @@ data class ReservatioDetails(
 class ChargePoints : ArrayList<ChargePoint>()
 data class ChargePoint(
     val chargePointID: Int,
-    val klarnaReservationAmount: Int,
-    val location: List<Double>,
+    val coordinates: List<Double>,
     val name: String,
-    val price: String
-)
+    val address : String
+    )
 
 class TransactionList : ArrayList<Transaction>()
 
 
 data class InitTransaction(
-    val klarnaConsumerToken : String,
-    val transactionId : String
+    val klarnaClientToken : String,
+    val klarnaSessionID : String,
+    val transactionID : Double
 )
 
 
 data class Transaction(
-    var chargerID: Int ?= null,
+    var connectorID: Int ?= null,
     var currentChargePercentage: Int ?= null,
     var kwhTransferred: Double ?= null,
     val pricePerKwh: String ?= null,
@@ -60,11 +60,10 @@ data class Transaction(
 )
 
 data class TransactionSession(
-    val userID: String,
-    val chargerID: Int,
-    val isKlarnaPayment: Boolean,
-    val pricePerKwh: Int
-)
+    val connectorID: Int,
+    val paymentType: String,
+
+    )
 
 data class TransactionSessionResponse(
     val transactionID: Int

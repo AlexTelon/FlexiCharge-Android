@@ -30,6 +30,7 @@ class ChargingService : Service() {
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
     private var isInitial: Boolean = true
     private var timeCalculation = TimeCalculation()
+    private var localAccessToken : String = ""
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -38,9 +39,11 @@ class ChargingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
+        val accessToken = sharedPreferences.getString("accessToken", Context.MODE_PRIVATE.toString())
+        localAccessToken = accessToken!!
         when (intent?.action) {
             //  Actions.START.toString() -> start(transactionId)
-            Actions.START.toString() -> start(9999)
+            Actions.START.toString() -> start(transactionId)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
                 stopSelf()
@@ -80,7 +83,7 @@ class ChargingService : Service() {
 
     private suspend fun getDataFromApi(firstTime: Boolean) {
         try {
-            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+            val response = RetrofitInstance.flexiChargeApi.getTransaction("Bearer $localAccessToken",transactionId)
 
             if (response.isSuccessful) {
                 val responseData = response.body()

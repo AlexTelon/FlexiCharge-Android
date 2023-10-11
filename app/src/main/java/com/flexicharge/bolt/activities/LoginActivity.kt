@@ -3,6 +3,7 @@ package com.flexicharge.bolt.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -70,6 +71,7 @@ class LoginActivity : AppCompatActivity() {
     private fun navigateToMain(accessToken: String, userId: String, username: String, email:String) {
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
+        Log.d("LoginAccess", accessToken)
         editor.apply {
             putString("accessToken", accessToken)
             putString("userId", userId)

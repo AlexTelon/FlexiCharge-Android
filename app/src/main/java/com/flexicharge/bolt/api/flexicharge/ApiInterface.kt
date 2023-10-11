@@ -33,14 +33,14 @@ interface ApiInterface {
         @Body body: MutableMap<String, String>
     ): Response<String>
 
-    @GET("transactions/{transactionId}")
-    suspend fun getTransaction(@Path("transactionId") transactionId: Int): Response<Transaction>
+    @GET("transaction/{transactionId}")
+    suspend fun getTransaction(@Header("Authorization") authorizationHeader : String, @Path("transactionId") transactionId: Int): Response<Transaction>
 
     @POST("transactions/session")
     suspend fun postTransactionSession(@Body body: TransactionSession): Response<TransactionSessionResponse>
 
-    @PUT("transactions/start/{transactionId}")
-    suspend fun transactionStart(
+    @PUT("transaction/start/{transactionId}")
+    suspend fun transactionStart(@Header("Authorization") authorizationHeader : String,
         @Path("transactionId") transactionId: Int,
     ): Response<Transaction>
 
@@ -73,8 +73,8 @@ interface ApiInterface {
     suspend fun  getUserInfo(@Header("Authorization") authorizationHeader : String) : Response<UserFullDetails>
 
 
-    @POST("/transactions")
-    suspend fun initTransaction(@Body body : TransactionSession) : Response<InitTransaction>
+    @POST("/transaction")
+    suspend fun initTransaction(@Header("Authorization") authorizationHeader: String, @Body body : TransactionSession) : Response<InitTransaction>
 
     @GET("/transactions/userTransactions/{userId}")
     suspend fun transactionsByUserID(@Path("userId") userId : String) :Response<List<Transaction>>

@@ -28,8 +28,8 @@ RecyclerView.Adapter<ChargePointListAdapter.ViewHolder>(){
             itemView.setOnClickListener { v: View ->
                 val position: Int = adapterPosition
                 act.showChargePoint(
-                    chargePoints[position].location[0],
-                    chargePoints[position].location[1],
+                    chargePoints[position].coordinates[0],
+                    chargePoints[position].coordinates[1],
                     chargePoints[position].chargePointID)
             }
         }
