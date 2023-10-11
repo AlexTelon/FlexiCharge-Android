@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         RemoteObjectRefresher(remoteChargers, REMOTE_CHARGERS_REFRESH_INTERVAL_MS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //checkPendingTransaction()
+        checkPendingTransaction()
 
 
         super.onCreate(savedInstanceState)
