@@ -16,12 +16,11 @@ import com.flexicharge.bolt.api.flexicharge.VerificationDetails
 import com.flexicharge.bolt.databinding.ActivityVerifyEmailBinding
 import com.flexicharge.bolt.helpers.LoginChecker
 import com.flexicharge.bolt.helpers.StatusCode
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.io.IOException
-
 
 class VerifyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityVerifyEmailBinding
@@ -37,10 +36,12 @@ class VerifyActivity : AppCompatActivity() {
         var userFirstName = intent.getStringExtra("userFirstName")
         var userLastName = intent.getStringExtra("userLastName")
 
-        if (userFirstName == null)
+        if (userFirstName == null) {
             userFirstName = ""
-        if (userLastName == null)
+        }
+        if (userLastName == null) {
             userLastName = ""
+        }
 
         confirmVerification(
             userEmail = userEmail!!,
@@ -51,7 +52,6 @@ class VerifyActivity : AppCompatActivity() {
     }
 
     private lateinit var verificationCode: EditText
-
 
     private fun confirmVerification(
         userEmail: String,
@@ -71,7 +71,6 @@ class VerifyActivity : AppCompatActivity() {
             )
         }
     }
-
 
     private fun verifyUser(
         userCode: String,
@@ -115,13 +114,12 @@ class VerifyActivity : AppCompatActivity() {
         }
     }
 
-
-    fun signIn(userData: Map<String, String>) {
+    private fun signIn(userData: Map<String, String>) {
         lifecycleScope.launch(Dispatchers.IO) {
             entryManager.singIn(
                 userData["email"]!!,
                 userData["pass"]!!
-            ) { responseBody, message, isOK ->
+            ) { responseBody, _, isOK ->
                 if (isOK) {
                     LoginChecker.LOGGED_IN = true
                     val loggedInData = mapOf(
@@ -156,7 +154,7 @@ class VerifyActivity : AppCompatActivity() {
             "",
             "",
             "",
-            "",
+            ""
         )
         lifecycleScope.launch(Dispatchers.IO) {
             val token = userData["accessToken"]
@@ -169,29 +167,4 @@ class VerifyActivity : AppCompatActivity() {
             }
         }
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

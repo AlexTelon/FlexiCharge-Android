@@ -32,7 +32,6 @@ class LoginActivity : AppCompatActivity() {
 
         val emailEditText = binding.loginActivityEditTextEmail
         val passwordEditText = binding.loginActivityEditTextPassword
-        val error = binding.loginActivityErrorMessage
 
         validator.validateUserInput(emailEditText, TextInputType.isEmail)
         validator.validateUserInput(passwordEditText, TextInputType.isPassword)
@@ -44,10 +43,14 @@ class LoginActivity : AppCompatActivity() {
                 entryManager.singIn(username, password) { responseBody, message, isOK ->
                     if (isOK) {
                         LoginChecker.LOGGED_IN = true
-                        navigateToMain(responseBody.accessToken, responseBody.user_id, responseBody.username, responseBody.email)
-                    }
-                    else {
-                        lifecycleScope.launch (Dispatchers.Main) {
+                        navigateToMain(
+                            responseBody.accessToken,
+                            responseBody.user_id,
+                            responseBody.username,
+                            responseBody.email
+                        )
+                    } else {
+                        lifecycleScope.launch(Dispatchers.Main) {
                             buildAlertDialog(message)
                         }
                     }
@@ -65,10 +68,9 @@ class LoginActivity : AppCompatActivity() {
             .setTitle("Oops!")
             .setMessage(message)
             .setNegativeButton("Ok") { _, _ ->
-
             }.show()
     }
-    private fun navigateToMain(accessToken: String, userId: String, username: String, email:String) {
+    private fun navigateToMain(accessToken: String, userId: String, username: String, email: String) {
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         Log.d("LoginAccess", accessToken)
@@ -83,5 +85,4 @@ class LoginActivity : AppCompatActivity() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
-
 }

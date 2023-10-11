@@ -1,6 +1,5 @@
 package com.flexicharge.bolt.api.klarna
 
-
 object OrderClient {
 
     private const val user = "PK44724_d698c30a2ecf" // please enter user here

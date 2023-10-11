@@ -7,7 +7,6 @@ import java.util.Locale
 
 class TimeCalculation {
 
-
     fun unixToDateTime(unixTime: Long): String {
         val locale = Locale("sv", "SE")
         val sdf = SimpleDateFormat("MM/dd/yyyy HH:mm", locale)
@@ -16,21 +15,30 @@ class TimeCalculation {
         return sdf.format(netDate)
     }
 
-    fun checkDuration(firstTime: Long, currentTime: Long): String {
-        val locale = Locale("sv", "SE")
-        Log.d("EndVerify5", firstTime.toString())
-        Log.d("EndVerify4", currentTime.toString())
-        val durationMillis = (currentTime) - (firstTime * 1000)
+    fun checkDuration(firstTime: Long, latestTime: Long): String {
+        val durationMillis = (latestTime) - (firstTime)
+        Log.d("EndVerify668", latestTime.toString())
+        Log.d("EndVerify669", firstTime.toString())
+        Log.d("EndVerify670", durationMillis.toString())
         val hours = durationMillis / (60 * 60 * 1000)
         val minutes = (durationMillis % (60 * 60 * 1000)) / (60 * 1000)
         val seconds = (durationMillis % (60 * 1000)) / 1000
-        return if (hours >= 1) {
-            "$hours hours and $minutes minutes"
+
+        val returnString = if (hours >= 1) {
+            if (minutes >= 1) {
+                "$hours hours and $minutes minutes"
+            } else {
+                "$hours hours"
+            }
         } else if (minutes >= 1) {
-            "$minutes minutes"
+            if (seconds >= 1) {
+                "$minutes minutes and $seconds seconds"
+            } else {
+                "$minutes minutes"
+            }
         } else {
             "$seconds seconds"
         }
-
+        return returnString
     }
 }

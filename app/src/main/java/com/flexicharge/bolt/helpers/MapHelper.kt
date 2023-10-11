@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -24,31 +25,47 @@ import com.google.android.gms.maps.model.*
 
 object MapHelper {
     lateinit var currentLocation: Location
-    lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
 
     private var markerToChargerMap = mutableMapOf<Marker, Charger>()
-    const val LOCATION_PERMISSION_REQUEST_CODE = 1
-    const val PERMISSION_CODE = 101
+    private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    private const val PERMISSION_CODE = 101
     private const val LOCATION_UPDATE_INTERVAL_MS = 5000L
 
-    fun currLocation(activity: MainActivity){
+    fun currLocation(activity: MainActivity) {
         if (MapHelper::currentLocation.isInitialized) {
             fetchLocation(activity)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 13f))
+            mMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(currentLocation.latitude, currentLocation.longitude),
+                    13f
+                )
+            )
         } else {
-            Toast.makeText(activity, "Location permissions are required for this feature.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                activity,
+                "Location permissions are required for this feature.",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
     fun fetchLocation(activity: MainActivity) {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
         if (ActivityCompat.checkSelfPermission(
-                activity, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                activity,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) !=
             PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                activity, Manifest.permission.ACCESS_COARSE_LOCATION) !=
-            PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_CODE
+                    activity,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSION_CODE
             )
             return
         }
@@ -62,31 +79,27 @@ object MapHelper {
             activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
         supportMapFragment.getMapAsync(activity)
 
-
-        val locationCallback = object: LocationCallback() {
+        val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 super.onLocationResult(result)
 
-                val fragment = activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map)
+                val fragment = activity.supportFragmentManager.findFragmentById(
+                    R.id.mainActivity_fragment_map
+                )
                 if (fragment is SupportMapFragment) {
                     fragment.getMapAsync(activity)
                     currentLocation = result.lastLocation
                 } else {
                     // Handle the case when the fragment is not found or is not a SupportMapFragment.
                 }
-
-                /*
-                val supportMapFragment =
-                    activity.supportFragmentManager.findFragmentById(R.id.mainActivity_fragment_map) as SupportMapFragment
-                supportMapFragment.getMapAsync(activity)
-                currentLocation = result.lastLocation
-
-                 */
-
             }
         }
 
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
        /* val task = fusedLocationProviderClient.lastLocation
 
         task.addOnSuccessListener { location ->
@@ -101,45 +114,45 @@ object MapHelper {
         }*/
     }
 
-    fun onRequestPermissionsResult(activity: MainActivity, requestCode: Int, grantResults: IntArray) {
-        when (requestCode) {
-            PERMISSION_CODE ->
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocationAccess(activity)
-                }
-        }
-    }
-
-    private fun setCurrentLocation(activity: MainActivity) {
-        try {
-            val curPos = LatLng(currentLocation.latitude, currentLocation.longitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPos, 13f))
-        } catch (e: Exception) {
-            Toast.makeText(activity,"Location permissions are required for MyLocation.",Toast.LENGTH_SHORT).show()
-        }
-    }
-
     private fun getLocationAccess(activity: MainActivity) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.isMyLocationEnabled = true
-        }
-        else
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        } else {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
+        }
     }
 
-    fun addNewMarkers(activity: MainActivity, chargers: Chargers, onTapMarker: (Charger?) -> Boolean){
-        val blackIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_black_marker)?.toBitmap())
-        val greenIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_green_marker)?.toBitmap())
-        val redIcon = BitmapDescriptorFactory.fromBitmap(activity.getDrawable(R.drawable.ic_red_marker)?.toBitmap())
+    fun addNewMarkers(
+        activity: MainActivity,
+        chargers: Chargers,
+        onTapMarker: (Charger?) -> Boolean
+    ) {
+        val blackIcon = BitmapDescriptorFactory.fromBitmap(
+            AppCompatResources.getDrawable(activity, R.drawable.ic_black_marker)?.toBitmap()
+        )
+        val greenIcon = BitmapDescriptorFactory.fromBitmap(
+            AppCompatResources.getDrawable(activity, R.drawable.ic_green_marker)?.toBitmap()
+        )
+        val redIcon = BitmapDescriptorFactory.fromBitmap(
+            AppCompatResources.getDrawable(activity, R.drawable.ic_red_marker)?.toBitmap()
+        )
 
-        markerToChargerMap.keys.forEach{
+        markerToChargerMap.keys.forEach {
             it.remove()
         }
-        Log.d("chargers","$chargers")
+        Log.d("chargers", "$chargers")
         chargers.forEach { charger ->
-            val marker = mMap.addMarker(MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(charger.connectorID.toString()))
+
+            val marker = mMap.addMarker(
+                MarkerOptions().position(LatLng(charger.location[0], charger.location[1])).title(
+                    charger.connectorID.toString()
+                )
+            )
+
             markerToChargerMap[marker] = charger
             when (charger.status) {
                 "Available" -> marker.setIcon(greenIcon)
@@ -154,9 +167,9 @@ object MapHelper {
         }
     }
 
-    fun panToPos (
+    fun panToPos(
         latitude: Double,
-        longitude: Double,
+        longitude: Double
     ) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 13f))
     }
@@ -164,8 +177,9 @@ object MapHelper {
     fun onMapReady(activity: MainActivity, googleMap: GoogleMap) {
         mMap = googleMap
         mMap.uiSettings.isMyLocationButtonEnabled = false
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(activity, R.raw.flexicharge_map_style) )
+        mMap.setMapStyle(
+            MapStyleOptions.loadRawResourceStyle(activity, R.raw.flexicharge_map_style)
+        )
         getLocationAccess(activity)
-
     }
 }

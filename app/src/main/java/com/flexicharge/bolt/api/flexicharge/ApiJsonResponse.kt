@@ -32,45 +32,39 @@ data class ReservatioDetails(
 class ChargePoints : ArrayList<ChargePoint>()
 data class ChargePoint(
     val chargePointID: Int,
-    val coordinates: List<Double>,
+    val location: List<Double>,
     val name: String,
-    val address : String
-    )
+    val address: String
+)
 
 class TransactionList : ArrayList<Transaction>()
 
-
 data class InitTransaction(
-    val klarnaClientToken : String,
-    val klarnaSessionID : String,
-    val transactionID : Double
+    val klarnaClientToken: String,
+    val klarnaSessionID: String,
+    val transactionID: Double
 )
 
-
 data class Transaction(
-    var connectorID: Int ?= null,
-    var currentChargePercentage: Int ?= null,
-    var kwhTransferred: Double ?= null,
-    val pricePerKwh: String ?= null,
+    var transactionID: Double ? = null,
+    var connectorID: Int ? = null,
+    var currentChargePercentage: Int ? = null,
+    var kwhTransferred: Double ? = null,
+    val pricePerKwh: String ? = null,
     var price: Int? = null,
-    var discount : String ?= null,
+    var discount: String ? = null,
     var startTimestamp: Long? = null,
-    var endTimestamp: Long? = null,
-    val totalEnergy : Int ?= null
+    var endTimestamp: Long? = null
 )
 
 data class TransactionSession(
     val connectorID: Int,
-    val paymentType: String,
+    val paymentType: String
 
-    )
+)
 
 data class TransactionSessionResponse(
     val transactionID: Int
-)
-
-data class TransactionOrder(
-    val authorization_token: String
 )
 
 // Every user has his own email, password
@@ -86,7 +80,7 @@ class UserFullDetails(
     val streetAddress: String? = null,
     val zipCode: String? = null,
     val city: String? = null,
-    val country: String? = null,
+    val country: String? = null
 )
 
 class ChargingHistoryObject(
@@ -121,5 +115,3 @@ data class InitTransactionDetails(
     val userID: String,
     val chargerID: String
 )
-
-

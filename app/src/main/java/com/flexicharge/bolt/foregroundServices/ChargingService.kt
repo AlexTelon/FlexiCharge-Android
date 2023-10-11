@@ -24,13 +24,13 @@ class ChargingService : Service() {
 
     private var shouldUpdate: Boolean = true
     private var transactionId: Int = -1
-    private var StartTime: Long = 0
+    private var startTime: Long = 0
     private lateinit var notificationManager: NotificationManager
     private val updateHandler = Handler(Looper.getMainLooper())
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
     private var isInitial: Boolean = true
     private var timeCalculation = TimeCalculation()
-    private var localAccessToken : String = ""
+    private var localAccessToken: String = ""
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -40,7 +40,10 @@ class ChargingService : Service() {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val sharedPreferencesLogin = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
-        val accessToken = sharedPreferencesLogin.getString("accessToken", Context.MODE_PRIVATE.toString())
+        val accessToken = sharedPreferencesLogin.getString(
+            "accessToken",
+            Context.MODE_PRIVATE.toString()
+        )
         localAccessToken = accessToken!!
         when (intent?.action) {
             //  Actions.START.toString() -> start(transactionId)
@@ -51,13 +54,10 @@ class ChargingService : Service() {
             }
         }
 
-
         return super.onStartCommand(intent, flags, startId)
     }
 
-
     private fun start(transaction: Int) {
-
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         CoroutineScope(Dispatchers.IO).launch {
             transactionId = transaction
@@ -65,8 +65,6 @@ class ChargingService : Service() {
             getDataFromApi(true)
         }
         updateHandler.postDelayed(updatedNotificationTask, 3000)
-
-
     }
 
     private val updatedNotificationTask = object : Runnable {
@@ -78,8 +76,6 @@ class ChargingService : Service() {
 
                 updateHandler.postDelayed(this, 3000)
             }
-
-
         }
     }
 
@@ -87,7 +83,10 @@ class ChargingService : Service() {
         try {
             Log.d("EndVerify12", localAccessToken.toString())
             Log.d("EndVerify12", transactionId.toString())
-            val response = RetrofitInstance.flexiChargeApi.getTransaction("Bearer $localAccessToken",transactionId)
+            val response = RetrofitInstance.flexiChargeApi.getTransaction(
+                "Bearer $localAccessToken",
+                transactionId
+            )
 
             if (response.isSuccessful) {
                 Log.d("EndVerify12", "Success")
@@ -95,22 +94,20 @@ class ChargingService : Service() {
                 val currentTime = System.currentTimeMillis()
                 val startTime = responseData?.startTimestamp
                 val newPercentage = responseData?.currentChargePercentage.toString()
-                val newTime = timeCalculation.checkDuration(startTime!!, currentTime)
+                val newTime = timeCalculation.checkDuration(startTime!! * 1000, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
                 if (firstTime) {
                     startForeground(1, updatedNotification)
                 } else {
                     notificationManager.notify(1, updatedNotification)
                 }
-
-            }else{
+            } else {
                 Log.d("EndVerify12", "No sucess")
             }
         } catch (e: java.lang.Exception) {
             Log.d("EndVerify12", "Catch error")
         }
     }
-
 
     private fun createNotification(percentage: String, timeElapsed: String): Notification {
         val contentView = RemoteViews(packageName, R.layout.layout_custom_notification)
@@ -127,7 +124,9 @@ class ChargingService : Service() {
         val activityIntent = Intent(this, SplashscreenActivity::class.java)
         val id = 0
         val pendingIntent = PendingIntent.getActivity(
-            this, id, activityIntent,
+            this,
+            id,
+            activityIntent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -144,16 +143,10 @@ class ChargingService : Service() {
             .setCustomBigContentView(contentView)
             .setContentIntent(pendingIntent)
 
-
-
-
-
         return notificationBuilder.build()
     }
-
 
     enum class Actions {
         START, STOP
     }
-
 }
