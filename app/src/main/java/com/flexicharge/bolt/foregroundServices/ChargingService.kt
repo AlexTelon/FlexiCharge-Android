@@ -38,8 +38,9 @@ class ChargingService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val sharedPreferencesLogin = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
-        val accessToken = sharedPreferences.getString("accessToken", Context.MODE_PRIVATE.toString())
+        val accessToken = sharedPreferencesLogin.getString("accessToken", Context.MODE_PRIVATE.toString())
         localAccessToken = accessToken!!
         when (intent?.action) {
             //  Actions.START.toString() -> start(transactionId)
@@ -60,6 +61,7 @@ class ChargingService : Service() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         CoroutineScope(Dispatchers.IO).launch {
             transactionId = transaction
+
             getDataFromApi(true)
         }
         updateHandler.postDelayed(updatedNotificationTask, 3000)
@@ -83,12 +85,15 @@ class ChargingService : Service() {
 
     private suspend fun getDataFromApi(firstTime: Boolean) {
         try {
+            Log.d("EndVerify12", localAccessToken.toString())
+            Log.d("EndVerify12", transactionId.toString())
             val response = RetrofitInstance.flexiChargeApi.getTransaction("Bearer $localAccessToken",transactionId)
 
             if (response.isSuccessful) {
+                Log.d("EndVerify12", "Success")
                 val responseData = response.body()
                 val currentTime = System.currentTimeMillis()
-                val startTime = responseData?.startTimeStamp
+                val startTime = responseData?.startTimestamp
                 val newPercentage = responseData?.currentChargePercentage.toString()
                 val newTime = timeCalculation.checkDuration(startTime!!, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
@@ -98,9 +103,11 @@ class ChargingService : Service() {
                     notificationManager.notify(1, updatedNotification)
                 }
 
+            }else{
+                Log.d("EndVerify12", "No sucess")
             }
         } catch (e: java.lang.Exception) {
-
+            Log.d("EndVerify12", "Catch error")
         }
     }
 

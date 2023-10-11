@@ -44,8 +44,8 @@ interface ApiInterface {
         @Path("transactionId") transactionId: Int,
     ): Response<Transaction>
 
-    @PUT("transactions/stop/{transactionId}")
-    suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<Transaction>
+    @PUT("transaction/stop/{transactionId}")
+    suspend fun transactionStop(@Header("Authorization") authorizationHeader : String, @Path("transactionId") transactionId: Int): Response<Transaction>
 
 
     @POST("/auth/sign-in")

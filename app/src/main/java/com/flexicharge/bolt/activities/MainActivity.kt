@@ -77,10 +77,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         //checkPendingTransaction()
 
 
-
-
-
-
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -126,7 +122,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val accessToken = loginSharedPref.getString("accessToken", Context.MODE_PRIVATE.toString())
         val userId = loginSharedPref.getString("userId", Context.MODE_PRIVATE.toString())
 
-        if(accessToken != null){
+        if (accessToken != null) {
             currentRemoteTransaction.localAccessToken = accessToken
         }
 
@@ -167,7 +163,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val loginSharedPref = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val accessToken = loginSharedPref.getString("accessToken", Context.MODE_PRIVATE.toString())
 
-        if(accessToken != null){
+        if (accessToken != null) {
             currentRemoteTransaction.localAccessToken = accessToken
         }
         remoteChargersRefresher.run(lifecycleScope)
@@ -222,8 +218,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         bottomSheetDialog: BottomSheetDialog,
     ) {
         currentRemoteTransaction.refresh(lifecycleScope)
-        val dateTime =
-            timeCalculation.unixToDateTime(currentRemoteTransaction.value.endTimeStamp.toString())
 
         try {
             val stopRemoteTransactionJob = currentRemoteTransaction.stop(lifecycleScope)
@@ -237,6 +231,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                         it.action = ChargingService.Actions.STOP.toString()
                         startService(it)
                     }
+
+
+                    Log.d("EndVerify2", (currentRemoteTransaction.value ?: "").toString())
+
+                    val dateTime =
+                        timeCalculation.unixToDateTime(currentRemoteTransaction.value.endTimestamp!!)
+
+                    Log.d("EndVerify3", dateTime)
+
                     val sharedPreferences =
                         getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
@@ -250,7 +253,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
                 bottomSheetDialog.dismiss()
-                displayPaymentSummaryDialog(dateTime)
+                //  displayPaymentSummaryDialog(dateTime)
             }
         }
     }
@@ -268,7 +271,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
         val retrieveJob =
-            currentRemoteTransaction.retriveReopened(lifecycleScope, transactionId)
+            currentRemoteTransaction.retrieve(lifecycleScope)
 
         try {
             retrieveJob.invokeOnCompletion {
@@ -278,6 +281,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                 }
             }
         } catch (e: Exception) {
+            Log.d("StartVerify", "catch error remote trans")
             println("Error when retreiving")
         }
 
@@ -287,6 +291,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             R.layout.layout_charger_in_progress,
             findViewById<ConstraintLayout>(R.id.chargerInProgress)
         )
+        Log.d("StartVerify", "set progress Percent")
         val progressbarPercent =
             bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_progressbarPercent)
         val progressbar =
@@ -303,6 +308,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val currentPercentage = currentRemoteTransaction.value.currentChargePercentage
 
+        // progressbar.progress = 33
         progressbar.progress = currentPercentage!!
 
         isPolling = true
@@ -324,7 +330,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
                     Log.d("NEWTEST", "trans :${currentRemoteTransaction}")
 
 
-                    if (currentRemoteTransaction.value.endTimeStamp != null) {
+                    if (currentRemoteTransaction.value.endTimestamp != null) {
                         Log.d("NEWTEST", "endTimeStamp active")
 
                         isPolling = false
@@ -386,33 +392,42 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback,
             isBottomSheetVisible = false
         }
 
-        val refreshJob = currentRemoteTransaction.refresh(lifecycleScope)
-        refreshJob.invokeOnCompletion {
-            val transaction = currentRemoteTransaction.value
-            val kwhTransferred = transaction.kwhTransferred
-            val totalCost = transaction.price
-            val pricePerKwh = transaction.pricePerKwh
-            val duration = timeCalculation.checkDuration(
-                transaction.startTimeStamp!!,
-                transaction.endTimeStamp!!
-            )
+        //  val refreshJob = currentRemoteTransaction.refresh(lifecycleScope)
+        //   refreshJob.invokeOnCompletion {
+        val transaction = currentRemoteTransaction.value
+        val kwhTransferred = transaction.kwhTransferred
+        val totalCost = transaction.price?.div(100)
+        val pricePerKwh = totalCost?.div(transaction.kwhTransferred!!)
+        val duration = timeCalculation.checkDuration(
+            transaction.startTimestamp!!,
+            transaction.endTimestamp!!
+        )
 
-            lifecycleScope.launch(Dispatchers.Main) {
+        var roundedPrice : Double = 0.0
 
-                val energyUsedText = "$kwhTransferred  kWh @ $pricePerKwh + kr kWh"
-                val chargingStopTimeText = "Charging stopped at $dateTime"
-                val totalCostText = "$totalCost kr"
-
-                energyUsedTextView.text = energyUsedText
-
-                durationTextView.text = duration
-                chargingStopTimeTextView.text = chargingStopTimeText
-                totalCostTextView.text = totalCostText
-
-                paymentSummaryDialog.setContentView(bottomSheetView)
-                paymentSummaryDialog.show()
-            }
+        if(pricePerKwh != null){
+            roundedPrice = String.format("%.2f", pricePerKwh).toDouble()
         }
+        //   val  priceString= String.format("%.2f", pricePerKwh)
+        val rounded = (pricePerKwh?.times(100))?.toFloat()?.div(100)
+        Log.d("EndVerify11", roundedPrice.toString())
+        Log.d("EndVerify12", rounded.toString())
+        lifecycleScope.launch(Dispatchers.Main) {
+
+            val energyUsedText = "$kwhTransferred  kWh @ $roundedPrice + kr kWh"
+            val chargingStopTimeText = "Charging stopped at $dateTime"
+            val totalCostText = "$totalCost kr"
+
+            energyUsedTextView.text = energyUsedText
+
+            durationTextView.text = duration
+            chargingStopTimeTextView.text = chargingStopTimeText
+            totalCostTextView.text = totalCostText
+
+            paymentSummaryDialog.setContentView(bottomSheetView)
+            paymentSummaryDialog.show()
+        }
+        //  }
     }
 
     private fun setupChargerInputDialog(chargerId: Int? = null) {

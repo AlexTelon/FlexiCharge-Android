@@ -52,10 +52,10 @@ data class Transaction(
     var currentChargePercentage: Int ?= null,
     var kwhTransferred: Double ?= null,
     val pricePerKwh: String ?= null,
-    val price: Int? = null,
-    val discount : String ?= null,
-    val startTimeStamp: Long? = null,
-    val endTimeStamp: Long? = null,
+    var price: Int? = null,
+    var discount : String ?= null,
+    var startTimestamp: Long? = null,
+    var endTimestamp: Long? = null,
     val totalEnergy : Int ?= null
 )
 

@@ -27,8 +27,7 @@ class RemoteTransaction( var transactionId : Int = -1) : RemoteObject<Transactio
 
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    Log.d("StartVerify", localAccessToken)
-                    Log.d("StartVerify", transactionId.toString())
+
                     val response = RetrofitInstance.flexiChargeApi.getTransaction("Bearer $localAccessToken",transactionId)
                     Log.d("StartVerify", response.toString())
                     Log.d("StartVerify", "values : ${response.body()}")
@@ -113,10 +112,22 @@ class RemoteTransaction( var transactionId : Int = -1) : RemoteObject<Transactio
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.transactionStop(transactionId)
+                    val response = RetrofitInstance.flexiChargeApi.transactionStop("Bearer $localAccessToken",transactionId)
+                    Log.d("EndVerify", response.toString())
+                    Log.d("EndVerify", response.body().toString())
+
+
                     if (!response.isSuccessful) {
-              
                         cancel(response.message())
+                    }else{
+                        value.endTimestamp = response.body()?.endTimestamp
+                        value.startTimestamp = response.body()?.startTimestamp
+                        value.price = response.body()?.price
+                        value.kwhTransferred = response.body()?.kwhTransferred
+                        value.discount = response.body()?.discount
+
+
+
                     }
                 }
                 catch (e: Exception) {
@@ -131,9 +142,6 @@ class RemoteTransaction( var transactionId : Int = -1) : RemoteObject<Transactio
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
                     val response = RetrofitInstance.flexiChargeApi.transactionStart("Bearer $accessToken",transactionId)
-                    Log.d("StartVerify", response.toString())
-                    Log.d("StartVerify", accessToken)
-                    Log.d("StartVerify", response.body().toString())
                     if(!response.isSuccessful) {
                         cancel(response.message())
                     }
