@@ -70,7 +70,7 @@ interface ApiInterface {
         @Body body: TransactionSession
     ): Response<InitTransaction>
 
-    @GET("/transactions/userTransactions/{userId}")
+    @GET("/transaction/userTransactions/{userId}")
     suspend fun transactionsByUserID(
         @Header("Authorization") authorizationHeader: String,
         @Path("userId") userId: String
