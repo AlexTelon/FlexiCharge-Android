@@ -70,7 +70,7 @@ app:layout_anchorGravity="bottom">
         android:layout_marginEnd="10dp"
         android:text="Kungsgatan 5, Jönköping"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_information" />
 
@@ -81,7 +81,7 @@ app:layout_anchorGravity="bottom">
         android:layout_marginTop="15dp"
         android:text="1h 21min until full"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textView_location"
         app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textView_location" />
 
@@ -92,14 +92,14 @@ app:layout_anchorGravity="bottom">
         android:layout_marginTop="15dp"
         android:text="5.72kwh at 3kwh"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
         app:layout_constraintTop_toBottomOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus" />
 
     <ImageView
         android:id="@+id/chargeInProgressLayout_imageView_locationIcon"
-        android:layout_width="21dp"
-        android:layout_height="24dp"
+        android:layout_width="18dp"
+        android:layout_height="21dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_position_pin"
         app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textView_location"
@@ -109,7 +109,7 @@ app:layout_anchorGravity="bottom">
     <ImageView
         android:id="@+id/chargeInProgressLayout_imageView_timeIcon"
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:layout_height="21dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_clock"
         app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textview_chargingTimeStatus"
@@ -118,8 +118,8 @@ app:layout_anchorGravity="bottom">
 
     <ImageView
         android:id="@+id/chargeInProgressLayout_imageView_lightningIcon"
-        android:layout_width="17dp"
-        android:layout_height="24dp"
+        android:layout_width="14dp"
+        android:layout_height="21dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/ic_lightning"
         app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_textView_chargeSpeed"

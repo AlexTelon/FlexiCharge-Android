@@ -26,18 +26,18 @@ class TimeCalculation {
 
         val returnString = if (hours >= 1) {
             if (minutes >= 1) {
-                "$hours hours and $minutes minutes"
+                "$hours h and $minutes m"
             } else {
-                "$hours hours"
+                "$hours h"
             }
         } else if (minutes >= 1) {
             if (seconds >= 1) {
-                "$minutes minutes and $seconds seconds"
+                "$minutes m and $seconds s"
             } else {
-                "$minutes minutes"
+                "$minutes m"
             }
         } else {
-            "$seconds seconds"
+            "$seconds s"
         }
         return returnString
     }

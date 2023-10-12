@@ -22,13 +22,6 @@ data class Charger(
     val status: String
 )
 
-data class ReservatioDetails(
-    val chargerID: String,
-    val userID: String,
-    val start: Int,
-    val end: Int
-)
-
 class ChargePoints : ArrayList<ChargePoint>()
 data class ChargePoint(
     val chargePointID: Int,
@@ -36,8 +29,6 @@ data class ChargePoint(
     val name: String,
     val address: String
 )
-
-class TransactionList : ArrayList<Transaction>()
 
 data class InitTransaction(
     val klarnaClientToken: String,
@@ -61,10 +52,6 @@ data class TransactionSession(
     val connectorID: Int,
     val paymentType: String
 
-)
-
-data class TransactionSessionResponse(
-    val transactionID: Int
 )
 
 // Every user has his own email, password
@@ -97,21 +84,10 @@ class VerificationDetails(
     val code: String
 )
 
-class UserDetailsGotten(
-    val message: String,
-    val code: String,
-    val statusCode: Int
-)
-
 data class ResetResponseBody(val status: String)
 
 data class ResetRequestBody(
     val username: String,
     val password: String,
     val confirmationCode: String
-)
-
-data class InitTransactionDetails(
-    val userID: String,
-    val chargerID: String
 )

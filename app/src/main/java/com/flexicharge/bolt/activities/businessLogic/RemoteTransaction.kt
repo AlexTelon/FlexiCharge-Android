@@ -24,9 +24,6 @@ class RemoteTransaction(var transactionId: Int = -1) : RemoteObject<Transaction>
             null, null, null
         )
 
-    var startTime: Long = 0
-        private set
-
     public override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
@@ -48,31 +45,6 @@ class RemoteTransaction(var transactionId: Int = -1) : RemoteObject<Transaction>
                     }
                 } catch (e: Exception) {
                     Log.d("StartVerify", e.message!!)
-
-                    cancel(CancellationException(e.message))
-                }
-            }
-        }
-    }
-
-    fun retrieveReopened(lifecycleScope: LifecycleCoroutineScope, transactionId: Int): Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
-                try {
-                    Log.d("StartVerify", localAccessToken)
-                    Log.d("StartVerify", transactionId.toString())
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(
-                        "Bearer $localAccessToken",
-                        transactionId
-                    )
-                    Log.d("StartVerify", "response : ${response.body()}")
-                    if (!response.isSuccessful) {
-                        cancel("Could not fetch transaction!")
-                    } else {
-                        value = response.body()!!
-                    }
-                } catch (e: Exception) {
-                    Log.d("StartVerify", e.message.toString())
 
                     cancel(CancellationException(e.message))
                 }
@@ -160,10 +132,5 @@ class RemoteTransaction(var transactionId: Int = -1) : RemoteObject<Transaction>
                 }
             }
         }
-    }
-
-    fun refresh(lifecycleScope: LifecycleCoroutineScope, transactionId: Int): Job {
-        this.transactionId = transactionId
-        return refresh(lifecycleScope)
     }
 }

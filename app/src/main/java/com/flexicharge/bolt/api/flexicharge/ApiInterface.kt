@@ -5,9 +5,6 @@ import retrofit2.http.*
 
 interface ApiInterface {
 
-    @POST("/reservations")
-    suspend fun makeReservation(@Body reservation: ReservatioDetails): Response<ReservatioDetails>
-
     @GET("chargers/{chargerId}")
     suspend fun getCharger(@Path("chargerId") chargerId: Int): Response<Charger>
 
@@ -20,18 +17,6 @@ interface ApiInterface {
     @GET("chargers/{chargerPointId}")
     suspend fun getChargePoint(@Path("chargerPointId") chargerPointId: Int): Response<ChargePoint>
 
-    @PUT("chargers/{chargerId}")
-    suspend fun setChargerStatus(
-        @Path("chargerId") chargerId: Int,
-        @Body body: MutableMap<String, String>
-    ): Response<Charger>
-
-    @PUT("reservations/{chargerId}")
-    suspend fun reserveCharger(
-        @Path("chargerId") chargerId: Int,
-        @Body body: MutableMap<String, String>
-    ): Response<String>
-
     @GET("transaction/{transactionId}")
     suspend fun getTransaction(
         @Header("Authorization") authorizationHeader: String,
@@ -39,9 +24,6 @@ interface ApiInterface {
             "transactionId"
         ) transactionId: Int
     ): Response<Transaction>
-
-    @POST("transactions/session")
-    suspend fun postTransactionSession(@Body body: TransactionSession): Response<TransactionSessionResponse>
 
     @PUT("transaction/start/{transactionId}")
     suspend fun transactionStart(

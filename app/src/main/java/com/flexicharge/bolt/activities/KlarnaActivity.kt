@@ -55,7 +55,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
 
     private fun initialize() {
         if (OrderClient.hasSetCredentials()) {
-            job = GlobalScope.launch {
+            job = lifecycleScope.launch {
                 try {
                     runOnUiThread {
                         Log.d("KlarnaTest", " Init")
@@ -99,7 +99,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     private fun runOnUiThread(action: () -> Unit) {
         Log.d("KlarnaTest", "Run on UI thread")
 
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Main) {
             action.invoke()
         }
     }

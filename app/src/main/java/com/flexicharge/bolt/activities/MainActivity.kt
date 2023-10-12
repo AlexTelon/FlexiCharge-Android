@@ -84,7 +84,6 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         remoteChargers.setOnRefreshedCallBack {
-            Log.d("TESTNULL", remoteChargers.value.toString())
             lifecycleScope.launch(Dispatchers.Main) {
                 addNewMarkers(
                     this@MainActivity,
@@ -227,8 +226,6 @@ class MainActivity :
                         startService(it)
                     }
 
-                    Log.d("EndVerify2", (currentRemoteTransaction.value ?: "").toString())
-
                     val dateTime =
                         timeCalculation.unixToDateTime(
                             currentRemoteTransaction.value.endTimestamp!!
@@ -263,22 +260,19 @@ class MainActivity :
             Log.d("CheckTransaction", "it is initialized")
             chargerInputDialog.dismiss()
         }
-
-        val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val transactionId = sharedPreferences.getInt("TransactionId", -1)
         val retrieveJob =
             currentRemoteTransaction.retrieve(lifecycleScope)
 
         try {
             retrieveJob.invokeOnCompletion {
                 if (retrieveJob.isCancelled) {
-                    Log.d("StartVerify", "retreive job cancelled")
+                    Log.d("StartVerify", "retrieve job cancelled")
                     return@invokeOnCompletion
                 }
             }
         } catch (e: Exception) {
             Log.d("StartVerify", "catch error remote trans")
-            println("Error when retreiving")
+            println("Error when retrieving")
         }
 
         val bottomSheetDialog = BottomSheetDialog(this@MainActivity)
@@ -297,13 +291,16 @@ class MainActivity :
             bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_chargeSpeed)
         val location =
             bottomSheetView.findViewById<TextView>(R.id.chargeInProgressLayout_textView_location)
+        val chargeDuration = bottomSheetView.findViewById<TextView>(
+            R.id.chargeInProgressLayout_textview_chargingTimeStatus
+        )
 
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.behavior.isDraggable = false
         bottomSheetDialog.setCancelable(false)
 
         val currentPercentage = currentRemoteTransaction.value.currentChargePercentage
-
+        // chargeDuration.text = "HEEEJ"
         progressbar.progress = currentPercentage!!
 
         isPolling = true
@@ -316,22 +313,26 @@ class MainActivity :
 
         scope.launch {
             while (isPolling) {
-                Log.d("NEWTEST", "performing a poll")
-                val retrive = currentRemoteTransaction.retrieve(lifecycleScope)
+                currentRemoteTransaction.retrieve(lifecycleScope)
 
                 withContext(Dispatchers.Main) {
-                    Log.d("NEWTEST", "trans :$currentRemoteTransaction")
-
                     if (currentRemoteTransaction.value.endTimestamp != null) {
-                        Log.d("NEWTEST", "endTimeStamp active")
-
                         isPolling = false
                         stopChargingProcess(bottomSheetDialog)
                     } else {
-                        Log.d(
-                            "NEWTEST",
-                            "percentage : ${currentRemoteTransaction.value.currentChargePercentage}"
-                        )
+                        if (currentRemoteTransaction.value.startTimestamp != null) {
+                            val currentTime = System.currentTimeMillis()
+                            val duration = timeCalculation.checkDuration(
+                                currentRemoteTransaction.value.startTimestamp!! * 1000,
+                                currentTime
+                            )
+                            Log.d("SVANTE", currentTime.toString())
+                            Log.d("SVANTE", duration)
+                            chargeDuration.text = duration
+                        } else {
+                            // chargeDuration.text = chargeDuration.text
+                        }
+
                         progressbar.progress =
                             currentRemoteTransaction.value.currentChargePercentage!!
                         progressbarPercent.text =
@@ -388,8 +389,6 @@ class MainActivity :
         }
 
         Log.d("EndVerify666", currentRemoteTransaction.value.toString())
-        //  val refreshJob = currentRemoteTransaction.refresh(lifecycleScope)
-        //   refreshJob.invokeOnCompletion {
         val transaction = currentRemoteTransaction.value
         val kwhTransferred = transaction.kwhTransferred
         val totalCost = transaction.price?.div(100)
@@ -406,7 +405,6 @@ class MainActivity :
             roundedPrice = String.format(Locale.US, "%.2f", pricePerKwh).toDouble()
             Log.d("EndVerify668", roundedPrice.toString())
         }
-        //   val  priceString= String.format("%.2f", pricePerKwh)
         val rounded = (pricePerKwh?.times(100))?.toFloat()?.div(100)
         Log.d("EndVerify11", roundedPrice.toString())
         Log.d("EndVerify12", rounded.toString())
@@ -424,7 +422,6 @@ class MainActivity :
             paymentSummaryDialog.setContentView(bottomSheetView)
             paymentSummaryDialog.show()
         }
-        //  }
     }
 
     private fun setupChargerInputDialog(chargerId: Int? = null) {
@@ -512,10 +509,8 @@ class MainActivity :
                 )
 
                 val chargersInCp = remoteChargers.value.filter { it.chargePointID == chargePointId }
-                val chargePoint =
-                    remoteChargePoints.value.filter { it.chargePointID == chargePointId }[0]
                 listOfChargersRecyclerView.adapter =
-                    ChargersListAdapter(chargersInCp, chargerId, chargePoint, this@MainActivity)
+                    ChargersListAdapter(chargersInCp, chargerId, this@MainActivity)
 
                 // Only add decoration on first-time display
                 if (listOfChargersRecyclerView.itemDecorationCount == 0) {
@@ -610,9 +605,7 @@ class MainActivity :
     }
 
     private fun createKlarnaTransactionSession(
-        userId: String,
         chargerId: Int
-
     ) {
         val retrieveJob = currentRemoteTransaction.retrieve(lifecycleScope)
 
@@ -640,7 +633,6 @@ class MainActivity :
 
     private fun reserveCharger(chargerId: Int, chargerInputStatus: MaterialButton) {
         val sharedPreferences = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getString("userId", "")
         val transactionSession = TransactionSession(chargerId, "klarna")
         val accessToken =
             sharedPreferences.getString("accessToken", Context.MODE_PRIVATE.toString())
@@ -661,7 +653,7 @@ class MainActivity :
 
                 when (currentRemoteTransaction.status) {
                     "Accepted" -> {
-                        createKlarnaTransactionSession(userId!!, chargerId)
+                        createKlarnaTransactionSession(chargerId)
                     }
 
                     "Faulted" -> {
