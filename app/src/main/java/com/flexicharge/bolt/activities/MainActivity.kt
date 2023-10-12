@@ -627,7 +627,6 @@ class MainActivity :
         val accessToken =
             sharedPreferences.getString("accessToken", Context.MODE_PRIVATE.toString())
 
-
         val createSessionJob =
             currentRemoteTransaction.createSession(
                 lifecycleScope,
