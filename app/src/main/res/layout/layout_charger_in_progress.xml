@@ -10,7 +10,7 @@ app:layout_anchorGravity="bottom">
     <ImageView
         android:id="@+id/chargeInProgressLayout_imageView_progressbarIcon"
         android:layout_width="wrap_content"
-        android:layout_height="18dp"
+        android:layout_height="16dp"
         app:layout_constraintBottom_toTopOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
         app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
         app:layout_constraintStart_toStartOf="@+id/chargeInProgressLayout_textView_progressbarPercent"
@@ -22,7 +22,7 @@ app:layout_anchorGravity="bottom">
         android:layout_height="wrap_content"
         android:text="67"
         android:textColor="@color/white"
-        android:textSize="34sp"
+        android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="@+id/chargeInProgressLayout_progressBar"
         app:layout_constraintEnd_toEndOf="@+id/chargeInProgressLayout_progressBar"
         app:layout_constraintStart_toStartOf="@+id/chargeInProgressLayout_progressBar"
