@@ -1,17 +1,11 @@
 package com.flexicharge.bolt.activities
 
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.lifecycleScope
 import com.flexicharge.bolt.databinding.ActivityProfileMenuLoggedInBinding
-import com.flexicharge.bolt.foregroundServices.ChargingService
 import com.flexicharge.bolt.helpers.LoginChecker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ProfileMenuLoggedInActivity : AppCompatActivity() {
     lateinit var binding: ActivityProfileMenuLoggedInBinding
@@ -45,17 +39,15 @@ class ProfileMenuLoggedInActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.loginActivityButtonLogout.setOnClickListener {
+            LoginChecker.LOGGED_IN = false
+            getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
+                clear()
+            }.apply()
 
-            binding.loginActivityButtonLogout.setOnClickListener {
-                LoginChecker.LOGGED_IN = false
-                getSharedPreferences("loginPreference", Context.MODE_PRIVATE).edit().apply {
-                    clear()
-                }.apply()
-
-                val intent = Intent(this, RegisterActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

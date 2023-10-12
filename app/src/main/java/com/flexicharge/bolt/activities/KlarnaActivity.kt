@@ -21,12 +21,17 @@ import com.klarna.mobile.sdk.api.payments.KlarnaPaymentsSDKError
 import kotlinx.coroutines.*
 
 class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
-    private val klarnaPaymentView by lazy { findViewById<KlarnaPaymentView>(R.id.klarnaActivity_KlarnaPaymentVie) }
+    private val klarnaPaymentView by lazy {
+        findViewById<KlarnaPaymentView>(
+            R.id.klarnaActivity_KlarnaPaymentVie
+        )
+    }
     private val authorizeButton by lazy { findViewById<Button>(R.id.klarnaActivity_button_authorize) }
-    private var chargerId : Int = 0
-    private var klarna_consumer_token : String = ""
-    private var transactionId : Int = 0
-    private var authTokenId : String = ""
+
+    private var chargerId: Int = 0
+    private var klarnaConsumerToken: String = ""
+    private var transactionId: Int = 0
+    private var authTokenId: String = ""
 
     private val paymentCategory = KlarnaPaymentCategory.PAY_NOW // please update this value if needed
 
@@ -37,9 +42,10 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         setContentView(R.layout.activity_klarna)
 
         chargerId = intent.getIntExtra("ChargerId", 0)
-        klarna_consumer_token = intent.getStringExtra("klarna_consumer_token").toString()
+        klarnaConsumerToken = intent.getStringExtra("klarna_consumer_token").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
-        Log.d("CLIENTTOKEN", klarna_consumer_token)
+
+        Log.d("KlarnaTest", klarnaConsumerToken)
 
         initialize()
 
@@ -48,28 +54,32 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     }
 
     private fun initialize() {
-
         if (OrderClient.hasSetCredentials()) {
-            job = GlobalScope.launch {
-            try {
-                runOnUiThread {
-
-                    klarnaPaymentView.initialize(
-                        klarna_consumer_token,
-                        "${getString(R.string.return_url_scheme)}://${getString(R.string.return_url_host)}"
-                    )
+            job = lifecycleScope.launch {
+                try {
+                    runOnUiThread {
+                        Log.d("KlarnaTest", " Init")
+                        klarnaPaymentView.initialize(
+                            klarnaConsumerToken,
+                            "${getString(R.string.return_url_scheme)}://${getString(
+                                R.string.return_url_host
+                            )}"
+                        )
+                    }
+                } catch (exception: Exception) {
+                    Log.d("KlarnaTest", "catch error init")
+                    showError(exception.message)
                 }
             }
-            catch (exception: Exception) {
-                showError(exception.message)
-            }
-            }
         } else {
+            Log.d("KlarnaTest", "init error")
             showError(getString(R.string.error_credentials))
         }
     }
 
     private fun setupButtons() {
+        Log.d("KlarnaTest", "Set up button")
+
         authorizeButton.setOnClickListener {
             klarnaPaymentView.authorize(true, null)
         }
@@ -87,19 +97,22 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     }
 
     private fun runOnUiThread(action: () -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
+        Log.d("KlarnaTest", "Run on UI thread")
+
+        lifecycleScope.launch(Dispatchers.Main) {
             action.invoke()
         }
     }
 
     override fun onInitialized(view: KlarnaPaymentView) {
-
+        Log.d("KlarnaTest", "Load View")
         // load the payment view after its been initialized
 
         view.load(null)
     }
 
     override fun onLoaded(view: KlarnaPaymentView) {
+        Log.d("KlarnaTest", "Loaded View")
         // enable the authorization after the payment view is loaded
         authorizeButton.isEnabled = true
     }
@@ -112,48 +125,51 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         authToken: String?,
         finalizedRequired: Boolean?
     ) {
+        Log.d("KlarnaTest", "On auth")
         if (authToken != null) {
             val remoteTransaction = RemoteTransaction(transactionId)
-            try{
-                val startTime = System.currentTimeMillis()
-                val startTransactionJob = remoteTransaction.start(lifecycleScope)
+            try {
+                val sharedPreferencesLogin = getSharedPreferences(
+                    "loginPreference",
+                    Context.MODE_PRIVATE
+                )
+                val accessToken = sharedPreferencesLogin.getString(
+                    "accessToken",
+                    Context.MODE_PRIVATE.toString()
+                )
+                val startTransactionJob = remoteTransaction.start(lifecycleScope, accessToken!!)
+                Log.d("StartVerify", accessToken)
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 startTransactionJob.invokeOnCompletion {
-                    if(!startTransactionJob.isCancelled) {
+                    if (!startTransactionJob.isCancelled) {
+                        Log.d("StartVerify", "It wasn't cancelled")
+
                         lifecycleScope.launch(Dispatchers.Main) {
                             sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
 
-
                             Intent(applicationContext, ChargingService::class.java).also {
                                 it.action = ChargingService.Actions.START.toString()
-                                it.putExtra("startTime", startTime )
                                 startService(it)
                             }
 
-
-
                             finish()
                         }
-
-
-                    }
-                    else {
-
+                    } else {
+                        Log.d("StartVerify", "It was cancelled")
                         sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
 
                         lifecycleScope.launch(Dispatchers.Main) {
-
                             finish()
                         }
                     }
-
-
                 }
-
-            }
-            catch (e: CancellationException) {
+            } catch (e: CancellationException) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    Toast.makeText(applicationContext, "Transaction could not be started: " + e.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "Transaction could not be started: " + e.message,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -183,5 +199,4 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         klarnaPaymentView.unregisterPaymentViewCallback(this)
         job?.cancel()
     }
-
 }

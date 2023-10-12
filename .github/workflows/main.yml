@@ -18,17 +18,16 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
-          java-version: '11'
+          java-version: '17'
 
       - name: Build with Gradle
         run: ./gradlew build
-        continue-on-error: true # Allow the workflow to continue even if some tests fail
 
 
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
-          java-version: '11'
+          java-version: '17'
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -47,7 +46,6 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew Test
-        continue-on-error: true # Allow the workflow to continue even if some tests fail
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v1
