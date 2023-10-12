@@ -300,7 +300,6 @@ class MainActivity :
         bottomSheetDialog.setCancelable(false)
 
         val currentPercentage = currentRemoteTransaction.value.currentChargePercentage
-        // chargeDuration.text = "HEEEJ"
         progressbar.progress = currentPercentage!!
 
         isPolling = true
@@ -326,8 +325,6 @@ class MainActivity :
                                 currentRemoteTransaction.value.startTimestamp!! * 1000,
                                 currentTime
                             )
-                            Log.d("SVANTE", currentTime.toString())
-                            Log.d("SVANTE", duration)
                             chargeDuration.text = duration
                         } else {
                             // chargeDuration.text = chargeDuration.text
@@ -565,13 +562,6 @@ class MainActivity :
 
                 val distanceFloat = (dist[0] / 1000)
                 val roundedDistance = (distanceFloat * 100).roundToInt() / 100f
-                if (chargePoint.name == "JU") {
-                    Log.d("Distance", chargePoint.location[0].toString())
-                    Log.d("Distance", chargePoint.location[1].toString())
-                    Log.d("Distance", currentLocation.latitude.toString())
-                    Log.d("Distance", currentLocation.longitude.toString())
-                    Log.d("Distance", chargePoint.chargePointID.toString())
-                }
                 val count =
                     remoteChargers.value.count { it.chargePointID == chargePoint.chargePointID }
 
@@ -636,7 +626,7 @@ class MainActivity :
         val transactionSession = TransactionSession(chargerId, "klarna")
         val accessToken =
             sharedPreferences.getString("accessToken", Context.MODE_PRIVATE.toString())
-        Log.d("CurrentTest", "reserveCharger")
+
 
         val createSessionJob =
             currentRemoteTransaction.createSession(
@@ -670,6 +660,16 @@ class MainActivity :
 
                     "Unavailable" -> {
                         setChargerButtonStatus(chargerInputStatus, false, "Charger Unavailable", 2)
+                    }
+                    "Unauthorized" -> {
+                        val intent = Intent(this, RegisterActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    "OldToken" -> {
+                        val intent = Intent(this, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
 
                     else -> {

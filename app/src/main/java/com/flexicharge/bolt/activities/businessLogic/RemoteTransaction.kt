@@ -59,31 +59,38 @@ class RemoteTransaction(var transactionId: Int = -1) : RemoteObject<Transaction>
     ): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
-                try {
-                    localAccessToken = accessToken
-                    val response = RetrofitInstance.flexiChargeApi.initTransaction(
-                        "Bearer $accessToken",
-                        transactionSession
-                    )
-                    if (!response.isSuccessful) {
-                        Log.d("CurrentTest", " response init fail")
-                        cancel(response.message())
-                    } else {
-                        val transactionSessionResponse = response.body() as InitTransaction
-                        Log.d("CurrentTest", "init: ${response.body()}")
-                        transactionId = transactionSessionResponse.transactionID.toInt()
-                        klarnaConsumerToken = transactionSessionResponse.klarnaClientToken
+                if (accessToken == "0") {
+                    status = "Unauthorized"
+                } else {
+                    try {
+                        localAccessToken = accessToken
+                        val response = RetrofitInstance.flexiChargeApi.initTransaction(
+                            "Bearer $accessToken",
+                            transactionSession
+                        )
+                        if (!response.isSuccessful) {
+                            if (response.code() == 401) {
+                                status = "OldToken"
+                            }
+                            Log.d("CurrentTest", response.code().toString())
+                            cancel(response.message())
+                        } else {
+                            val transactionSessionResponse = response.body() as InitTransaction
+                            Log.d("CurrentTest", "init: ${response.body()}")
+                            transactionId = transactionSessionResponse.transactionID.toInt()
+                            klarnaConsumerToken = transactionSessionResponse.klarnaClientToken
 
-                        status = "Accepted"
-                        try {
-                            val refreshJob = refresh(lifecycleScope)
-                            refreshJob.join()
-                        } catch (e: CancellationException) {
-                            cancel(e)
+                            status = "Accepted"
+                            try {
+                                val refreshJob = refresh(lifecycleScope)
+                                refreshJob.join()
+                            } catch (e: CancellationException) {
+                                cancel(e)
+                            }
                         }
+                    } catch (e: Exception) {
+                        cancel(CancellationException(e.message))
                     }
-                } catch (e: Exception) {
-                    cancel(CancellationException(e.message))
                 }
             }
         }
