@@ -388,7 +388,7 @@ class MainActivity :
         Log.d("EndVerify666", currentRemoteTransaction.value.toString())
         val transaction = currentRemoteTransaction.value
         val kwhTransferred = transaction.kwhTransferred
-        val totalCost = transaction.price?.div(100)
+        val totalCost = transaction.price?.toFloat()?.div(100)
         val pricePerKwh = totalCost?.div(transaction.kwhTransferred!!)
         val duration = timeCalculation.checkDuration(
             transaction.startTimestamp!! * 1000,
@@ -396,17 +396,15 @@ class MainActivity :
         )
 
         var roundedPrice = 0.0
-        Log.d("EndVerify667", pricePerKwh.toString())
+        var roundedKwh = 0.0
 
         if (pricePerKwh != null) {
             roundedPrice = String.format(Locale.US, "%.2f", pricePerKwh).toDouble()
-            Log.d("EndVerify668", roundedPrice.toString())
+            roundedKwh = String.format(Locale.US, "%.2f", kwhTransferred).toDouble()
         }
         val rounded = (pricePerKwh?.times(100))?.toFloat()?.div(100)
-        Log.d("EndVerify11", roundedPrice.toString())
-        Log.d("EndVerify12", rounded.toString())
         lifecycleScope.launch(Dispatchers.Main) {
-            val energyUsedText = "$kwhTransferred  kWh @ $roundedPrice + kr kWh"
+            val energyUsedText = "$roundedKwh  kWh @ $roundedPrice + kr kWh"
             val chargingStopTimeText = "Charging stopped at $dateTime"
             val totalCostText = "$totalCost kr"
 
