@@ -32,12 +32,6 @@ class TestApi {
     }
 
     @Test
-    fun testGetTransactionSuccessful() = runBlocking {
-        val response = RetrofitInstance.flexiChargeApi.getTransaction(1)
-        assert(response.isSuccessful)
-    }
-
-    @Test
     fun testLogin() = runBlocking {
         val email = "green.sock5070+native@fastmail.com"
         val pass = "aB3\$hejhejhejhej"
@@ -90,9 +84,13 @@ class TestApi {
         val credentials = Credentials(email, pass)
         val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
         val userID = login.body()?.user_id.toString()
+        val token = login.body()?.accessToken
         val chargerID = "100030"
         assert(login.isSuccessful)
-        val transactions = RetrofitInstance.flexiChargeApi.transactionsByUserID(userID)
+        val transactions = RetrofitInstance.flexiChargeApi.transactionsByUserID(
+            "Bearer $token",
+            userID
+        )
         println(transactions)
         // assert(transactions.isSuccessful)
     }
@@ -104,17 +102,12 @@ class TestApi {
         val credentials = Credentials(email, pass)
         val login = RetrofitInstance.flexiChargeApi.signIn(credentials)
         val userID = login.body()?.user_id.toString()
+        val token = login.body()?.accessToken
         val chargerID = "100000"
         assert(login.isSuccessful)
-/*
-        val transactions = RetrofitInstance.flexiChargeApi.transactionsByUserID(userID)
+        val id: Int = 9999
 
-        val transactionId = transactions.body()?.get(0)?.transactionID
-        println(transactionId)
-
- */ val id: Int = 9999
-
-        val startTransaction = RetrofitInstance.flexiChargeApi.startTransaction(id)
+        val startTransaction = RetrofitInstance.flexiChargeApi.transactionStart("Bearer $token", id)
         println(startTransaction)
         assert(startTransaction.isSuccessful)
     }

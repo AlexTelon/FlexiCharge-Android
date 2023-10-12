@@ -71,8 +71,8 @@ interface ApiInterface {
     ): Response<InitTransaction>
 
     @GET("/transactions/userTransactions/{userId}")
-    suspend fun transactionsByUserID(@Path("userId") userId: String): Response<List<Transaction>>
-
-    @PUT("/transactions/start/{id}")
-    suspend fun startTransaction(@Path("id") id: Int): Response<Transaction>
+    suspend fun transactionsByUserID(
+        @Header("Authorization") authorizationHeader: String,
+        @Path("userId") userId: String
+    ): Response<List<Transaction>>
 }
