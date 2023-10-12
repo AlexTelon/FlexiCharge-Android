@@ -33,7 +33,13 @@ class ExampleUnitTest {
 
     @Test
     fun testGetTransactionSuccessful() = runBlocking {
-        val response = RetrofitInstance.flexiChargeApi.getTransaction(1)
+
+        val email = "didiwa6692@searpen.com"
+        val pass = "Test1234!"
+        val credentials = Credentials(email, pass)
+        val logIn = RetrofitInstance.flexiChargeApi.signIn(credentials)
+        val accessToken = logIn.body()?.accessToken
+        val response = RetrofitInstance.flexiChargeApi.getTransaction("Bearer $accessToken",1)
         assert(response.isSuccessful)
     }
 
