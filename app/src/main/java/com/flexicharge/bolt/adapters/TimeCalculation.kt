@@ -1,29 +1,44 @@
 package com.flexicharge.bolt.adapters
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class TimeCalculation {
 
-    fun unixToDateTime(unixTime: String): String {
+    fun unixToDateTime(unixTime: Long): String {
         val locale = Locale("sv", "SE")
-        val sdf = SimpleDateFormat("MM/dd/HH:mm", locale)
-        val netDate = Date(unixTime.toLong())
+        val sdf = SimpleDateFormat("MM/dd/yyyy HH:mm", locale)
+        val netDate = Date(unixTime * 1000)
+
         return sdf.format(netDate)
     }
 
-    fun checkDuration(firstTime: Long, currentTime: Long): String {
-        val durationMillis = currentTime - firstTime
+    fun checkDuration(firstTime: Long, latestTime: Long): String {
+        val durationMillis = (latestTime) - (firstTime)
+        Log.d("EndVerify668", latestTime.toString())
+        Log.d("EndVerify669", firstTime.toString())
+        Log.d("EndVerify670", durationMillis.toString())
         val hours = durationMillis / (60 * 60 * 1000)
         val minutes = (durationMillis % (60 * 60 * 1000)) / (60 * 1000)
         val seconds = (durationMillis % (60 * 1000)) / 1000
-        return if (hours >= 1) {
-            "$hours hours and $minutes minutes"
+
+        val returnString = if (hours >= 1) {
+            if (minutes >= 1) {
+                "$hours h and $minutes m"
+            } else {
+                "$hours h"
+            }
         } else if (minutes >= 1) {
-            "$minutes minutes"
+            if (seconds >= 1) {
+                "$minutes m and $seconds s"
+            } else {
+                "$minutes m"
+            }
         } else {
-            "$seconds seconds"
+            "$seconds s"
         }
+        return returnString
     }
 }

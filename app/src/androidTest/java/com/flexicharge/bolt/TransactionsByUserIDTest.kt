@@ -45,34 +45,26 @@ class TransactionsByUserIDTest {
         val responseBody = """
             [
                 {
-                    "chargerID": 1,
-                    "klarna_consumer_token": "token1",
-                    "currentChargePercentage": 50,
-                    "isKlarnaPayment": true,
-                    "kwhTransfered": 25.5,
-                    "meterStart": 100,
-                    "paymentConfirmed": true,
-                    "paymentID": "payment1",
-                    "pricePerKwh": "0.12",
-                    "session_id": "session1",
-                    "timestamp": 1633524900,
-                    "transactionID": 1,
-                    "userID": "123456"
+               "transactionID": 1,
+                "connectorID": "55",
+                "currentChargePercentage": 50,
+                "kwhTransferred": 25.5,
+                "pricePerKwh": 100,
+                "price": 7728,
+                "discount": "0",
+                "startTimestamp": "123123123",
+                "endTimestamp": "2223232323",
                 },
                 {
-                    "chargerID": 2,
-                    "klarna_consumer_token": "token2",
-                    "currentChargePercentage": 75,
-                    "isKlarnaPayment": false,
-                    "kwhTransfered": 30.0,
-                    "meterStart": 200,
-                    "paymentConfirmed": false,
-                    "paymentID": "payment2",
-                    "pricePerKwh": "0.15",
-                    "session_id": "session2",
-                    "timestamp": 1633525900,
-                    "transactionID": 2,
-                    "userID": "123456"
+               "transactionID": 12,
+                "connectorID": "42",
+                "currentChargePercentage": 16,
+                "kwhTransferred": 25.5,
+                "pricePerKwh": 100,
+                "price": 7728,
+                "discount": "0",
+                "startTimestamp": "123123123",
+                "endTimestamp": "2223232323",
                 }
             ]
         """.trimIndent()
@@ -81,7 +73,8 @@ class TransactionsByUserIDTest {
         mockWebServer.enqueue(mockResponse)
 
         // Act:
-        val response = apiService.transactionsByUserID(userId)
+        val token = 222
+        val response = apiService.transactionsByUserID("Bearer $token", userId)
 
         // Assert:
         assertNotNull(response)
@@ -91,7 +84,7 @@ class TransactionsByUserIDTest {
         assertNotNull(transactions)
         assertEquals(2, transactions?.size)
         assertEquals(1, transactions?.get(0)?.transactionID)
-        assertEquals(true, transactions?.get(0)?.isKlarnaPayment)
+        assertEquals(50, transactions?.get(0)?.currentChargePercentage)
     }
 
     @Test
@@ -104,7 +97,8 @@ class TransactionsByUserIDTest {
         mockWebServer.enqueue(mockResponse)
 
         // Act:
-        val response = apiService.transactionsByUserID(userId)
+        val token = 222
+        val response = apiService.transactionsByUserID("Bearer $token", userId)
 
         // Assert:
         assertNotNull(response)
@@ -124,7 +118,8 @@ class TransactionsByUserIDTest {
         mockWebServer.enqueue(mockResponse)
 
         // Act: Make an API request to retrieve transactions by user ID
-        val response = apiService.transactionsByUserID(userId)
+        val token = 222
+        val response = apiService.transactionsByUserID("Bearer $token", userId)
 
         // Assert:
         assertNotNull(response)

@@ -1,56 +1,51 @@
 package com.flexicharge.bolt.activities.businessLogic
 
+import android.util.Log
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.flexicharge.bolt.api.flexicharge.InitTransaction
 import com.flexicharge.bolt.api.flexicharge.RetrofitInstance
 import com.flexicharge.bolt.api.flexicharge.Transaction
 import com.flexicharge.bolt.api.flexicharge.TransactionSession
 import kotlinx.coroutines.*
 
-class RemoteTransaction(private var transactionId: Int = -1) : RemoteObject<Transaction>() {
+class RemoteTransaction(var transactionId: Int = -1) : RemoteObject<Transaction>() {
 
     var status: String = ""
         private set
-
-    var startTime: Long = 0
+    var klarnaConsumerToken: String = ""
         private set
+
+    var localAccessToken: String = ""
 
     override var value =
         Transaction(
-            -1, "invalid", 0,
-            false, 0.0, 0, false,
-            "", "", "", 0, transactionId, ""
+            null, null,
+            null, null, null, null,
+            null, null, null
         )
 
     public override fun retrieve(lifecycleScope: LifecycleCoroutineScope): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+                    val response = RetrofitInstance.flexiChargeApi.getTransaction(
+                        "Bearer $localAccessToken",
+                        transactionId
+                    )
+                    Log.d("StartVerify", response.toString())
+                    Log.d("StartVerify", "values : ${response.body()}")
                     if (!response.isSuccessful) {
+                        Log.d("StartVerify", response.toString())
                         cancel("Could not fetch transaction!")
                     } else {
-                        // value = response.body() as Transaction
-                        value.kwhTransfered = response.body()!!.kwhTransfered
-                        value.currentChargePercentage = response.body()!!.currentChargePercentage
-                    }
-                } catch (e: Exception) {
-                    cancel(CancellationException(e.message))
-                }
-            }
-        }
-    }
+                        value = response.body() as Transaction
 
-    fun retrieveReopened(lifecycleScope: LifecycleCoroutineScope, transactionId: Int): Job {
-        return lifecycleScope.launch(Dispatchers.IO) {
-            withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
-                try {
-                    val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
-                    if (!response.isSuccessful) {
-                        cancel("Could not fetch transaction!")
-                    } else {
-                        value = response.body()!!
+                        //  value.kwhTransferred = response.body()!!.kwhTransferred
+                        // value.currentChargePercentage = response.body()!!.currentChargePercentage
                     }
                 } catch (e: Exception) {
+                    Log.d("StartVerify", e.message!!)
+
                     cancel(CancellationException(e.message))
                 }
             }
@@ -59,31 +54,43 @@ class RemoteTransaction(private var transactionId: Int = -1) : RemoteObject<Tran
 
     fun createSession(
         lifecycleScope: LifecycleCoroutineScope,
-        transactionSession: TransactionSession
+        transactionSession: TransactionSession,
+        accessToken: String
     ): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
-                try {
-                    val response = RetrofitInstance.flexiChargeApi.initTransaction(
-                        transactionSession
-                    )
-                    if (!response.isSuccessful) {
-                        cancel(response.message())
-                    } else {
-                        val transactionSessionResponse = response.body() as Transaction
-                        value = transactionSessionResponse
-                        transactionId = transactionSessionResponse.transactionID
-                        startTime = transactionSessionResponse.timestamp
-                        status = "Accepted"
-                        try {
-                            val refreshJob = refresh(lifecycleScope)
-                            refreshJob.join()
-                        } catch (e: CancellationException) {
-                            cancel(e)
+                if (accessToken == "0") {
+                    status = "Unauthorized"
+                } else {
+                    try {
+                        localAccessToken = accessToken
+                        val response = RetrofitInstance.flexiChargeApi.initTransaction(
+                            "Bearer $accessToken",
+                            transactionSession
+                        )
+                        if (!response.isSuccessful) {
+                            if (response.code() == 401) {
+                                status = "OldToken"
+                            }
+                            Log.d("CurrentTest", response.code().toString())
+                            cancel(response.message())
+                        } else {
+                            val transactionSessionResponse = response.body() as InitTransaction
+                            Log.d("CurrentTest", "init: ${response.body()}")
+                            transactionId = transactionSessionResponse.transactionID.toInt()
+                            klarnaConsumerToken = transactionSessionResponse.klarnaClientToken
+
+                            status = "Accepted"
+                            try {
+                                val refreshJob = refresh(lifecycleScope)
+                                refreshJob.join()
+                            } catch (e: CancellationException) {
+                                cancel(e)
+                            }
                         }
+                    } catch (e: Exception) {
+                        cancel(CancellationException(e.message))
                     }
-                } catch (e: Exception) {
-                    cancel(CancellationException(e.message))
                 }
             }
         }
@@ -94,10 +101,20 @@ class RemoteTransaction(private var transactionId: Int = -1) : RemoteObject<Tran
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
                     val response = RetrofitInstance.flexiChargeApi.transactionStop(
-                        value.transactionID
+                        "Bearer $localAccessToken",
+                        transactionId
                     )
+                    Log.d("EndVerify", response.toString())
+                    Log.d("EndVerify", response.body().toString())
+
                     if (!response.isSuccessful) {
                         cancel(response.message())
+                    } else {
+                        value.endTimestamp = response.body()?.endTimestamp
+                        value.startTimestamp = response.body()?.startTimestamp
+                        value.price = response.body()?.price
+                        value.kwhTransferred = response.body()?.kwhTransferred
+                        value.discount = response.body()?.discount
                     }
                 } catch (e: Exception) {
                     cancel(CancellationException(e.message))
@@ -106,12 +123,13 @@ class RemoteTransaction(private var transactionId: Int = -1) : RemoteObject<Tran
         }
     }
 
-    fun start(lifecycleScope: LifecycleCoroutineScope): Job {
+    fun start(lifecycleScope: LifecycleCoroutineScope, accessToken: String): Job {
         return lifecycleScope.launch(Dispatchers.IO) {
             withTimeout(REMOTE_OBJECT_TIMEOUT_MILLISECONDS) {
                 try {
                     val response = RetrofitInstance.flexiChargeApi.transactionStart(
-                        value.transactionID
+                        "Bearer $accessToken",
+                        transactionId
                     )
                     if (!response.isSuccessful) {
                         cancel(response.message())
@@ -121,10 +139,5 @@ class RemoteTransaction(private var transactionId: Int = -1) : RemoteObject<Tran
                 }
             }
         }
-    }
-
-    fun refresh(lifecycleScope: LifecycleCoroutineScope, transactionId: Int): Job {
-        this.transactionId = transactionId
-        return refresh(lifecycleScope)
     }
 }

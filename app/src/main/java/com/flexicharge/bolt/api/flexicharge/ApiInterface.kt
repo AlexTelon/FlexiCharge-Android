@@ -5,9 +5,6 @@ import retrofit2.http.*
 
 interface ApiInterface {
 
-    @POST("/reservations")
-    suspend fun makeReservation(@Body reservation: ReservatioDetails): Response<ReservatioDetails>
-
     @GET("chargers/{chargerId}")
     suspend fun getCharger(@Path("chargerId") chargerId: Int): Response<Charger>
 
@@ -20,16 +17,27 @@ interface ApiInterface {
     @GET("chargers/{chargerPointId}")
     suspend fun getChargePoint(@Path("chargerPointId") chargerPointId: Int): Response<ChargePoint>
 
-    @GET("transactions/{transactionId}")
-    suspend fun getTransaction(@Path("transactionId") transactionId: Int): Response<Transaction>
+    @GET("transaction/{transactionId}")
+    suspend fun getTransaction(
+        @Header("Authorization") authorizationHeader: String,
+        @Path(
+            "transactionId"
+        ) transactionId: Int
+    ): Response<Transaction>
 
-    @PUT("transactions/start/{transactionId}")
+    @PUT("transaction/start/{transactionId}")
     suspend fun transactionStart(
+        @Header("Authorization") authorizationHeader: String,
         @Path("transactionId") transactionId: Int
     ): Response<Transaction>
 
-    @PUT("transactions/stop/{transactionId}")
-    suspend fun transactionStop(@Path("transactionId") transactionId: Int): Response<Transaction>
+    @PUT("transaction/stop/{transactionId}")
+    suspend fun transactionStop(
+        @Header("Authorization") authorizationHeader: String,
+        @Path(
+            "transactionId"
+        ) transactionId: Int
+    ): Response<Transaction>
 
     @POST("/auth/sign-in")
     suspend fun signIn(@Body body: Credentials): Response<LoginResponseBody>
@@ -56,12 +64,15 @@ interface ApiInterface {
     @GET("/auth/user-information")
     suspend fun getUserInfo(@Header("Authorization") authorizationHeader: String): Response<UserFullDetails>
 
-    @POST("/transactions")
-    suspend fun initTransaction(@Body body: TransactionSession): Response<Transaction>
+    @POST("/transaction")
+    suspend fun initTransaction(
+        @Header("Authorization") authorizationHeader: String,
+        @Body body: TransactionSession
+    ): Response<InitTransaction>
 
     @GET("/transactions/userTransactions/{userId}")
-    suspend fun transactionsByUserID(@Path("userId") userId: String): Response<List<Transaction>>
-
-    @PUT("/transactions/start/{id}")
-    suspend fun startTransaction(@Path("id") id: Int): Response<Transaction>
+    suspend fun transactionsByUserID(
+        @Header("Authorization") authorizationHeader: String,
+        @Path("userId") userId: String
+    ): Response<List<Transaction>>
 }

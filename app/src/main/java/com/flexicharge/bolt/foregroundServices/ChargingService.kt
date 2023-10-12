@@ -30,6 +30,7 @@ class ChargingService : Service() {
     private val notificationBuilder = NotificationCompat.Builder(this, "charging_channel")
     private var isInitial: Boolean = true
     private var timeCalculation = TimeCalculation()
+    private var localAccessToken: String = ""
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -37,10 +38,15 @@ class ChargingService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val sharedPreferencesLogin = getSharedPreferences("loginPreference", Context.MODE_PRIVATE)
         val transactionId = sharedPreferences.getInt("TransactionId", -1)
-        startTime = intent?.getLongExtra("startTime", -1)!!
-        Log.d("TIME", startTime.toString())
-        when (intent.action) {
+        val accessToken = sharedPreferencesLogin.getString(
+            "accessToken",
+            Context.MODE_PRIVATE.toString()
+        )
+        localAccessToken = accessToken!!
+        when (intent?.action) {
+            //  Actions.START.toString() -> start(transactionId)
             Actions.START.toString() -> start(transactionId)
             Actions.STOP.toString() -> {
                 shouldUpdate = false
@@ -55,6 +61,7 @@ class ChargingService : Service() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         CoroutineScope(Dispatchers.IO).launch {
             transactionId = transaction
+
             getDataFromApi(true)
         }
         updateHandler.postDelayed(updatedNotificationTask, 3000)
@@ -74,24 +81,31 @@ class ChargingService : Service() {
 
     private suspend fun getDataFromApi(firstTime: Boolean) {
         try {
-            val response = RetrofitInstance.flexiChargeApi.getTransaction(transactionId)
+            Log.d("EndVerify12", localAccessToken.toString())
+            Log.d("EndVerify12", transactionId.toString())
+            val response = RetrofitInstance.flexiChargeApi.getTransaction(
+                "Bearer $localAccessToken",
+                transactionId
+            )
 
             if (response.isSuccessful) {
+                Log.d("EndVerify12", "Success")
                 val responseData = response.body()
                 val currentTime = System.currentTimeMillis()
-                // val startTime = responseData?.timestamp
+                val startTime = responseData?.startTimestamp
                 val newPercentage = responseData?.currentChargePercentage.toString()
-                val newTime = timeCalculation.checkDuration(startTime, currentTime)
+                val newTime = timeCalculation.checkDuration(startTime!! * 1000, currentTime)
                 val updatedNotification = createNotification(newPercentage, newTime)
                 if (firstTime) {
-                    // StartTime = currentTime
                     startForeground(1, updatedNotification)
                 } else {
                     notificationManager.notify(1, updatedNotification)
                 }
+            } else {
+                Log.d("EndVerify12", "No sucess")
             }
         } catch (e: java.lang.Exception) {
-            Log.d("ChargingServiceError", "Ge transaction api error")
+            Log.d("EndVerify12", "Catch error")
         }
     }
 

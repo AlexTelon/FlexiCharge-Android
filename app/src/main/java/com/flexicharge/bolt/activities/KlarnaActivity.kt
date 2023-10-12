@@ -27,6 +27,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         )
     }
     private val authorizeButton by lazy { findViewById<Button>(R.id.klarnaActivity_button_authorize) }
+
     private var chargerId: Int = 0
     private var klarnaConsumerToken: String = ""
     private var transactionId: Int = 0
@@ -43,7 +44,8 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         chargerId = intent.getIntExtra("ChargerId", 0)
         klarnaConsumerToken = intent.getStringExtra("klarna_consumer_token").toString()
         transactionId = intent.getIntExtra("TransactionId", 0)
-        Log.d("CLIENT_TOKEN", klarnaConsumerToken)
+
+        Log.d("KlarnaTest", klarnaConsumerToken)
 
         initialize()
 
@@ -56,6 +58,7 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
             job = lifecycleScope.launch {
                 try {
                     runOnUiThread {
+                        Log.d("KlarnaTest", " Init")
                         klarnaPaymentView.initialize(
                             klarnaConsumerToken,
                             "${getString(R.string.return_url_scheme)}://${getString(
@@ -64,15 +67,19 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
                         )
                     }
                 } catch (exception: Exception) {
+                    Log.d("KlarnaTest", "catch error init")
                     showError(exception.message)
                 }
             }
         } else {
+            Log.d("KlarnaTest", "init error")
             showError(getString(R.string.error_credentials))
         }
     }
 
     private fun setupButtons() {
+        Log.d("KlarnaTest", "Set up button")
+
         authorizeButton.setOnClickListener {
             klarnaPaymentView.authorize(true, null)
         }
@@ -90,18 +97,22 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
     }
 
     private fun runOnUiThread(action: () -> Unit) {
+        Log.d("KlarnaTest", "Run on UI thread")
+
         lifecycleScope.launch(Dispatchers.Main) {
             action.invoke()
         }
     }
 
     override fun onInitialized(view: KlarnaPaymentView) {
+        Log.d("KlarnaTest", "Load View")
         // load the payment view after its been initialized
 
         view.load(null)
     }
 
     override fun onLoaded(view: KlarnaPaymentView) {
+        Log.d("KlarnaTest", "Loaded View")
         // enable the authorization after the payment view is loaded
         authorizeButton.isEnabled = true
     }
@@ -114,26 +125,37 @@ class KlarnaActivity : AppCompatActivity(), KlarnaPaymentViewCallback {
         authToken: String?,
         finalizedRequired: Boolean?
     ) {
+        Log.d("KlarnaTest", "On auth")
         if (authToken != null) {
             val remoteTransaction = RemoteTransaction(transactionId)
             try {
-                val startTime = System.currentTimeMillis()
-                val startTransactionJob = remoteTransaction.start(lifecycleScope)
+                val sharedPreferencesLogin = getSharedPreferences(
+                    "loginPreference",
+                    Context.MODE_PRIVATE
+                )
+                val accessToken = sharedPreferencesLogin.getString(
+                    "accessToken",
+                    Context.MODE_PRIVATE.toString()
+                )
+                val startTransactionJob = remoteTransaction.start(lifecycleScope, accessToken!!)
+                Log.d("StartVerify", accessToken)
                 val sharedPreferences = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
                 startTransactionJob.invokeOnCompletion {
                     if (!startTransactionJob.isCancelled) {
+                        Log.d("StartVerify", "It wasn't cancelled")
+
                         lifecycleScope.launch(Dispatchers.Main) {
                             sharedPreferences.edit().apply { putInt("TransactionId", transactionId) }.apply()
 
                             Intent(applicationContext, ChargingService::class.java).also {
                                 it.action = ChargingService.Actions.START.toString()
-                                it.putExtra("startTime", startTime)
                                 startService(it)
                             }
 
                             finish()
                         }
                     } else {
+                        Log.d("StartVerify", "It was cancelled")
                         sharedPreferences.edit().apply { putInt("TransactionId", -1) }.apply()
 
                         lifecycleScope.launch(Dispatchers.Main) {

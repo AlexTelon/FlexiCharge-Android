@@ -43,19 +43,16 @@ class StartTransactionTest {
 
         val responseBody = """
             {
-                "chargerID": 1,
-                "klarna_consumer_token": "token1",
+                "transactionID": 1,
+                "connectorID": "55",
                 "currentChargePercentage": 50,
-                "isKlarnaPayment": true,
-                "kwhTransfered": 25.5,
-                "meterStart": 100,
-                "paymentConfirmed": true,
-                "paymentID": "payment1",
-                "pricePerKwh": "0.12",
-                "session_id": "session1",
-                "timestamp": 1633524900,
-                "transactionID": 123,
-                "userID": "123456"
+                "kwhTransferred": 25.5,
+                "pricePerKwh": 100,
+                "price": 7728,
+                "discount": "0",
+                "startTimestamp": "123123123",
+                "endTimestamp": "2223232323",
+
             }
         """.trimIndent()
 
@@ -63,7 +60,8 @@ class StartTransactionTest {
         mockWebServer.enqueue(mockResponse)
 
         // Act:
-        val response = apiService.startTransaction(transactionId)
+        val token = 2222
+        val response = apiService.transactionStart("Bearer $token", transactionId)
 
         // Assert:
         assertNotNull(response)
@@ -71,11 +69,10 @@ class StartTransactionTest {
 
         val startedTransaction = response.body()
         assertNotNull(startedTransaction)
-        assertEquals(123, startedTransaction?.transactionID)
-        assertEquals(1, startedTransaction?.chargerID)
-        assertEquals("token1", startedTransaction?.klarna_consumer_token)
+        assertEquals(7728, startedTransaction?.price)
+        assertEquals(1, startedTransaction?.transactionID)
+        assertEquals("55", startedTransaction?.connectorID)
         assertEquals(50, startedTransaction?.currentChargePercentage)
-        assertTrue(startedTransaction?.isKlarnaPayment ?: false)
     }
 
     @Test
@@ -86,8 +83,8 @@ class StartTransactionTest {
         val mockResponse = createMockResponse(404, "Transaction not found")
         mockWebServer.enqueue(mockResponse)
 
-        // Act:
-        val response = apiService.startTransaction(transactionId)
+        val token = 2222
+        val response = apiService.transactionStart("Bearer $token", transactionId)
 
         // Assert:
         assertNotNull(response)
@@ -105,8 +102,8 @@ class StartTransactionTest {
         val mockResponse = createMockResponse(500, "Internal Server Error")
         mockWebServer.enqueue(mockResponse)
 
-        // Act:
-        val response = apiService.startTransaction(transactionId)
+        val token = 2222
+        val response = apiService.transactionStart("Bearer $token", transactionId)
 
         // Assert:
         assertNotNull(response)
