@@ -41,10 +41,4 @@ class ExampleUnitTest {
         val response = RetrofitInstance.flexiChargeApi.getTransaction("Bearer $accessToken", 1)
         assert(response.isSuccessful)
     }
-
-   /* @Test
-    fun testGetChargePoint() = runBlocking {
-        val response = RetrofitInstance.flexiChargeApi.getChargePoint(100029)
-        assert(response.isSuccessful)
-    }*/
 }
