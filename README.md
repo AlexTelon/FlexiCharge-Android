@@ -7,7 +7,9 @@
 * [RegisterActivity](./Docs/RegisterFeature.md)
 * [Login Feature](./Docs/LoginFeature.md)
 * [Reset Password Feature](./Docs/ResetPasswordFeature.md)
-* [Ktlint (Automatic linter & formatter)](./Docs/KtlintFeature.md)
+* [Ktlint](./Docs/KtlintFeature.md)
+* [Charging process](./Docs/ChargingProcess.md)
+* [Testing strategy](./Docs/TestingStrategy.md)
 
 ## Project Architecture
 
